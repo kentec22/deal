@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal or No Deal - Settings</title>
+    <style>
+        :root {
+            --primary-color: #c41e3a;
+            --secondary-color: #1a1a1a;
+            --accent-color: #ffd700;
+            --light-color: #f5f5f5;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--secondary-color);
+            color: var(--light-color);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .settings-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .music-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        
+        .music-control label {
+            flex: 1;
+            font-weight: bold;
+        }
+        
+        .music-control input[type="file"] {
+            flex: 2;
+            margin-right: 10px;
+        }
+        
+        .music-control button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        
+        .checkbox-group label {
+            margin-right: 5px;
+            font-weight: normal;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .level-settings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .level-input {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .level-input label {
+            font-weight: bold;
+        }
+        
+        .level-input input {
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .action-buttons button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .action-buttons button:hover {
+            background-color: #a0182f;
+        }
+        
+        .debug-section {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: rgba(255, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        
+        .debug-section h3 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+        
+        .debug-section button {
+            padding: 8px 15px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="dodTransparent.png" alt="Deal or No Deal" class="logo">
+            <h1>Game Settings</h1>
+        </div>
+        
+        <div class="settings-section">
+            <h2 class="section-title">Music Settings</h2>
+            
+            <div class="music-control">
+                <label>Intro Music:</label>
+                <input type="file" id="introMusic" accept="audio/*">
+                <button id="previewIntro">Preview</button>
+                <button id="stopIntro">Stop</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="introLoop">
+                    <label for="introLoop">Loop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="introEnabled" checked>
+                    <label for="introEnabled">Enabled</label>
+                </div>
+            </div>
+            
+            <div class="music-control">
+                <label>Selecting Case Music:</label>
+                <input type="file" id="selectCaseMusic" accept="audio/*">
+                <button id="previewSelectCase">Preview</button>
+                <button id="stopSelectCase">Stop</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="selectCaseLoop">
+                    <label for="selectCaseLoop">Loop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="selectCaseEnabled" checked>
+                    <label for="selectCaseEnabled">Enabled</label>
+                </div>
+            </div>
+            
+            <div class="music-control">
+                <label>Offer Music:</label>
+                <input type="file" id="offerMusic" accept="audio/*">
+                <button id="previewOffer">Preview</button>
+                <button id="stopOffer">Stop</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="offerLoop">
+                    <label for="offerLoop">Loop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="offerEnabled" checked>
+                    <label for="offerEnabled">Enabled</label>
+                </div>
+            </div>
+            
+            <div class="music-control">
+                <label>Loop Music:</label>
+                <input type="file" id="loopMusic" accept="audio/*">
+                <button id="previewLoop">Preview</button>
+                <button id="stopLoop">Stop</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="loopMusicLoop">
+                    <label for="loopMusicLoop">Loop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="loopMusicEnabled" checked>
+                    <label for="loopMusicEnabled">Enabled</label>
+                </div>
+            </div>
+            
+            <div class="music-control">
+                <label>Case Reveal Small Amount Music:</label>
+                <input type="file" id="revealSmallMusic" accept="audio/*">
+                <button id="previewRevealSmall">Preview</button>
+                <button id="stopRevealSmall">Stop</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="revealSmallLoop">
+                    <label for="revealSmallLoop">Loop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="revealSmallEnabled" checked>
+                    <label for="revealSmallEnabled">Enabled</label>
+                </div>
+            </div>
+            
+            <div class="music-control">
+                <label>Case Reveal Big Amount Music:</label>
+                <input type="file" id="revealBigMusic" accept="audio/*">
+                <button id="previewRevealBig">Preview</button>
+                <button id="stopRevealBig">Stop</button>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="revealBigLoop">
+                    <label for="revealBigLoop">Loop</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="revealBigEnabled" checked>
+                    <label for="revealBigEnabled">Enabled</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2 class="section-title">Game Settings</h2>
+            
+            <div class="form-group">
+                <label for="companyLogo">Company Logo:</label>
+                <input type="file" id="companyLogo" accept="image/*">
+            </div>
+            
+            <div class="form-group">
+                <label for="playerName">Player Name:</label>
+                <input type="text" id="playerName" placeholder="Enter player name">
+            </div>
+            
+            <div class="form-group">
+                <label for="numCases">Number of Cases:</label>
+                <input type="number" id="numCases" min="1" max="50" value="26">
+            </div>
+            
+            <div class="form-group">
+                <label for="caseAmounts">Amounts for Each Case (comma separated):</label>
+                <textarea id="caseAmounts" rows="4" placeholder="Enter amounts separated by commas">1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 2500000</textarea>
+            </div>
+            
+            <h3>Level Settings</h3>
+            <div class="level-settings">
+                <div class="level-input">
+                    <label for="level1">Level 1 Cases:</label>
+                    <input type="number" id="level1" min="1" max="10" value="6">
+                </div>
+                <div class="level-input">
+                    <label for="level2">Level 2 Cases:</label>
+                    <input type="number" id="level2" min="1" max="10" value="5">
+                </div>
+                <div class="level-input">
+                    <label for="level3">Level 3 Cases:</label>
+                    <input type="number" id="level3" min="1" max="10" value="4">
+                </div>
+                <div class="level-input">
+                    <label for="level4">Level 4 Cases:</label>
+                    <input type="number" id="level4" min="1" max="10" value="3">
+                </div>
+                <div class="level-input">
+                    <label for="level5">Level 5 Cases:</label>
+                    <input type="number" id="level5" min="1" max="10" value="2">
+                </div>
+                <div class="level-input">
+                    <label for="level6">Level 6 Cases:</label>
+                    <input type="number" id="level6" min="1" max="10" value="1">
+                </div>
+                <div class="level-input">
+                    <label for="level7">Level 7 Cases:</label>
+                    <input type="number" id="level7" min="1" max="10" value="1">
+                </div>
+                <div class="level-input">
+                    <label for="level8">Level 8 Cases:</label>
+                    <input type="number" id="level8" min="1" max="10" value="1">
+                </div>
+                <div class="level-input">
+                    <label for="level9">Level 9 Cases:</label>
+                    <input type="number" id="level9" min="1" max="10" value="1">
+                </div>
+                <div class="level-input">
+                    <label for="level10">Level 10 Cases:</label>
+                    <input type="number" id="level10" min="1" max="10" value="1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="saveSettings">Save Settings</button>
+            <button id="exportSettings">Export Settings</button>
+            <button id="importSettings">Import Settings</button>
+            <button id="resetSettings">Reset Settings</button>
+            <button id="proceedToGame">Proceed to Game</button>
+        </div>
+        
+        <div class="debug-section">
+            <h3>Debug Tools</h3>
+            <button id="debugButton">Show Errors</button>
+            <div id="debugOutput" style="margin-top: 10px; font-family: monospace;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Audio objects for preview
+        let currentAudio = null;
+        
+        // Music settings
+        const musicSettings = {
+            intro: { file: null, loop: false, enabled: true },
+            selectCase: { file: null, loop: false, enabled: true },
+            offer: { file: null, loop: false, enabled: true },
+            loop: { file: null, loop: false, enabled: true },
+            revealSmall: { file: null, loop: false, enabled: true },
+            revealBig: { file: null, loop: false, enabled: true }
+        };
+        
+        // Game settings
+        let gameSettings = {
+            companyLogo: null,
+            playerName: "",
+            numCases: 26,
+            caseAmounts: [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 2500000],
+            levels: [6, 5, 4, 3, 2, 1, 1, 1, 1, 1]
+        };
+        
+        // DOM elements
+        const debugOutput = document.getElementById('debugOutput');
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            setupEventListeners();
+        });
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Music file inputs
+            document.getElementById('introMusic').addEventListener('change', handleMusicFileChange);
+            document.getElementById('selectCaseMusic').addEventListener('change', handleMusicFileChange);
+            document.getElementById('offerMusic').addEventListener('change', handleMusicFileChange);
+            document.getElementById('loopMusic').addEventListener('change', handleMusicFileChange);
+            document.getElementById('revealSmallMusic').addEventListener('change', handleMusicFileChange);
+            document.getElementById('revealBigMusic').addEventListener('change', handleMusicFileChange);
+            
+            // Music preview buttons
+            document.getElementById('previewIntro').addEventListener('click', () => previewMusic('intro'));
+            document.getElementById('previewSelectCase').addEventListener('click', () => previewMusic('selectCase'));
+            document.getElementById('previewOffer').addEventListener('click', () => previewMusic('offer'));
+            document.getElementById('previewLoop').addEventListener('click', () => previewMusic('loop'));
+            document.getElementById('previewRevealSmall').addEventListener('click', () => previewMusic('revealSmall'));
+            document.getElementById('previewRevealBig').addEventListener('click', () => previewMusic('revealBig'));
+            
+            // Music stop buttons
+            document.getElementById('stopIntro').addEventListener('click', stopMusic);
+            document.getElementById('stopSelectCase').addEventListener('click', stopMusic);
+            document.getElementById('stopOffer').addEventListener('click', stopMusic);
+            document.getElementById('stopLoop').addEventListener('click', stopMusic);
+            document.getElementById('stopRevealSmall').addEventListener('click', stopMusic);
+            document.getElementById('stopRevealBig').addEventListener('click', stopMusic);
+            
+            // Loop checkboxes
+            document.getElementById('introLoop').addEventListener('change', (e) => musicSettings.intro.loop = e.target.checked);
+            document.getElementById('selectCaseLoop').addEventListener('change', (e) => musicSettings.selectCase.loop = e.target.checked);
+            document.getElementById('offerLoop').addEventListener('change', (e) => musicSettings.offer.loop = e.target.checked);
+            document.getElementById('loopMusicLoop').addEventListener('change', (e) => musicSettings.loop.loop = e.target.checked);
+            document.getElementById('revealSmallLoop').addEventListener('change', (e) => musicSettings.revealSmall.loop = e.target.checked);
+            document.getElementById('revealBigLoop').addEventListener('change', (e) => musicSettings.revealBig.loop = e.target.checked);
+            
+            // Enabled checkboxes
+            document.getElementById('introEnabled').addEventListener('change', (e) => musicSettings.intro.enabled = e.target.checked);
+            document.getElementById('selectCaseEnabled').addEventListener('change', (e) => musicSettings.selectCase.enabled = e.target.checked);
+            document.getElementById('offerEnabled').addEventListener('change', (e) => musicSettings.offer.enabled = e.target.checked);
+            document.getElementById('loopMusicEnabled').addEventListener('change', (e) => musicSettings.loop.enabled = e.target.checked);
+            document.getElementById('revealSmallEnabled').addEventListener('change', (e) => musicSettings.revealSmall.enabled = e.target.checked);
+            document.getElementById('revealBigEnabled').addEventListener('change', (e) => musicSettings.revealBig.enabled = e.target.checked);
+            
+            // Company logo
+            document.getElementById('companyLogo').addEventListener('change', handleLogoChange);
+            
+            // Game settings
+            document.getElementById('playerName').addEventListener('input', (e) => gameSettings.playerName = e.target.value);
+            document.getElementById('numCases').addEventListener('input', (e) => gameSettings.numCases = parseInt(e.target.value));
+            document.getElementById('caseAmounts').addEventListener('input', (e) => {
+                const amounts = e.target.value.split(',').map(amount => parseInt(amount.trim())).filter(amount => !isNaN(amount));
+                if (amounts.length > 0) {
+                    gameSettings.caseAmounts = amounts;
+                }
+            });
+            
+            // Level settings
+            for (let i = 1; i <= 10; i++) {
+                document.getElementById(`level${i}`).addEventListener('input', (e) => {
+                    gameSettings.levels[i-1] = parseInt(e.target.value);
+                });
+            }
+            
+            // Action buttons
+            document.getElementById('saveSettings').addEventListener('click', saveSettings);
+            document.getElementById('exportSettings').addEventListener('click', exportSettings);
+            document.getElementById('importSettings').addEventListener('click', importSettings);
+            document.getElementById('resetSettings').addEventListener('click', resetSettings);
+            document.getElementById('proceedToGame').addEventListener('click', proceedToGame);
+            
+            // Debug button
+            document.getElementById('debugButton').addEventListener('click', showDebugInfo);
+        }
+        
+        // Handle music file change
+        function handleMusicFileChange(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const musicType = e.target.id.replace('Music', '');
+            musicSettings[musicType].file = file;
+            
+            debugOutput.textContent = `Loaded ${musicType} music: ${file.name}`;
+        }
+        
+        // Handle logo change
+        function handleLogoChange(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            gameSettings.companyLogo = file;
+            debugOutput.textContent = `Loaded company logo: ${file.name}`;
+        }
+        
+        // Preview music
+        function previewMusic(type) {
+            stopMusic(); // Stop any currently playing music
+            
+            if (!musicSettings[type].file) {
+                debugOutput.textContent = `No ${type} music file loaded`;
+                return;
+            }
+            
+            const url = URL.createObjectURL(musicSettings[type].file);
+            currentAudio = new Audio(url);
+            currentAudio.loop = musicSettings[type].loop;
+            currentAudio.play().catch(error => {
+                debugOutput.textContent = `Error playing ${type} music: ${error.message}`;
+            });
+            
+            debugOutput.textContent = `Playing ${type} music`;
+        }
+        
+        // Stop music
+        function stopMusic() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+                debugOutput.textContent = 'Music stopped';
+            }
+        }
+        
+        // Save settings
+        function saveSettings() {
+            // Update game settings from form
+            gameSettings.playerName = document.getElementById('playerName').value;
+            gameSettings.numCases = parseInt(document.getElementById('numCases').value);
+            
+            const amountsText = document.getElementById('caseAmounts').value;
+            gameSettings.caseAmounts = amountsText.split(',').map(amount => parseInt(amount.trim())).filter(amount => !isNaN(amount));
+            
+            for (let i = 1; i <= 10; i++) {
+                gameSettings.levels[i-1] = parseInt(document.getElementById(`level${i}`).value);
+            }
+            
+            // Create settings object
+            const settings = {
+                music: musicSettings,
+                game: gameSettings
+            };
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('dealOrNoDealSettings', JSON.stringify(settings));
+                debugOutput.textContent = 'Settings saved successfully';
+            } catch (error) {
+                debugOutput.textContent = `Error saving settings: ${error.message}`;
+            }
+        }
+        
+        // Load settings
+        function loadSettings() {
+            try {
+                const savedSettings = localStorage.getItem('dealOrNoDealSettings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    
+                    // Load music settings
+                    if (settings.music) {
+                        Object.keys(settings.music).forEach(key => {
+                            if (settings.music[key]) {
+                                musicSettings[key] = settings.music[key];
+                                
+                                // Update checkboxes
+                                document.getElementById(`${key}Loop`).checked = settings.music[key].loop || false;
+                                document.getElementById(`${key}Enabled`).checked = settings.music[key].enabled !== false;
+                            }
+                        });
+                    }
+                    
+                    // Load game settings
+                    if (settings.game) {
+                        gameSettings = settings.game;
+                        
+                        // Update form fields
+                        document.getElementById('playerName').value = gameSettings.playerName || '';
+                        document.getElementById('numCases').value = gameSettings.numCases || 26;
+                        document.getElementById('caseAmounts').value = gameSettings.caseAmounts ? gameSettings.caseAmounts.join(', ') : '';
+                        
+                        // Update level settings
+                        for (let i = 1; i <= 10; i++) {
+                            document.getElementById(`level${i}`).value = gameSettings.levels && gameSettings.levels[i-1] ? gameSettings.levels[i-1] : 1;
+                        }
+                    }
+                    
+                    debugOutput.textContent = 'Settings loaded successfully';
+                } else {
+                    debugOutput.textContent = 'No saved settings found, using defaults';
+                }
+            } catch (error) {
+                debugOutput.textContent = `Error loading settings: ${error.message}`;
+            }
+        }
+        
+        // Export settings
+        function exportSettings() {
+            saveSettings(); // Save current settings first
+            
+            try {
+                const settings = localStorage.getItem('dealOrNoDealSettings');
+                if (!settings) {
+                    debugOutput.textContent = 'No settings to export';
+                    return;
+                }
+                
+                const blob = new Blob([settings], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'settings.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                debugOutput.textContent = 'Settings exported successfully';
+            } catch (error) {
+                debugOutput.textContent = `Error exporting settings: ${error.message}`;
+            }
+        }
+        
+        // Import settings
+        function importSettings() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const settings = JSON.parse(event.target.result);
+                        localStorage.setItem('dealOrNoDealSettings', JSON.stringify(settings));
+                        loadSettings();
+                        debugOutput.textContent = 'Settings imported successfully';
+                    } catch (error) {
+                        debugOutput.textContent = `Error importing settings: ${error.message}`;
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // Reset settings
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to default?')) {
+                localStorage.removeItem('dealOrNoDealSettings');
+                
+                // Reset form fields
+                document.getElementById('playerName').value = '';
+                document.getElementById('numCases').value = 26;
+                document.getElementById('caseAmounts').value = '1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 2500000';
+                
+                // Reset level settings
+                const defaultLevels = [6, 5, 4, 3, 2, 1, 1, 1, 1, 1];
+                for (let i = 1; i <= 10; i++) {
+                    document.getElementById(`level${i}`).value = defaultLevels[i-1];
+                }
+                
+                // Reset music settings
+                Object.keys(musicSettings).forEach(key => {
+                    musicSettings[key] = { file: null, loop: false, enabled: true };
+                    document.getElementById(`${key}Loop`).checked = false;
+                    document.getElementById(`${key}Enabled`).checked = true;
+                });
+                
+                // Reset file inputs
+                document.getElementById('introMusic').value = '';
+                document.getElementById('selectCaseMusic').value = '';
+                document.getElementById('offerMusic').value = '';
+                document.getElementById('loopMusic').value = '';
+                document.getElementById('revealSmallMusic').value = '';
+                document.getElementById('revealBigMusic').value = '';
+                document.getElementById('companyLogo').value = '';
+                
+                debugOutput.textContent = 'Settings reset to defaults';
+            }
+        }
+        
+        // Proceed to game
+        function proceedToGame() {
+            saveSettings(); // Save current settings first
+            
+            // Validate settings
+            if (!gameSettings.playerName) {
+                debugOutput.textContent = 'Please enter a player name';
+                return;
+            }
+            
+            if (gameSettings.caseAmounts.length < gameSettings.numCases) {
+                debugOutput.textContent = `Number of cases (${gameSettings.numCases}) exceeds the number of amounts provided (${gameSettings.caseAmounts.length})`;
+                return;
+            }
+            
+            // Open game page
+            window.open('playdod.html', '_blank');
+        }
+        
+        // Show debug info
+        function showDebugInfo() {
+            debugOutput.textContent = JSON.stringify({
+                musicSettings,
+                gameSettings
+            }, null, 2);
+        }
+    </script>
+</body>
+</html>
