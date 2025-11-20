@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal or No Deal - Christmas Edition</title>
+    <style>
+        :root {
+            --primary-color: #c41e3a;
+            --secondary-color: #1a1a1a;
+            --accent-color: #ffd700;
+            --light-color: #f5f5f5;
+            --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --case-color: #8b4513;
+            --amount-bg: rgba(0, 0, 0, 0.3);
+            --modal-bg: #1a1a1a;
+        }
+
+        .christmas-theme {
+            --primary-color: #c41e3a;
+            --secondary-color: #0a3d1f;
+            --accent-color: #ffd700;
+            --light-color: #f5f5f5;
+            --background-gradient: linear-gradient(135deg, #0a3d1f 0%, #1a5c38 100%);
+            --case-color: #8b4513;
+            --amount-bg: rgba(255, 255, 255, 0.1);
+            --modal-bg: #0a3d1f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--background-gradient);
+            color: var(--light-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .logo {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: var(--accent-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-info, .banker-info {
+            flex: 1;
+            text-align: center;
+        }
+
+        .player-info h2, .banker-info h2 {
+            margin-top: 0;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .selected-case {
+            width: 100px;
+            height: 120px;
+            margin: 0 auto;
+            position: relative;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.3s;
+        }
+
+        .selected-case:hover {
+            transform: scale(1.05);
+        }
+
+        .case-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .offer-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 10px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-area {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .cases-container {
+            flex: 3;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .case {
+            width: 100px;
+            height: 120px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s, opacity 0.3s;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .case:hover {
+            transform: scale(1.05);
+        }
+
+        .case-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .amounts-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .amount {
+            padding: 10px;
+            text-align: center;
+            background-color: var(--amount-bg);
+            border-radius: 5px;
+            font-weight: bold;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .amount.revealed {
+            opacity: 0.3;
+            text-decoration: line-through;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .deal-btn, .no-deal-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .deal-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .no-deal-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .deal-btn:hover, .no-deal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .deal-btn:disabled, .no-deal-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--accent-color);
+        }
+
+        .modal h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-gradient);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: background 0.5s ease;
+        }
+
+        .splash-logo {
+            max-width: 400px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .case-opening {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+        }
+
+        .case-opening-content {
+            text-align: center;
+            color: white;
+            background-color: var(--modal-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--accent-color);
+        }
+
+        .opening-case {
+            width: 200px;
+            height: 240px;
+            margin: 0 auto 20px;
+            position: relative;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .revealed-amount {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .debug-section {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: rgba(255, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .debug-section h3 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+
+        .debug-section button {
+            padding: 8px 15px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .music-controls {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .music-controls button {
+            margin: 0;
+            padding: 5px 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .christmas-decoration {
+            position: absolute;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .snowflake {
+            position: absolute;
+            color: white;
+            font-size: 20px;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .holly {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%230a3d1f" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/><circle fill="%23c41e3a" cx="10.5" cy="8.5" r="1.5"/><circle fill="%23c41e3a" cx="13.5" cy="8.5" r="1.5"/></svg>');
+            animation: sway 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes sway {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        .gift-box {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #c41e3a 50%, #0a3d1f 50%);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1080px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .cases-container {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .case {
+                width: 80px;
+                height: 100px;
+            }
+            
+            .selected-case {
+                width: 80px;
+                height: 100px;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <img src="dodTransparent.png" alt="Deal or No Deal" class="splash-logo">
+        <h1 id="welcomeMessage">Welcome, Player!</h1>
+        <button class="start-btn" id="startBtn">START GAME</button>
+    </div>
+    
+    <!-- Case Opening Animation -->
+    <div class="case-opening" id="caseOpening">
+        <div class="case-opening-content">
+            <div class="opening-case" id="openingCase">
+                <div class="case-number" id="openingCaseNumber">1</div>
+            </div>
+            <div class="revealed-amount" id="revealedAmount">₱0</div>
+            <button class="modal-btn" id="closeCaseBtn">CONTINUE</button>
+        </div>
+    </div>
+    
+    <!-- Banker Offer Modal -->
+    <div class="modal" id="offerModal">
+        <div class="modal-content">
+            <h2>BANKER'S OFFER</h2>
+            <p>The banker is making an offer...</p>
+            <div class="offer-amount" id="modalOfferAmount">₱0</div>
+            <p>Will you take the deal?</p>
+            <div class="modal-buttons">
+                <button class="deal-btn" id="modalDealBtn">DEAL</button>
+                <button class="no-deal-btn" id="modalNoDealBtn">NO DEAL</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Over Modal -->
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="gameOverTitle">GAME OVER</h2>
+            <p id="gameOverMessage"></p>
+            <div class="offer-amount" id="finalAmount">₱0</div>
+            <div class="modal-buttons">
+                <button class="modal-btn" id="playAgainBtn">PLAY AGAIN</button>
+                <button class="modal-btn" id="settingsBtn">SETTINGS</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Music Controls -->
+    <div class="music-controls">
+        <button id="stopMusicBtn">Stop Music</button>
+        <button id="testMusicBtn">Test Music</button>
+    </div>
+    
+    <!-- Main Game Container -->
+    <div class="container" id="gameContainer" style="display: none;">
+        <div class="header">
+            <img src="dodTransparent.png" alt="Deal or No Deal" class="logo">
+            <div class="theme-toggle">
+                <span class="toggle-label">Christmas Theme</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="game-info">
+            <div class="player-info">
+                <h2 id="playerNameDisplay">PLAYER NAME</h2>
+                <div class="selected-case" id="selectedCase">
+                    <div class="case-number" id="selectedCaseNumber">?</div>
+                </div>
+            </div>
+            
+            <div class="banker-info">
+                <h2>BANKER'S OFFER</h2>
+                <div class="offer-amount" id="currentOffer">₱0</div>
+                <p>Last offer: <span id="lastOfferAmount">₱0</span></p>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="cases-container" id="casesContainer">
+                <!-- Cases will be generated here -->
+            </div>
+            
+            <div class="amounts-container" id="amountsContainer">
+                <!-- Amounts will be generated here -->
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="deal-btn" id="dealBtn" disabled>DEAL</button>
+            <button class="no-deal-btn" id="noDealBtn" disabled>NO DEAL</button>
+        </div>
+        
+        <div class="footer">
+            <p>CREATED BY KT</p>
+        </div>
+        
+        <div class="debug-section">
+            <h3>Debug Tools</h3>
+            <button id="debugButton">Show Game State</button>
+            <div id="debugOutput" style="margin-top: 10px; font-family: monospace;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Game state
+        let gameState = {
+            playerName: '',
+            selectedCase: null,
+            cases: [],
+            amounts: [],
+            revealedAmounts: [],
+            currentLevel: 0,
+            casesToOpen: 0,
+            totalCases: 0,
+            levels: [],
+            bankerOffer: 0,
+            gameOver: false,
+            musicSettings: {},
+            isChristmasTheme: false
+        };
+        
+        // Audio objects
+        let currentAudio = null;
+        let audioContext = null;
+        
+        // Music storage
+        const musicStorage = {
+            intro: { url: null, audio: null },
+            selectCase: { url: null, audio: null },
+            offer: { url: null, audio: null },
+            loop: { url: null, audio: null },
+            revealSmall: { url: null, audio: null },
+            revealBig: { url: null, audio: null }
+        };
+        
+        // DOM elements
+        const splashScreen = document.getElementById('splashScreen');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const startBtn = document.getElementById('startBtn');
+        const gameContainer = document.getElementById('gameContainer');
+        const playerNameDisplay = document.getElementById('playerNameDisplay');
+        const selectedCase = document.getElementById('selectedCase');
+        const selectedCaseNumber = document.getElementById('selectedCaseNumber');
+        const currentOffer = document.getElementById('currentOffer');
+        const lastOfferAmount = document.getElementById('lastOfferAmount');
+        const casesContainer = document.getElementById('casesContainer');
+        const amountsContainer = document.getElementById('amountsContainer');
+        const dealBtn = document.getElementById('dealBtn');
+        const noDealBtn = document.getElementById('noDealBtn');
+        const offerModal = document.getElementById('offerModal');
+        const modalOfferAmount = document.getElementById('modalOfferAmount');
+        const modalDealBtn = document.getElementById('modalDealBtn');
+        const modalNoDealBtn = document.getElementById('modalNoDealBtn');
+        const gameOverModal = document.getElementById('gameOverModal');
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const finalAmount = document.getElementById('finalAmount');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const caseOpening = document.getElementById('caseOpening');
+        const openingCase = document.getElementById('openingCase');
+        const openingCaseNumber = document.getElementById('openingCaseNumber');
+        const revealedAmount = document.getElementById('revealedAmount');
+        const closeCaseBtn = document.getElementById('closeCaseBtn');
+        const debugOutput = document.getElementById('debugOutput');
+        const debugButton = document.getElementById('debugButton');
+        const stopMusicBtn = document.getElementById('stopMusicBtn');
+        const testMusicBtn = document.getElementById('testMusicBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Initialize the game
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            setupEventListeners();
+            initializeAudio();
+            updateTheme();
+        });
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            startBtn.addEventListener('click', startGame);
+            dealBtn.addEventListener('click', handleDeal);
+            noDealBtn.addEventListener('click', handleNoDeal);
+            modalDealBtn.addEventListener('click', acceptOffer);
+            modalNoDealBtn.addEventListener('click', rejectOffer);
+            playAgainBtn.addEventListener('click', resetGame);
+            settingsBtn.addEventListener('click', () => window.location.href = 'settingsdod.html');
+            closeCaseBtn.addEventListener('click', closeCaseOpening);
+            debugButton.addEventListener('click', showDebugInfo);
+            stopMusicBtn.addEventListener('click', stopMusic);
+            testMusicBtn.addEventListener('click', testMusic);
+            themeToggle.addEventListener('change', toggleTheme);
+        }
+        
+        // Toggle Christmas theme
+        function toggleTheme() {
+            gameState.isChristmasTheme = themeToggle.checked;
+            updateTheme();
+        }
+        
+        // Update theme based on toggle state
+        function updateTheme() {
+            if (gameState.isChristmasTheme) {
+                document.body.classList.add('christmas-theme');
+                addChristmasDecorations();
+            } else {
+                document.body.classList.remove('christmas-theme');
+                removeChristmasDecorations();
+            }
+        }
+        
+        // Add Christmas decorations
+        function addChristmasDecorations() {
+            // Remove any existing decorations first
+            removeChristmasDecorations();
+            
+            // Add snowflakes
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake christmas-decoration';
+                snowflake.innerHTML = '❄';
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+                document.body.appendChild(snowflake);
+            }
+            
+            // Add holly
+            for (let i = 0; i < 10; i++) {
+                const holly = document.createElement('div');
+                holly.className = 'holly christmas-decoration';
+                holly.style.left = Math.random() * 90 + 5 + 'vw';
+                holly.style.top = Math.random() * 90 + 5 + 'vh';
+                holly.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(holly);
+            }
+            
+            // Add gift boxes
+            for (let i = 0; i < 5; i++) {
+                const gift = document.createElement('div');
+                gift.className = 'gift-box christmas-decoration';
+                gift.style.left = Math.random() * 90 + 5 + 'vw';
+                gift.style.top = Math.random() * 90 + 5 + 'vh';
+                gift.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(gift);
+            }
+        }
+        
+        // Remove Christmas decorations
+        function removeChristmasDecorations() {
+            const decorations = document.querySelectorAll('.christmas-decoration');
+            decorations.forEach(deco => deco.remove());
+        }
+        
+        // Initialize audio system
+        function initializeAudio() {
+            try {
+                // Create audio context for better audio control
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                debugOutput.textContent = 'Audio system initialized';
+            } catch (error) {
+                debugOutput.textContent = `Audio context not supported: ${error.message}`;
+            }
+        }
+        
+        // Load settings from localStorage
+        function loadSettings() {
+            try {
+                const savedSettings = localStorage.getItem('dealOrNoDealSettings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    
+                    // Set player name
+                    gameState.playerName = settings.game.playerName || 'Player';
+                    welcomeMessage.textContent = `Welcome, ${gameState.playerName}!`;
+                    
+                    // Set game settings
+                    gameState.totalCases = settings.game.numCases || 26;
+                    gameState.amounts = settings.game.caseAmounts || [1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 2500000];
+                    gameState.levels = settings.game.levels || [6, 5, 4, 3, 2, 1, 1, 1, 1, 1];
+                    
+                    // Set music settings
+                    gameState.musicSettings = settings.music || {};
+                    
+                    // Load music files from localStorage
+                    loadMusicFiles();
+                    
+                    // Load theme preference
+                    const savedTheme = localStorage.getItem('dealOrNoDealTheme');
+                    gameState.isChristmasTheme = savedTheme === 'christmas';
+                    themeToggle.checked = gameState.isChristmasTheme;
+                    
+                    debugOutput.textContent = 'Settings loaded successfully';
+                } else {
+                    debugOutput.textContent = 'No saved settings found';
+                }
+            } catch (error) {
+                debugOutput.textContent = `Error loading settings: ${error.message}`;
+            }
+        }
+        
+        // Load music files from localStorage
+        function loadMusicFiles() {
+            Object.keys(musicStorage).forEach(type => {
+                const musicData = localStorage.getItem(`dealOrNoDealMusic_${type}`);
+                if (musicData) {
+                    try {
+                        const musicObj = JSON.parse(musicData);
+                        musicStorage[type].url = musicObj.url;
+                        debugOutput.textContent += `\nLoaded ${type} music`;
+                    } catch (error) {
+                        debugOutput.textContent += `\nError loading ${type} music: ${error.message}`;
+                    }
+                }
+            });
+        }
+        
+        // Start the game
+        function startGame() {
+            // Play intro music if enabled
+            playMusic('intro');
+            
+            // Hide splash screen
+            splashScreen.style.display = 'none';
+            
+            // Show game container
+            gameContainer.style.display = 'block';
+            
+            // Initialize game state
+            initializeGame();
+            
+            // Animate cases and amounts
+            animateGameElements();
+        }
+        
+        // Initialize game state
+        function initializeGame() {
+            // Reset game state
+            gameState.selectedCase = null;
+            gameState.cases = [];
+            gameState.revealedAmounts = [];
+            gameState.currentLevel = 0;
+            gameState.casesToOpen = gameState.levels[0];
+            gameState.bankerOffer = 0;
+            gameState.gameOver = false;
+            
+            // Set player name
+            playerNameDisplay.textContent = gameState.playerName.toUpperCase();
+            
+            // Create cases
+            for (let i = 1; i <= gameState.totalCases; i++) {
+                gameState.cases.push({
+                    number: i,
+                    amount: gameState.amounts[i-1],
+                    opened: false,
+                    element: null
+                });
+            }
+            
+            // Shuffle amounts
+            shuffleArray(gameState.amounts);
+            
+            // Assign amounts to cases
+            for (let i = 0; i < gameState.totalCases; i++) {
+                gameState.cases[i].amount = gameState.amounts[i];
+            }
+            
+            // Render cases
+            renderCases();
+            
+            // Render amounts
+            renderAmounts();
+            
+            // Disable deal/no deal buttons initially
+            dealBtn.disabled = true;
+            noDealBtn.disabled = true;
+        }
+        
+        // Render cases
+        function renderCases() {
+            casesContainer.innerHTML = '';
+            
+            gameState.cases.forEach((caseObj, index) => {
+                const caseElement = document.createElement('div');
+                caseElement.className = 'case';
+                caseElement.style.backgroundImage = 'url("suitcase.png")';
+                caseElement.dataset.index = index;
+                
+                const caseNumber = document.createElement('div');
+                caseNumber.className = 'case-number';
+                caseNumber.textContent = caseObj.number;
+                
+                caseElement.appendChild(caseNumber);
+                caseElement.addEventListener('click', () => selectCase(index));
+                
+                casesContainer.appendChild(caseElement);
+                caseObj.element = caseElement;
+            });
+        }
+        
+        // Render amounts
+        function renderAmounts() {
+            amountsContainer.innerHTML = '';
+            
+            // Sort amounts for display
+            const sortedAmounts = [...gameState.amounts].sort((a, b) => a - b);
+            
+            sortedAmounts.forEach(amount => {
+                const amountElement = document.createElement('div');
+                amountElement.className = 'amount';
+                amountElement.textContent = formatCurrency(amount);
+                amountElement.dataset.amount = amount;
+                
+                amountsContainer.appendChild(amountElement);
+            });
+        }
+        
+        // Select a case
+        function selectCase(index) {
+            if (gameState.gameOver) return;
+            
+            const caseObj = gameState.cases[index];
+            
+            // If no case is selected yet, select this case
+            if (gameState.selectedCase === null) {
+                // Play selecting case music
+                playMusic('selectCase');
+                
+                gameState.selectedCase = caseObj;
+                selectedCase.style.backgroundImage = 'url("suitcase.png")';
+                selectedCaseNumber.textContent = caseObj.number;
+                
+                // Remove case from board
+                caseObj.element.style.opacity = '0';
+                setTimeout(() => {
+                    caseObj.element.style.display = 'none';
+                }, 300);
+                
+                debugOutput.textContent = `Case ${caseObj.number} selected`;
+                return;
+            }
+            
+            // If a case is already selected, open this case
+            if (!caseObj.opened && gameState.casesToOpen > 0) {
+                openCase(index);
+            }
+        }
+        
+        // Open a case
+        function openCase(index) {
+            const caseObj = gameState.cases[index];
+            if (caseObj.opened || caseObj === gameState.selectedCase) return;
+            
+            // Play appropriate reveal music
+            const isSmallAmount = caseObj.amount < 100000;
+            playMusic(isSmallAmount ? 'revealSmall' : 'revealBig');
+            
+            // Update game state
+            caseObj.opened = true;
+            gameState.revealedAmounts.push(caseObj.amount);
+            gameState.casesToOpen--;
+            
+            // Show case opening animation
+            showCaseOpening(caseObj);
+            
+            // Update amounts display
+            updateAmountsDisplay();
+            
+            // Check if level is complete
+            if (gameState.casesToOpen === 0) {
+                setTimeout(() => {
+                    makeBankerOffer();
+                }, 1000);
+            }
+            
+            debugOutput.textContent = `Case ${caseObj.number} opened: ${formatCurrency(caseObj.amount)}`;
+        }
+        
+        // Show case opening animation
+        function showCaseOpening(caseObj) {
+            openingCase.style.backgroundImage = 'url("suitcase.png")';
+            openingCaseNumber.textContent = caseObj.number;
+            revealedAmount.textContent = formatCurrency(caseObj.amount);
+            
+            caseOpening.style.display = 'flex';
+        }
+        
+        // Close case opening animation
+        function closeCaseOpening() {
+            caseOpening.style.display = 'none';
+            
+            // Remove case from board
+            const caseIndex = gameState.cases.findIndex(c => c.number === parseInt(openingCaseNumber.textContent));
+            if (caseIndex !== -1) {
+                gameState.cases[caseIndex].element.style.opacity = '0';
+                setTimeout(() => {
+                    gameState.cases[caseIndex].element.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Update amounts display
+        function updateAmountsDisplay() {
+            const amountElements = amountsContainer.querySelectorAll('.amount');
+            
+            amountElements.forEach(element => {
+                const amount = parseInt(element.dataset.amount);
+                if (gameState.revealedAmounts.includes(amount)) {
+                    element.classList.add('revealed');
+                }
+            });
+        }
+        
+        // Make banker offer
+        function makeBankerOffer() {
+            // Play offer music
+            playMusic('offer');
+            
+            // Calculate banker's offer (simplified calculation)
+            const remainingAmounts = gameState.amounts.filter(amount => 
+                !gameState.revealedAmounts.includes(amount) && 
+                amount !== (gameState.selectedCase ? gameState.selectedCase.amount : null)
+            );
+            
+            const average = remainingAmounts.reduce((sum, amount) => sum + amount, 0) / remainingAmounts.length;
+            const offer = Math.round(average * (0.7 + Math.random() * 0.3)); // Random factor between 70% and 100% of average
+            
+            gameState.bankerOffer = offer;
+            currentOffer.textContent = formatCurrency(offer);
+            lastOfferAmount.textContent = formatCurrency(offer);
+            
+            // Show offer modal
+            modalOfferAmount.textContent = formatCurrency(offer);
+            offerModal.style.display = 'flex';
+            
+            // Enable deal/no deal buttons
+            dealBtn.disabled = false;
+            noDealBtn.disabled = false;
+            
+            debugOutput.textContent = `Banker's offer: ${formatCurrency(offer)}`;
+        }
+        
+        // Handle deal
+        function handleDeal() {
+            acceptOffer();
+        }
+        
+        // Handle no deal
+        function handleNoDeal() {
+            rejectOffer();
+        }
+        
+        // Accept banker's offer
+        function acceptOffer() {
+            // Play intro music
+            playMusic('intro');
+            
+            gameState.gameOver = true;
+            offerModal.style.display = 'none';
+            
+            // Show game over modal
+            gameOverTitle.textContent = 'DEAL!';
+            gameOverMessage.textContent = `You accepted the banker's offer of`;
+            finalAmount.textContent = formatCurrency(gameState.bankerOffer);
+            gameOverModal.style.display = 'flex';
+            
+            debugOutput.textContent = `Deal accepted: ${formatCurrency(gameState.bankerOffer)}`;
+        }
+        
+        // Reject banker's offer
+        function rejectOffer() {
+            // Play loop music
+            playMusic('loop');
+            
+            offerModal.style.display = 'none';
+            
+            // Move to next level
+            gameState.currentLevel++;
+            
+            if (gameState.currentLevel < gameState.levels.length) {
+                gameState.casesToOpen = gameState.levels[gameState.currentLevel];
+                debugOutput.textContent = `Moving to level ${gameState.currentLevel + 1}, cases to open: ${gameState.casesToOpen}`;
+            } else {
+                // Game over - reveal selected case
+                revealSelectedCase();
+            }
+            
+            // Disable deal/no deal buttons until next offer
+            dealBtn.disabled = true;
+            noDealBtn.disabled = true;
+        }
+        
+        // Reveal selected case
+        function revealSelectedCase() {
+            if (!gameState.selectedCase) return;
+            
+            // Play appropriate reveal music
+            const isSmallAmount = gameState.selectedCase.amount < 100000;
+            playMusic(isSmallAmount ? 'revealSmall' : 'revealBig');
+            
+            gameState.gameOver = true;
+            
+            // Show case opening for selected case
+            openingCase.style.backgroundImage = 'url("suitcase.png")';
+            openingCaseNumber.textContent = gameState.selectedCase.number;
+            revealedAmount.textContent = formatCurrency(gameState.selectedCase.amount);
+            
+            caseOpening.style.display = 'flex';
+            
+            // Change close button text
+            closeCaseBtn.textContent = 'SEE RESULT';
+            
+            // When case is closed, show game over modal
+            closeCaseBtn.onclick = () => {
+                caseOpening.style.display = 'none';
+                
+                gameOverTitle.textContent = 'GAME OVER';
+                gameOverMessage.textContent = `Your case contained`;
+                finalAmount.textContent = formatCurrency(gameState.selectedCase.amount);
+                gameOverModal.style.display = 'flex';
+                
+                debugOutput.textContent = `Game over. Selected case amount: ${formatCurrency(gameState.selectedCase.amount)}`;
+            };
+        }
+        
+        // Reset game
+        function resetGame() {
+            gameOverModal.style.display = 'none';
+            splashScreen.style.display = 'flex';
+            initializeGame();
+        }
+        
+        // Play music
+        function playMusic(type) {
+            // Stop any currently playing music
+            stopMusic();
+            
+            const musicSetting = gameState.musicSettings[type];
+            if (!musicSetting || !musicSetting.enabled) {
+                debugOutput.textContent = `${type} music is disabled`;
+                return;
+            }
+            
+            // Check if we have a URL for this music
+            if (!musicStorage[type].url) {
+                debugOutput.textContent = `No ${type} music file available`;
+                return;
+            }
+            
+            try {
+                // Create new audio element
+                currentAudio = new Audio(musicStorage[type].url);
+                currentAudio.loop = musicSetting.loop || false;
+                
+                // Play the audio
+                currentAudio.play().then(() => {
+                    debugOutput.textContent = `Playing ${type} music`;
+                }).catch(error => {
+                    debugOutput.textContent = `Error playing ${type} music: ${error.message}`;
+                });
+                
+                // Store reference
+                musicStorage[type].audio = currentAudio;
+            } catch (error) {
+                debugOutput.textContent = `Error creating audio for ${type}: ${error.message}`;
+            }
+        }
+        
+        // Stop music
+        function stopMusic() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+            
+            // Also stop all stored audio
+            Object.keys(musicStorage).forEach(type => {
+                if (musicStorage[type].audio) {
+                    musicStorage[type].audio.pause();
+                    musicStorage[type].audio.currentTime = 0;
+                }
+            });
+            
+            debugOutput.textContent = 'All music stopped';
+        }
+        
+        // Test music functionality
+        function testMusic() {
+            debugOutput.textContent = 'Testing music functionality:\n';
+            
+            Object.keys(musicStorage).forEach(type => {
+                const musicSetting = gameState.musicSettings[type];
+                if (musicSetting && musicSetting.enabled && musicStorage[type].url) {
+                    debugOutput.textContent += `✓ ${type} music: Enabled and loaded\n`;
+                } else if (musicSetting && musicSetting.enabled) {
+                    debugOutput.textContent += `✗ ${type} music: Enabled but not loaded\n`;
+                } else {
+                    debugOutput.textContent += `- ${type} music: Disabled\n`;
+                }
+            });
+            
+            // Test playing a short sound
+            try {
+                const testAudio = new Audio();
+                testAudio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyymsqBjiM0/LMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyymsqBjiM0/LMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyymsqBjiM0/LMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyymsqBjiM0/LMeSsFJHfH8N2QQAo=';
+                testAudio.play().then(() => {
+                    debugOutput.textContent += '\n✓ Audio test: Success';
+                }).catch(e => {
+                    debugOutput.textContent += `\n✗ Audio test: Failed - ${e.message}`;
+                });
+            } catch (error) {
+                debugOutput.textContent += `\n✗ Audio test: Error - ${error.message}`;
+            }
+        }
+        
+        // Animate game elements
+        function animateGameElements() {
+            const cases = casesContainer.querySelectorAll('.case');
+            const amounts = amountsContainer.querySelectorAll('.amount');
+            
+            cases.forEach((caseElement, index) => {
+                caseElement.style.opacity = '0';
+                caseElement.style.transform = 'scale(0)';
+                
+                setTimeout(() => {
+                    caseElement.style.transition = 'opacity 0.5s, transform 0.5s';
+                    caseElement.style.opacity = '1';
+                    caseElement.style.transform = 'scale(1)';
+                }, index * 100);
+            });
+            
+            amounts.forEach((amountElement, index) => {
+                amountElement.style.opacity = '0';
+                
+                setTimeout(() => {
+                    amountElement.style.transition = 'opacity 0.5s';
+                    amountElement.style.opacity = '1';
+                }, index * 50);
+            });
+        }
+        
+        // Format currency (Philippine Peso)
+        function formatCurrency(amount) {
+            return '₱' + amount.toLocaleString('en-PH');
+        }
+        
+        // Shuffle array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Show debug info
+        function showDebugInfo() {
+            debugOutput.textContent = JSON.stringify(gameState, null, 2);
+        }
+    </script>
+</body>
+</html>
