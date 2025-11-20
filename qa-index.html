@@ -158,6 +158,11 @@
             color: white;
         }
 
+        .btn-info {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -261,6 +266,29 @@
             padding: 10px;
             border-radius: 5px;
             text-align: center;
+        }
+
+        .music-status {
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-loaded {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-default {
+            background: #2196F3;
+            color: white;
+        }
+
+        .status-missing {
+            background: #ff9800;
+            color: black;
         }
 
         @media (max-width: 768px) {
@@ -375,6 +403,7 @@
                 <button class="btn btn-warning" onclick="resetSettings()">Reset to Defaults</button>
                 <button class="btn btn-secondary" onclick="saveSettings()">Save Settings</button>
                 <button class="btn btn-primary" onclick="startGame()">Proceed to Game</button>
+                <button class="btn btn-info" onclick="testAllAudio()">Test All Audio</button>
             </div>
         </div>
 
@@ -386,15 +415,57 @@
     </div>
 
     <script>
+        // Default audio file names
+        const defaultAudioFiles = {
+            intro: '1-intro.mp3',
+            selectCase: '2-case.mp3',
+            offer: '3-offer.mp3',
+            loop: '4-loop.mp3',
+            revealSmall: '5-smallcase.mp3',
+            revealBig: '6-bigcase.mp3',
+            win: '5-smallcase.mp3', // Using smallcase for win
+            lose: '6-bigcase.mp3'   // Using bigcase for lose
+        };
+
         // Audio Controller Class
         class AudioController {
             constructor() {
                 this.currentAudio = null;
                 this.audioTracks = new Map();
                 this.enabledTracks = new Set();
+                this.defaultFilesLoaded = new Set();
             }
             
-            async loadTrack(name, file) {
+            async loadDefaultTrack(name) {
+                return new Promise((resolve) => {
+                    const fileName = defaultAudioFiles[name];
+                    if (!fileName) {
+                        resolve(false);
+                        return;
+                    }
+                    
+                    const audio = new Audio(fileName);
+                    audio.onloadeddata = () => {
+                        this.audioTracks.set(name, audio);
+                        this.defaultFilesLoaded.add(name);
+                        resolve(true);
+                    };
+                    audio.onerror = () => {
+                        debugLog(`Failed to load default audio: ${fileName}`);
+                        resolve(false);
+                    };
+                    
+                    // Set a timeout in case the file doesn't exist
+                    setTimeout(() => {
+                        if (!this.defaultFilesLoaded.has(name)) {
+                            debugLog(`Timeout loading default audio: ${fileName}`);
+                            resolve(false);
+                        }
+                    }, 3000);
+                });
+            }
+            
+            async loadCustomTrack(name, file) {
                 return new Promise((resolve) => {
                     if (!file) {
                         resolve(false);
@@ -407,7 +478,7 @@
                         resolve(true);
                     };
                     audio.onerror = () => {
-                        debugLog(`Failed to load audio: ${name}`);
+                        debugLog(`Failed to load custom audio: ${name}`);
                         resolve(false);
                     };
                 });
@@ -419,10 +490,17 @@
                 if (this.audioTracks.has(trackName) && this.enabledTracks.has(trackName)) {
                     this.currentAudio = this.audioTracks.get(trackName);
                     this.currentAudio.loop = loop;
-                    this.currentAudio.play().catch(e => {
-                        debugLog(`Play error for ${trackName}: ${e.message}`);
-                    });
+                    this.currentAudio.currentTime = 0;
+                    
+                    const playPromise = this.currentAudio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(e => {
+                            debugLog(`Play error for ${trackName}: ${e.message}`);
+                        });
+                    }
                     debugLog(`Playing: ${trackName} ${loop ? '(looping)' : ''}`);
+                } else {
+                    debugLog(`Cannot play: ${trackName} - ${!this.audioTracks.has(trackName) ? 'not loaded' : 'disabled'}`);
                 }
             }
             
@@ -443,7 +521,15 @@
             }
             
             preview(trackName) {
-                this.play(trackName, false);
+                const loop = document.getElementById(`${trackName}Loop`).checked;
+                this.play(trackName, loop);
+            }
+            
+            getStatus(trackName) {
+                if (this.audioTracks.has(trackName)) {
+                    return this.defaultFilesLoaded.has(trackName) ? 'default' : 'loaded';
+                }
+                return 'missing';
             }
         }
 
@@ -452,14 +538,14 @@
 
         // Music configuration
         const musicTypes = [
-            { id: 'intro', label: 'Intro Music', loop: false },
-            { id: 'selectCase', label: 'Select Case Music', loop: false },
-            { id: 'offer', label: 'Offer Music', loop: false },
-            { id: 'loop', label: 'Loop Music', loop: true },
-            { id: 'revealSmall', label: 'Reveal Small Amount', loop: false },
-            { id: 'revealBig', label: 'Reveal Big Amount', loop: false },
-            { id: 'win', label: 'Win Music', loop: false },
-            { id: 'lose', label: 'Lose Music', loop: false }
+            { id: 'intro', label: 'Intro Music', loop: false, defaultFile: '1-intro.mp3' },
+            { id: 'selectCase', label: 'Select Case Music', loop: false, defaultFile: '2-case.mp3' },
+            { id: 'offer', label: 'Offer Music', loop: false, defaultFile: '3-offer.mp3' },
+            { id: 'loop', label: 'Loop Music', loop: true, defaultFile: '4-loop.mp3' },
+            { id: 'revealSmall', label: 'Reveal Small Amount', loop: false, defaultFile: '5-smallcase.mp3' },
+            { id: 'revealBig', label: 'Reveal Big Amount', loop: false, defaultFile: '6-bigcase.mp3' },
+            { id: 'win', label: 'Win Music', loop: false, defaultFile: '5-smallcase.mp3' },
+            { id: 'lose', label: 'Lose Music', loop: false, defaultFile: '6-bigcase.mp3' }
         ];
 
         // Christmas theme elements
@@ -534,10 +620,14 @@
                             <span>Enabled</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="${music.id}Enabled" checked 
-                                    onchange="audioController.setEnabled('${music.id}', this.checked)">
+                                    onchange="audioController.setEnabled('${music.id}', this.checked); updateMusicStatus('${music.id}')">
                                 <span class="slider"></span>
                             </label>
                         </div>
+                    </div>
+                    <div>
+                        <small>Default: ${music.defaultFile}</small>
+                        <div id="${music.id}Status" class="music-status status-missing">Checking...</div>
                     </div>
                     <input type="file" id="${music.id}File" accept="audio/*" 
                         onchange="handleMusicUpload('${music.id}', this.files[0])">
@@ -557,14 +647,65 @@
             });
         }
 
+        // Update music status display
+        function updateMusicStatus(trackName) {
+            const statusElement = document.getElementById(`${trackName}Status`);
+            const status = audioController.getStatus(trackName);
+            const enabled = document.getElementById(`${trackName}Enabled`).checked;
+            
+            let statusText = '';
+            let statusClass = '';
+            
+            switch(status) {
+                case 'default':
+                    statusText = 'Default file loaded';
+                    statusClass = 'status-default';
+                    break;
+                case 'loaded':
+                    statusText = 'Custom file loaded';
+                    statusClass = 'status-loaded';
+                    break;
+                case 'missing':
+                    statusText = 'File missing';
+                    statusClass = 'status-missing';
+                    break;
+            }
+            
+            if (!enabled) {
+                statusText += ' (Disabled)';
+                statusClass = 'status-missing';
+            }
+            
+            statusElement.textContent = statusText;
+            statusElement.className = `music-status ${statusClass}`;
+        }
+
         // Handle music file upload
         async function handleMusicUpload(type, file) {
             if (file) {
-                const success = await audioController.loadTrack(type, file);
+                const success = await audioController.loadCustomTrack(type, file);
                 if (success) {
-                    debugLog(`Loaded audio: ${type}`);
+                    debugLog(`Loaded custom audio: ${type}`);
+                    updateMusicStatus(type);
                 }
             }
+        }
+
+        // Load all default audio files
+        async function loadDefaultAudioFiles() {
+            debugLog('Loading default audio files...');
+            
+            for (const music of musicTypes) {
+                const success = await audioController.loadDefaultTrack(music.id);
+                if (success) {
+                    debugLog(`✓ Loaded default: ${music.defaultFile}`);
+                } else {
+                    debugLog(`✗ Missing: ${music.defaultFile}`);
+                }
+                updateMusicStatus(music.id);
+            }
+            
+            debugLog('Default audio loading completed');
         }
 
         // Initialize level configuration
@@ -584,6 +725,25 @@
             }
         }
 
+        // Test all audio files
+        async function testAllAudio() {
+            debugLog('Testing all audio files...');
+            audioController.stop();
+            
+            for (const music of musicTypes) {
+                if (document.getElementById(`${music.id}Enabled`).checked) {
+                    debugLog(`Testing: ${music.label}`);
+                    audioController.play(music.id, false);
+                    
+                    // Wait for 2 seconds before next test
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    audioController.stop();
+                }
+            }
+            
+            debugLog('Audio testing completed');
+        }
+
         // Settings management
         function exportSettings() {
             const settings = {
@@ -592,13 +752,22 @@
                 smallAmounts: document.getElementById('smallAmounts').value,
                 bigAmounts: document.getElementById('bigAmounts').value,
                 levels: {},
-                christmasTheme: document.getElementById('christmasToggle').checked
+                christmasTheme: document.getElementById('christmasToggle').checked,
+                musicSettings: {}
             };
             
             // Get level configurations
             for (let i = 1; i <= 10; i++) {
                 settings.levels[i] = document.getElementById(`level${i}`).value;
             }
+            
+            // Get music settings
+            musicTypes.forEach(music => {
+                settings.musicSettings[music.id] = {
+                    enabled: document.getElementById(`${music.id}Enabled`).checked,
+                    loop: document.getElementById(`${music.id}Loop`).checked
+                };
+            });
             
             // Create and download settings file
             const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
@@ -650,6 +819,19 @@
                 }
             }
             
+            // Load music settings
+            if (settings.musicSettings) {
+                musicTypes.forEach(music => {
+                    const musicSettings = settings.musicSettings[music.id];
+                    if (musicSettings) {
+                        document.getElementById(`${music.id}Enabled`).checked = musicSettings.enabled;
+                        document.getElementById(`${music.id}Loop`).checked = musicSettings.loop;
+                        audioController.setEnabled(music.id, musicSettings.enabled);
+                        updateMusicStatus(music.id);
+                    }
+                });
+            }
+            
             initChristmasTheme();
         }
 
@@ -670,6 +852,8 @@
                 musicTypes.forEach(music => {
                     document.getElementById(`${music.id}Enabled`).checked = true;
                     document.getElementById(`${music.id}Loop`).checked = music.loop;
+                    audioController.setEnabled(music.id, true);
+                    updateMusicStatus(music.id);
                 });
                 
                 audioController.stop();
@@ -686,12 +870,20 @@
                 bigAmounts: document.getElementById('bigAmounts').value,
                 levels: {},
                 christmasTheme: document.getElementById('christmasToggle').checked,
+                musicSettings: {},
                 timestamp: new Date().toISOString()
             };
             
             for (let i = 1; i <= 10; i++) {
                 settings.levels[i] = document.getElementById(`level${i}`).value;
             }
+            
+            musicTypes.forEach(music => {
+                settings.musicSettings[music.id] = {
+                    enabled: document.getElementById(`${music.id}Enabled`).checked,
+                    loop: document.getElementById(`${music.id}Loop`).checked
+                };
+            });
             
             localStorage.setItem('dealOrNoDealSettings', JSON.stringify(settings));
             debugLog('Settings saved to browser storage');
@@ -732,9 +924,10 @@
         }
 
         // Initialize everything when page loads
-        window.onload = function() {
+        window.onload = async function() {
             initMusicControls();
             initLevelConfig();
+            await loadDefaultAudioFiles();
             loadSavedSettings();
             initChristmasTheme();
             
@@ -743,28 +936,10 @@
             
             debugLog('System initialized successfully');
             
-            // Test audio functionality
-            setTimeout(() => {
-                let audioTest = true;
-                musicTypes.forEach(music => {
-                    const enabled = document.getElementById(`${music.id}Enabled`).checked;
-                    if (enabled) {
-                        debugLog(`✓ ${music.label}: Enabled`);
-                    } else {
-                        debugLog(`✗ ${music.label}: Disabled`);
-                    }
-                });
-                
-                // Test audio context
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    const audioContext = new AudioContext();
-                    debugLog('✓ Audio test: Success');
-                    audioContext.close();
-                } catch (e) {
-                    debugLog('✗ Audio test: Failed - ' + e.message);
-                }
-            }, 1000);
+            // Update all music status displays
+            musicTypes.forEach(music => {
+                updateMusicStatus(music.id);
+            });
         };
     </script>
 </body>
