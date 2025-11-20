@@ -1,1 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal or No Deal - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100vw;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            border: 3px solid gold;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo-placeholder {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed gold;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .settings-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #ffd700;
+        }
+
+        .section-title {
+            color: gold;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-align: center;
+            border-bottom: 2px solid gold;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: gold;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid gold;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .music-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .music-item {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid gold;
+        }
+
+        .music-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .music-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: black;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .christmas-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 2px solid red;
+        }
+
+        .debug-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-title {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .level-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .level-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .music-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Christmas Theme Elements */
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .christmas-decoration {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: red;
+            border-radius: 50%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Christmas Theme Toggle -->
+        <div class="christmas-toggle">
+            <span>🎄 Christmas Theme</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="christmasToggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo-placeholder" id="companyLogo">
+                    Upload Company Logo
+                </div>
+                <h1>DEAL OR NO DEAL</h1>
+                <div class="logo-placeholder">
+                    dodTransparent.png
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Settings -->
+        <div class="settings-panel">
+            <h2 class="section-title">Game Settings</h2>
+            
+            <div class="form-group">
+                <label for="playerName">Player Name</label>
+                <input type="text" id="playerName" placeholder="Enter player name">
+            </div>
+
+            <div class="form-group">
+                <label for="numCases">Number of Cases (1-26)</label>
+                <input type="number" id="numCases" min="1" max="26" value="20">
+            </div>
+
+            <div class="form-group">
+                <label for="smallAmounts">Small Amounts (comma separated)</label>
+                <textarea id="smallAmounts" placeholder="100,200,300,400,500,750,1000,1500,2000,2500">100,200,300,400,500,750,1000,1500,2000,2500</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="bigAmounts">Big Amounts (comma separated)</label>
+                <textarea id="bigAmounts" placeholder="5000,7500,10000,15000,20000,25000,50000,75000,100000,250000">5000,7500,10000,15000,20000,25000,50000,75000,100000,250000</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Level Configuration (Cases to open per level)</label>
+                <div class="level-config" id="levelConfig">
+                    <!-- Levels will be generated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Settings -->
+        <div class="settings-panel">
+            <h2 class="section-title">Music Settings</h2>
+            <div class="music-controls" id="musicControls">
+                <!-- Music items will be generated dynamically -->
+            </div>
+        </div>
+
+        <!-- Settings Management -->
+        <div class="settings-panel">
+            <h2 class="section-title">Settings Management</h2>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="exportSettings()">Export Settings</button>
+                <button class="btn btn-secondary" onclick="importSettings()">Import Settings</button>
+                <button class="btn btn-warning" onclick="resetSettings()">Reset to Defaults</button>
+                <button class="btn btn-secondary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn btn-primary" onclick="startGame()">Proceed to Game</button>
+            </div>
+        </div>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel">
+            <div class="debug-title">Debug Information</div>
+            <div id="debugInfo">System ready...</div>
+        </div>
+    </div>
+
+    <script>
+        // Audio Controller Class
+        class AudioController {
+            constructor() {
+                this.currentAudio = null;
+                this.audioTracks = new Map();
+                this.enabledTracks = new Set();
+            }
+            
+            async loadTrack(name, file) {
+                return new Promise((resolve) => {
+                    if (!file) {
+                        resolve(false);
+                        return;
+                    }
+                    
+                    const audio = new Audio(URL.createObjectURL(file));
+                    audio.onloadeddata = () => {
+                        this.audioTracks.set(name, audio);
+                        resolve(true);
+                    };
+                    audio.onerror = () => {
+                        debugLog(`Failed to load audio: ${name}`);
+                        resolve(false);
+                    };
+                });
+            }
+            
+            play(trackName, loop = false) {
+                this.stop();
+                
+                if (this.audioTracks.has(trackName) && this.enabledTracks.has(trackName)) {
+                    this.currentAudio = this.audioTracks.get(trackName);
+                    this.currentAudio.loop = loop;
+                    this.currentAudio.play().catch(e => {
+                        debugLog(`Play error for ${trackName}: ${e.message}`);
+                    });
+                    debugLog(`Playing: ${trackName} ${loop ? '(looping)' : ''}`);
+                }
+            }
+            
+            stop() {
+                if (this.currentAudio) {
+                    this.currentAudio.pause();
+                    this.currentAudio.currentTime = 0;
+                    this.currentAudio = null;
+                }
+            }
+            
+            setEnabled(trackName, enabled) {
+                if (enabled) {
+                    this.enabledTracks.add(trackName);
+                } else {
+                    this.enabledTracks.delete(trackName);
+                }
+            }
+            
+            preview(trackName) {
+                this.play(trackName, false);
+            }
+        }
+
+        // Global audio controller
+        const audioController = new AudioController();
+
+        // Music configuration
+        const musicTypes = [
+            { id: 'intro', label: 'Intro Music', loop: false },
+            { id: 'selectCase', label: 'Select Case Music', loop: false },
+            { id: 'offer', label: 'Offer Music', loop: false },
+            { id: 'loop', label: 'Loop Music', loop: true },
+            { id: 'revealSmall', label: 'Reveal Small Amount', loop: false },
+            { id: 'revealBig', label: 'Reveal Big Amount', loop: false },
+            { id: 'win', label: 'Win Music', loop: false },
+            { id: 'lose', label: 'Lose Music', loop: false }
+        ];
+
+        // Christmas theme elements
+        let snowInterval;
+
+        function initChristmasTheme() {
+            if (document.getElementById('christmasToggle').checked) {
+                startSnowfall();
+                addDecorations();
+                document.body.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)';
+            } else {
+                stopSnowfall();
+                removeDecorations();
+                document.body.style.background = 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)';
+            }
+        }
+
+        function startSnowfall() {
+            stopSnowfall();
+            snowInterval = setInterval(() => {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.innerHTML = '❄';
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                document.body.appendChild(snowflake);
+                
+                setTimeout(() => {
+                    if (snowflake.parentNode) {
+                        snowflake.parentNode.removeChild(snowflake);
+                    }
+                }, 5000);
+            }, 100);
+        }
+
+        function stopSnowfall() {
+            if (snowInterval) {
+                clearInterval(snowInterval);
+            }
+            document.querySelectorAll('.snowflake').forEach(el => el.remove());
+        }
+
+        function addDecorations() {
+            // Add some Christmas decorations
+            for (let i = 0; i < 10; i++) {
+                const decoration = document.createElement('div');
+                decoration.className = 'christmas-decoration';
+                decoration.style.left = Math.random() * 90 + 5 + 'vw';
+                decoration.style.top = Math.random() * 50 + 10 + 'vh';
+                decoration.style.background = i % 2 === 0 ? 'red' : 'green';
+                decoration.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(decoration);
+            }
+        }
+
+        function removeDecorations() {
+            document.querySelectorAll('.christmas-decoration').forEach(el => el.remove());
+        }
+
+        // Initialize music controls
+        function initMusicControls() {
+            const container = document.getElementById('musicControls');
+            container.innerHTML = '';
+            
+            musicTypes.forEach(music => {
+                const musicItem = document.createElement('div');
+                musicItem.className = 'music-item';
+                musicItem.innerHTML = `
+                    <div class="music-header">
+                        <strong>${music.label}</strong>
+                        <div class="toggle-group">
+                            <span>Enabled</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="${music.id}Enabled" checked 
+                                    onchange="audioController.setEnabled('${music.id}', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="file" id="${music.id}File" accept="audio/*" 
+                        onchange="handleMusicUpload('${music.id}', this.files[0])">
+                    <div class="music-buttons">
+                        <button class="btn btn-primary" onclick="audioController.preview('${music.id}')">Preview</button>
+                        <button class="btn btn-danger" onclick="audioController.stop()">Stop</button>
+                        <div class="toggle-group">
+                            <span>Loop</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="${music.id}Loop" ${music.loop ? 'checked' : ''}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(musicItem);
+            });
+        }
+
+        // Handle music file upload
+        async function handleMusicUpload(type, file) {
+            if (file) {
+                const success = await audioController.loadTrack(type, file);
+                if (success) {
+                    debugLog(`Loaded audio: ${type}`);
+                }
+            }
+        }
+
+        // Initialize level configuration
+        function initLevelConfig() {
+            const container = document.getElementById('levelConfig');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= 10; i++) {
+                const levelItem = document.createElement('div');
+                levelItem.className = 'level-item';
+                levelItem.innerHTML = `
+                    <label>Level ${i}</label>
+                    <input type="number" id="level${i}" min="1" max="10" value="${i === 1 ? 5 : 1}" 
+                        style="width: 80px; margin-top: 5px;">
+                `;
+                container.appendChild(levelItem);
+            }
+        }
+
+        // Settings management
+        function exportSettings() {
+            const settings = {
+                playerName: document.getElementById('playerName').value,
+                numCases: document.getElementById('numCases').value,
+                smallAmounts: document.getElementById('smallAmounts').value,
+                bigAmounts: document.getElementById('bigAmounts').value,
+                levels: {},
+                christmasTheme: document.getElementById('christmasToggle').checked
+            };
+            
+            // Get level configurations
+            for (let i = 1; i <= 10; i++) {
+                settings.levels[i] = document.getElementById(`level${i}`).value;
+            }
+            
+            // Create and download settings file
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'settings.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            debugLog('Settings exported successfully');
+        }
+
+        function importSettings() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const settings = JSON.parse(event.target.result);
+                        loadSettings(settings);
+                        debugLog('Settings imported successfully');
+                    } catch (error) {
+                        debugLog('Error importing settings: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function loadSettings(settings) {
+            document.getElementById('playerName').value = settings.playerName || '';
+            document.getElementById('numCases').value = settings.numCases || 20;
+            document.getElementById('smallAmounts').value = settings.smallAmounts || '';
+            document.getElementById('bigAmounts').value = settings.bigAmounts || '';
+            document.getElementById('christmasToggle').checked = settings.christmasTheme || false;
+            
+            // Load level configurations
+            if (settings.levels) {
+                for (let i = 1; i <= 10; i++) {
+                    const levelInput = document.getElementById(`level${i}`);
+                    if (levelInput && settings.levels[i]) {
+                        levelInput.value = settings.levels[i];
+                    }
+                }
+            }
+            
+            initChristmasTheme();
+        }
+
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to defaults?')) {
+                document.getElementById('playerName').value = '';
+                document.getElementById('numCases').value = 20;
+                document.getElementById('smallAmounts').value = '100,200,300,400,500,750,1000,1500,2000,2500';
+                document.getElementById('bigAmounts').value = '5000,7500,10000,15000,20000,25000,50000,75000,100000,250000';
+                document.getElementById('christmasToggle').checked = true;
+                
+                // Reset levels
+                for (let i = 1; i <= 10; i++) {
+                    document.getElementById(`level${i}`).value = i === 1 ? 5 : 1;
+                }
+                
+                // Reset music toggles
+                musicTypes.forEach(music => {
+                    document.getElementById(`${music.id}Enabled`).checked = true;
+                    document.getElementById(`${music.id}Loop`).checked = music.loop;
+                });
+                
+                audioController.stop();
+                initChristmasTheme();
+                debugLog('Settings reset to defaults');
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                playerName: document.getElementById('playerName').value,
+                numCases: document.getElementById('numCases').value,
+                smallAmounts: document.getElementById('smallAmounts').value,
+                bigAmounts: document.getElementById('bigAmounts').value,
+                levels: {},
+                christmasTheme: document.getElementById('christmasToggle').checked,
+                timestamp: new Date().toISOString()
+            };
+            
+            for (let i = 1; i <= 10; i++) {
+                settings.levels[i] = document.getElementById(`level${i}`).value;
+            }
+            
+            localStorage.setItem('dealOrNoDealSettings', JSON.stringify(settings));
+            debugLog('Settings saved to browser storage');
+        }
+
+        function loadSavedSettings() {
+            const saved = localStorage.getItem('dealOrNoDealSettings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    loadSettings(settings);
+                    debugLog('Loaded saved settings');
+                } catch (error) {
+                    debugLog('Error loading saved settings: ' + error.message);
+                }
+            }
+        }
+
+        function startGame() {
+            // Validate required fields
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter a player name');
+                return;
+            }
+            
+            // Save settings before proceeding
+            saveSettings();
+            
+            // Open game page
+            window.open('playdod.html', '_blank');
+        }
+
+        function debugLog(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.innerHTML = `[${timestamp}] ${message}<br>${debugInfo.innerHTML}`;
+        }
+
+        // Initialize everything when page loads
+        window.onload = function() {
+            initMusicControls();
+            initLevelConfig();
+            loadSavedSettings();
+            initChristmasTheme();
+            
+            // Add event listeners
+            document.getElementById('christmasToggle').addEventListener('change', initChristmasTheme);
+            
+            debugLog('System initialized successfully');
+            
+            // Test audio functionality
+            setTimeout(() => {
+                let audioTest = true;
+                musicTypes.forEach(music => {
+                    const enabled = document.getElementById(`${music.id}Enabled`).checked;
+                    if (enabled) {
+                        debugLog(`✓ ${music.label}: Enabled`);
+                    } else {
+                        debugLog(`✗ ${music.label}: Disabled`);
+                    }
+                });
+                
+                // Test audio context
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const audioContext = new AudioContext();
+                    debugLog('✓ Audio test: Success');
+                    audioContext.close();
+                } catch (e) {
+                    debugLog('✗ Audio test: Failed - ' + e.message);
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
