@@ -72,6 +72,12 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
+        .game-title-img {
+            max-width: 400px;
+            max-height: 100px;
+            object-fit: contain;
+        }
+
         .theme-controls {
             display: flex;
             flex-direction: column;
@@ -481,6 +487,10 @@
                 width: 80px;
                 height: 100px;
             }
+            
+            .game-title-img {
+                max-width: 300px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -499,8 +509,8 @@
                 height: 80px;
             }
             
-            .game-title {
-                font-size: 1.8em;
+            .game-title-img {
+                max-width: 250px;
             }
         }
 
@@ -518,6 +528,10 @@
                 width: 50px;
                 height: 60px;
             }
+            
+            .game-title-img {
+                max-width: 200px;
+            }
         }
     </style>
 </head>
@@ -528,7 +542,9 @@
             <div class="logo-section">
                 <div class="logo" id="companyLogo">Company Logo</div>
             </div>
-            <div class="game-title">DEAL OR NO DEAL</div>
+            <div class="game-title">
+                <img src="dodTransparent.png" alt="DEAL OR NO DEAL" class="game-title-img" onerror="this.style.display='none'; document.querySelector('.game-title').innerHTML='DEAL OR NO DEAL';">
+            </div>
             <div class="theme-controls">
                 <label class="toggle-group">
                     <span>🎄 Christmas</span>
@@ -600,7 +616,7 @@
     <div class="splash-screen" id="welcomeSplash">
         <div class="splash-content">
             <div class="splash-title">WELCOME TO</div>
-            <div class="splash-title" style="color: #FFD700;">DEAL OR NO DEAL</div>
+            <img src="dodTransparent.png" alt="DEAL OR NO DEAL" style="max-width: 400px; margin: 20px 0;">
             <div class="splash-player" id="welcomePlayerName">Player</div>
             <button class="btn btn-primary btn-lg" onclick="startGame()" style="font-size: 1.5em; padding: 15px 30px;">
                 START GAME
@@ -611,7 +627,10 @@
     <div class="splash-screen" id="caseSelectSplash" style="display: none;">
         <div class="splash-content">
             <div class="splash-title">SELECT YOUR CASE</div>
-            <div class="splash-message">Choose one case to keep throughout the game</div>
+            <div class="splash-message">Click on any case to select it as your personal case</div>
+            <div class="splash-message" style="font-size: 1.2em; color: gold; margin-top: 20px;">
+                Cases are displayed below - click one to continue
+            </div>
         </div>
     </div>
 
@@ -619,6 +638,9 @@
         <div class="splash-content">
             <div class="splash-title" id="levelTitle">LEVEL 1</div>
             <div class="splash-message" id="levelMessage">Open 5 cases in this round</div>
+            <button class="btn btn-primary btn-lg" onclick="hideLevelSplash()" style="font-size: 1.5em; padding: 15px 30px; margin-top: 20px;">
+                CONTINUE
+            </button>
         </div>
     </div>
 
@@ -627,10 +649,13 @@
         <div class="offer-content">
             <div class="offer-title">BANKER'S OFFER</div>
             <div class="splash-message">Enter the banker's offer amount:</div>
-            <input type="number" class="offer-input" id="bankerOfferInput" placeholder="₱0">
+            <input type="number" class="offer-input" id="bankerOfferInput" placeholder="₱0" min="0">
             <div class="offer-buttons">
                 <button class="btn btn-success btn-lg" onclick="submitOffer()" style="font-size: 1.5em;">
                     SUBMIT OFFER
+                </button>
+                <button class="btn btn-danger btn-lg" onclick="cancelOffer()" style="font-size: 1.5em;">
+                    CANCEL
                 </button>
             </div>
         </div>
@@ -843,6 +868,7 @@
             gameState.audioController.play('selectCase');
             gameState.gamePhase = 'caseSelect';
             renderCases();
+            renderAmounts();
         }
 
         // Render cases grid
@@ -858,8 +884,10 @@
                     <div class="case-amount">₱${caseItem.amount.toLocaleString()}</div>
                 `;
                 
-                if (!caseItem.opened && !caseItem.selected) {
+                if (!caseItem.opened && !caseItem.selected && gameState.gamePhase === 'caseSelect') {
                     caseElement.onclick = () => selectCase(caseItem.number);
+                } else if (!caseItem.opened && !caseItem.selected && gameState.gamePhase === 'playing') {
+                    caseElement.onclick = () => openCase(caseItem.number);
                 }
                 
                 grid.appendChild(caseElement);
@@ -887,20 +915,19 @@
             });
         }
 
-        // Select a case
+        // Select a case (player's personal case)
         function selectCase(caseNumber) {
-            if (gameState.gamePhase === 'caseSelect') {
-                // Player's personal case selection
-                gameState.playerCase = caseNumber;
-                gameState.cases[caseNumber - 1].selected = true;
-                document.getElementById('playerCaseDisplay').textContent = caseNumber;
-                hideAllSplashes();
-                gameState.audioController.stop();
-                startFirstLevel();
-            } else if (gameState.gamePhase === 'playing') {
-                // Opening cases during gameplay
-                openCase(caseNumber);
-            }
+            if (gameState.gamePhase !== 'caseSelect') return;
+            
+            debugLog(`Player selected case: ${caseNumber}`);
+            gameState.playerCase = caseNumber;
+            gameState.cases[caseNumber - 1].selected = true;
+            document.getElementById('playerCaseDisplay').textContent = caseNumber;
+            
+            // Hide splash and start first level
+            hideAllSplashes();
+            gameState.audioController.stop();
+            startFirstLevel();
         }
 
         // Start first level
@@ -916,11 +943,14 @@
             
             showLevelSplash(gameState.currentLevel, gameState.casesToOpenThisLevel);
             gameState.gamePhase = 'playing';
-            
-            setTimeout(() => {
-                hideAllSplashes();
-                enableGameButtons(false);
-            }, 3000);
+        }
+
+        // Hide level splash and continue to gameplay
+        function hideLevelSplash() {
+            hideAllSplashes();
+            enableGameButtons(false);
+            renderCases();
+            renderAmounts();
         }
 
         // Show level splash screen
@@ -930,18 +960,24 @@
             showSplash('levelSplash');
         }
 
-        // Open a case
+        // Open a case during gameplay
         function openCase(caseNumber) {
+            if (gameState.gamePhase !== 'playing' || gameState.casesToOpenThisLevel <= 0) return;
+            
             const caseIndex = caseNumber - 1;
             const caseItem = gameState.cases[caseIndex];
             
-            if (caseItem.opened || caseItem.selected || gameState.casesToOpenThisLevel <= 0) {
+            if (caseItem.opened || caseItem.selected) {
                 return;
             }
 
+            debugLog(`Opening case ${caseNumber}`);
+            
             // Animate case opening
             const caseElement = document.querySelector(`.case:nth-child(${caseNumber})`);
-            caseElement.classList.add('opening');
+            if (caseElement) {
+                caseElement.classList.add('opening');
+            }
             
             setTimeout(() => {
                 caseItem.opened = true;
@@ -966,7 +1002,6 @@
                         showBankerOffer();
                     }, 1500);
                 } else {
-                    // Show remaining cases message
                     debugLog(`${gameState.casesToOpenThisLevel} cases remaining to open this level`);
                 }
             }, 500);
@@ -978,6 +1013,12 @@
             document.getElementById('bankerOfferModal').style.display = 'flex';
             document.getElementById('bankerOfferInput').value = '';
             document.getElementById('bankerOfferInput').focus();
+        }
+
+        // Cancel banker offer
+        function cancelOffer() {
+            document.getElementById('bankerOfferModal').style.display = 'none';
+            // Continue with level if needed
         }
 
         // Submit banker offer
@@ -1136,6 +1177,13 @@
         document.getElementById('christmasToggle').addEventListener('change', function() {
             gameState.christmasTheme = this.checked;
             initChristmasTheme();
+        });
+
+        // Handle Enter key in banker offer input
+        document.getElementById('bankerOfferInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitOffer();
+            }
         });
 
         // Initialize game when page loads
