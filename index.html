@@ -233,8 +233,12 @@
         }
 
         .amount-item.highlight {
-            background: rgba(0, 255, 0, 0.3);
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: 2px solid #4CAF50;
+            animation: highlightPulse 1.5s infinite;
             transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
         }
 
         /* Footer */
@@ -527,6 +531,13 @@
             animation: finalReveal 2s ease-out;
         }
 
+        .auto-close-timer {
+            font-size: 1.2em;
+            color: #FFD700;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
         /* Debug Panel */
         .debug-panel {
             position: fixed;
@@ -650,6 +661,17 @@
             0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
             70% { opacity: 1; transform: scale(1.1) rotate(5deg); }
             100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes highlightPulse {
+            0%, 100% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 25px rgba(76, 175, 80, 0.8);
+            }
         }
 
         .fade-out {
@@ -937,8 +959,9 @@
             <div class="final-case">Case #<span id="finalCaseNumber">0</span></div>
             <div class="final-amount" id="finalAmount">₱0</div>
             <div class="splash-message" id="endGameMessage">Thank you for playing!</div>
-            <button class="btn btn-primary btn-lg" onclick="restartGame()" style="font-size: 1.5em; padding: 15px 30px; margin-top: 30px;">
-                PLAY AGAIN
+            <div class="auto-close-timer" id="autoCloseTimer">Auto-closing in 10 seconds...</div>
+            <button class="btn btn-warning btn-lg" onclick="closeGameEndSplash()" style="font-size: 1.5em; padding: 15px 30px; margin-top: 20px;">
+                CLOSE
             </button>
         </div>
     </div>
@@ -972,7 +995,8 @@
             caseSize: 130,
             christmasTheme: true,
             caseSelectionTimer: null,
-            countdownTime: 10
+            countdownTime: 10,
+            gameEndTimer: null
         };
 
         // Audio Controller
@@ -1207,13 +1231,15 @@
             renderCases();
             renderAmounts();
             
-            // Make cases selectable with animation
+            // Add 5-second delay before cases become selectable
             setTimeout(() => {
+                // Make cases selectable with animation
                 const cases = document.querySelectorAll('.case');
                 cases.forEach(caseElement => {
                     caseElement.classList.add('selectable');
                 });
-            }, 500);
+                debugLog('Cases are now selectable');
+            }, 5000); // 5-second delay
         }
 
         // Render cases grid - 6x5 layout
@@ -1247,6 +1273,10 @@
             const grid = document.getElementById('amountsGrid');
             grid.innerHTML = '';
 
+            // Find the largest remaining amount
+            const largestAmount = gameState.remainingAmounts.length > 0 ? 
+                Math.max(...gameState.remainingAmounts) : 0;
+
             gameState.remainingAmounts.sort((a, b) => a - b).forEach(amount => {
                 const amountElement = document.createElement('div');
                 amountElement.className = 'amount-item';
@@ -1254,6 +1284,11 @@
                 
                 if (gameState.openedCases.includes(amount)) {
                     amountElement.classList.add('eliminated');
+                }
+                
+                // Highlight the largest amount
+                if (amount === largestAmount && !gameState.openedCases.includes(amount)) {
+                    amountElement.classList.add('highlight');
                 }
                 
                 grid.appendChild(amountElement);
@@ -1433,12 +1468,11 @@
         function handleDealDecision(acceptDeal) {
             document.getElementById('offerDisplaySplash').style.display = 'none';
             
+            // Play loop music for both deal and no deal
+            gameState.audioController.play('loop', true);
+            
             if (acceptDeal) {
                 debugLog('Deal accepted!');
-                gameState.audioController.stop();
-                
-                // Play loop music after deal
-                gameState.audioController.play('loop', true);
                 
                 const isWin = gameState.bankerOffer >= Math.max(...gameState.remainingAmounts);
                 if (isWin) {
@@ -1453,7 +1487,6 @@
                 }, 5000);
             } else {
                 debugLog('Deal rejected!');
-                gameState.audioController.play('loop');
                 enableGameButtons(false);
                 gameState.currentLevel++;
                 
@@ -1483,6 +1516,48 @@
             
             document.getElementById('endGameMessage').textContent = message;
             document.getElementById('gameEndSplash').style.display = 'flex';
+            
+            // Start auto-close timer
+            startAutoCloseTimer();
+        }
+
+        // Start auto-close timer for game end splash
+        function startAutoCloseTimer() {
+            let timeLeft = 10;
+            const timerElement = document.getElementById('autoCloseTimer');
+            
+            gameState.gameEndTimer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Auto-closing in ${timeLeft} seconds...`;
+                
+                if (timeLeft <= 0) {
+                    closeGameEndSplash();
+                }
+            }, 1000);
+        }
+
+        // Close game end splash and show all cases
+        function closeGameEndSplash() {
+            if (gameState.gameEndTimer) {
+                clearInterval(gameState.gameEndTimer);
+            }
+            
+            document.getElementById('gameEndSplash').style.display = 'none';
+            
+            // Show all cases with their amounts
+            showAllCasesWithAmounts();
+        }
+
+        // Show all cases with their amounts revealed
+        function showAllCasesWithAmounts() {
+            // Open all cases for display
+            gameState.cases.forEach(caseItem => {
+                caseItem.opened = true;
+            });
+            
+            renderCases();
+            renderAmounts();
+            debugLog('All cases revealed with their amounts');
         }
 
         // Get player's case amount
