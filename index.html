@@ -123,7 +123,7 @@
             height: calc(75vh - 60px);
         }
 
-        /* Cases Grid - 5x6 Layout */
+        /* Cases Grid - 6x5 Layout */
         .cases-container {
             background: rgba(0, 0, 0, 0.6);
             border: 2px solid gold;
@@ -134,17 +134,17 @@
 
         .cases-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 12px;
             justify-items: center;
             align-items: center;
             height: 100%;
         }
 
         .case {
-            width: 120px;
-            height: 140px;
+            width: 130px;
+            height: 150px;
             background: url('suitcase.png') center/contain no-repeat;
             display: flex;
             align-items: center;
@@ -176,14 +176,14 @@
         }
 
         .case-number {
-            font-size: 2em;
+            font-size: 2.2em;
             font-weight: bold;
             color: white;
             text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
         }
 
         .case-amount {
-            font-size: 1.4em;
+            font-size: 1.5em;
             font-weight: bold;
             color: gold;
             text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
@@ -527,6 +527,50 @@
             animation: finalReveal 2s ease-out;
         }
 
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 350px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            z-index: 1004;
+            display: none;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .debug-title {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .debug-close {
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .debug-close:hover {
+            background: #ff6666;
+        }
+
         /* Controls */
         .size-controls {
             display: flex;
@@ -612,30 +656,19 @@
             animation: fadeOut 0.5s ease-out forwards;
         }
 
-        /* Debug Panel */
-        .debug-panel {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 300px;
-            height: 150px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #00ff00;
-            border-radius: 10px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            overflow-y: auto;
-            z-index: 1002;
-            display: none;
-        }
-
-        .debug-title {
-            color: #00ff00;
-            margin-bottom: 5px;
-        }
-
         /* Responsive Design */
+        @media (max-width: 1200px) {
+            .cases-grid {
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: repeat(6, 1fr);
+            }
+            
+            .case {
+                width: 110px;
+                height: 130px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .game-area {
                 grid-template-columns: 75% 25%;
@@ -795,7 +828,7 @@
 
         <!-- Main Game Area -->
         <div class="game-area">
-            <!-- Cases - 5x6 Layout -->
+            <!-- Cases - 6x5 Layout -->
             <div class="cases-container">
                 <div class="cases-grid" id="casesGrid">
                     <!-- Cases will be generated dynamically -->
@@ -912,7 +945,10 @@
 
     <!-- Debug Panel -->
     <div class="debug-panel" id="debugPanel">
-        <div class="debug-title">Debug Information</div>
+        <div class="debug-header">
+            <div class="debug-title">Debug Information</div>
+            <button class="debug-close" onclick="toggleDebug()">CLOSE</button>
+        </div>
         <div id="debugInfo">Game initialized...</div>
     </div>
 
@@ -933,7 +969,7 @@
             gamePhase: 'welcome', // welcome, caseSelect, playing, offer, ended
             settings: null,
             audioController: null,
-            caseSize: 120,
+            caseSize: 130,
             christmasTheme: true,
             caseSelectionTimer: null,
             countdownTime: 10
@@ -1180,7 +1216,7 @@
             }, 500);
         }
 
-        // Render cases grid - 5x6 layout
+        // Render cases grid - 6x5 layout
         function renderCases() {
             const grid = document.getElementById('casesGrid');
             grid.innerHTML = '';
@@ -1230,6 +1266,9 @@
             
             debugLog(`Player selected case: ${caseNumber}`);
             
+            // Stop case selection music
+            gameState.audioController.stop();
+            
             // Add selection delay and animation
             const caseElement = document.querySelector(`.case:nth-child(${caseNumber})`);
             if (caseElement) {
@@ -1252,7 +1291,6 @@
                     document.getElementById('playerCaseDisplay').textContent = caseNumber;
                     
                     // Start first level
-                    gameState.audioController.stop();
                     startFirstLevel();
                 }, 1000);
             }
@@ -1327,13 +1365,19 @@
                         gameState.audioController.play('revealBig');
                     }
 
+                    // After reveal sound, play case selection music on loop
+                    setTimeout(() => {
+                        gameState.audioController.play('selectCase', true);
+                    }, 1000);
+
                     renderCases();
                     renderAmounts();
 
                     // Check if level is complete
                     if (gameState.casesToOpenThisLevel === 0) {
-                        // Add delay before showing banker offer
+                        // Stop case selection music before showing offer
                         setTimeout(() => {
+                            gameState.audioController.stop();
                             showBankerOffer();
                         }, 2000); // 2-second delay after last case opens
                     } else {
@@ -1392,6 +1436,9 @@
             if (acceptDeal) {
                 debugLog('Deal accepted!');
                 gameState.audioController.stop();
+                
+                // Play loop music after deal
+                gameState.audioController.play('loop', true);
                 
                 const isWin = gameState.bankerOffer >= Math.max(...gameState.remainingAmounts);
                 if (isWin) {
