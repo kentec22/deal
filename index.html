@@ -44,25 +44,32 @@
             margin-bottom: 10px;
             height: 12vh;
             min-height: 100px;
+            position: relative;
         }
 
         .logo-section {
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100%;
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: 100%;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid gold;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            text-align: center;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .game-title {
@@ -130,6 +137,7 @@
             border-radius: 10px;
             padding: 15px;
             overflow: hidden;
+            position: relative;
         }
 
         .cases-grid {
@@ -216,6 +224,7 @@
             border-radius: 10px;
             padding: 15px;
             overflow-y: auto;
+            position: relative;
         }
 
         .amounts-grid {
@@ -240,9 +249,10 @@
         }
 
         .amount-item.eliminated {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ccc;
-            opacity: 0.6;
+            background: rgba(255, 0, 0, 0.1);
+            color: #888;
+            opacity: 0.1;
+            border-color: #666;
         }
 
         .amount-item.jackpot {
@@ -252,6 +262,16 @@
             animation: jackpotPulse 1.5s infinite;
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .amount-item.jackpot.eliminated {
+            background: rgba(76, 175, 80, 0.1);
+            color: #888;
+            opacity: 0.1;
+            border-color: #666;
+            animation: none;
+            transform: scale(1);
+            box-shadow: none;
         }
 
         .amount-value {
@@ -269,6 +289,10 @@
             color: #aaffaa;
         }
 
+        .amount-item.jackpot.eliminated .amount-label {
+            color: #888;
+        }
+
         /* Footer - Removed Deal/No Deal buttons */
         .footer {
             display: grid;
@@ -281,11 +305,19 @@
             margin-top: 10px;
             height: 5vh;
             min-height: 45px;
+            position: relative;
         }
 
         .creator {
             color: gold;
             font-size: 0.8em;
+        }
+
+        .delay-timer {
+            color: #FFD700;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-align: center;
         }
 
         .game-buttons {
@@ -298,6 +330,7 @@
             display: flex;
             gap: 8px;
             justify-content: flex-end;
+            align-items: center;
         }
 
         .btn {
@@ -377,10 +410,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
-            height: 80%;
+            width: 90%;
+            height: 90%;
             background: url('company.png') center/contain no-repeat;
-            opacity: 0.3;
+            opacity: 0.4;
             z-index: 1;
             pointer-events: none;
         }
@@ -654,6 +687,47 @@
             font-size: 10px;
         }
 
+        /* Christmas Theme Effects */
+        .christmas-effect {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 999;
+            animation: floatAround 6s linear infinite;
+        }
+
+        .christmas-border {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .christmas-border::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff0000);
+            background-size: 400% 400%;
+            animation: christmasGradient 3s ease infinite;
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .christmas-border::after {
+            content: '🎄🎅🎁❄️✨';
+            position: absolute;
+            top: -15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 24px;
+            animation: christmasText 4s linear infinite;
+            opacity: 0.8;
+        }
+
         /* Animations */
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -703,6 +777,25 @@
                 transform: scale(1.1);
                 box-shadow: 0 0 25px rgba(76, 175, 80, 0.8);
             }
+        }
+
+        @keyframes floatAround {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -20px) rotate(90deg); }
+            50% { transform: translate(0, -40px) rotate(180deg); }
+            75% { transform: translate(-20px, -20px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        @keyframes christmasGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes christmasText {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* Responsive Design */
@@ -829,10 +922,10 @@
 <body>
     <div class="container">
         <!-- Header -->
-        <div class="header">
+        <div class="header" id="headerElement">
             <div class="logo-section">
-                <div class="logo" id="companyLogo">
-                    <img src="company.png" alt="Company Logo" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.parentElement.innerHTML='Company Logo';">
+                <div class="logo">
+                    <img src="company.png" alt="Company Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='Company Logo';">
                 </div>
             </div>
             <div class="game-title">
@@ -876,14 +969,14 @@
         <!-- Main Game Area - 70% cases, 30% amounts -->
         <div class="game-area">
             <!-- Cases - 7x4 Layout -->
-            <div class="cases-container">
+            <div class="cases-container" id="casesContainer">
                 <div class="cases-grid" id="casesGrid">
                     <!-- Cases will be generated dynamically -->
                 </div>
             </div>
 
             <!-- Amounts - 2 Columns -->
-            <div class="amounts-container">
+            <div class="amounts-container" id="amountsContainer">
                 <div class="amounts-grid" id="amountsGrid">
                     <!-- Amounts will be generated dynamically -->
                 </div>
@@ -891,8 +984,9 @@
         </div>
 
         <!-- Footer - Deal/No Deal buttons removed -->
-        <div class="footer">
-            <div class="creator">CREATED BY KT</div>
+        <div class="footer" id="footerElement">
+            <div class="creator">created by kentec with chatgpt.</div>
+            <div class="delay-timer" id="delayTimer">Next action in: --</div>
             <div class="game-buttons">
                 <!-- Deal/No Deal buttons removed from here -->
             </div>
@@ -911,6 +1005,9 @@
             <div class="splash-title">WELCOME TO</div>
             <img src="dodTransparent.png" alt="DEAL OR NO DEAL" style="max-width: 400px; margin: 20px 0;">
             <div class="splash-player" id="welcomePlayerName">Player</div>
+            <div class="splash-message" style="font-size: 1.2em; color: gold; margin: 20px 0;">
+                Get ready for an exciting game!
+            </div>
             <button class="btn btn-primary btn-lg" onclick="startGame()" style="font-size: 1.5em; padding: 15px 30px;">
                 START GAME
             </button>
@@ -1019,663 +1116,3 @@
             settings: null,
             audioController: null,
             caseSize: 140,
-            christmasTheme: true,
-            caseSelectionTimer: null,
-            countdownTime: 10,
-            gameEndTimer: null,
-            backgroundMusicTimer: null
-        };
-
-        // Enhanced Audio Controller
-        class AudioController {
-            constructor() {
-                this.currentAudio = null;
-                this.audioTracks = new Map();
-                this.enabledTracks = new Set();
-                this.isPlaying = false;
-            }
-
-            async loadTrack(name, url) {
-                return new Promise((resolve) => {
-                    const audio = new Audio(url);
-                    audio.onloadeddata = () => {
-                        this.audioTracks.set(name, audio);
-                        resolve(true);
-                    };
-                    audio.onerror = () => {
-                        console.warn(`Failed to load audio: ${url}`);
-                        resolve(false);
-                    };
-                });
-            }
-
-            play(trackName, loop = false) {
-                this.stop();
-                
-                if (this.audioTracks.has(trackName) && this.enabledTracks.has(trackName)) {
-                    this.currentAudio = this.audioTracks.get(trackName);
-                    this.currentAudio.loop = loop;
-                    this.currentAudio.currentTime = 0;
-                    
-                    this.currentAudio.play().catch(e => {
-                        debugLog(`Audio play error: ${e.message}`);
-                    });
-                    this.isPlaying = true;
-                    debugLog(`Playing: ${trackName} ${loop ? '(looping)' : ''}`);
-                }
-            }
-
-            stop() {
-                if (this.currentAudio) {
-                    this.currentAudio.pause();
-                    this.currentAudio.currentTime = 0;
-                    this.currentAudio = null;
-                    this.isPlaying = false;
-                }
-            }
-
-            setEnabled(trackName, enabled) {
-                if (enabled) {
-                    this.enabledTracks.add(trackName);
-                } else {
-                    this.enabledTracks.delete(trackName);
-                }
-            }
-
-            // Check if no audio is playing and play background music
-            checkAndPlayBackgroundMusic() {
-                if (!this.isPlaying && this.enabledTracks.has('loop')) {
-                    this.play('loop', true);
-                    debugLog('Background music started (4-loop.mp3)');
-                }
-            }
-        }
-
-        // Initialize Game
-        async function initGame() {
-            debugLog('Initializing game...');
-            
-            // Load settings
-            await loadSettings();
-            
-            // Initialize audio
-            gameState.audioController = new AudioController();
-            await initializeAudio();
-            
-            // Setup game based on settings
-            setupGameFromSettings();
-            
-            // Show welcome splash and play intro music on loop
-            showSplash('welcomeSplash');
-            gameState.audioController.play('intro', true);
-            
-            // Start background music checker
-            startBackgroundMusicChecker();
-            
-            debugLog('Game initialized successfully');
-        }
-
-        // Start background music checker
-        function startBackgroundMusicChecker() {
-            gameState.backgroundMusicTimer = setInterval(() => {
-                gameState.audioController.checkAndPlayBackgroundMusic();
-            }, 1000); // Check every second
-        }
-
-        // Stop background music checker
-        function stopBackgroundMusicChecker() {
-            if (gameState.backgroundMusicTimer) {
-                clearInterval(gameState.backgroundMusicTimer);
-                gameState.backgroundMusicTimer = null;
-            }
-        }
-
-        // Load settings from localStorage
-        async function loadSettings() {
-            const saved = localStorage.getItem('dealOrNoDealSettings');
-            if (saved) {
-                try {
-                    gameState.settings = JSON.parse(saved);
-                    debugLog('Settings loaded from storage');
-                } catch (error) {
-                    debugLog('Error loading settings: ' + error.message);
-                    useDefaultSettings();
-                }
-            } else {
-                useDefaultSettings();
-            }
-        }
-
-        function useDefaultSettings() {
-            gameState.settings = {
-                playerName: 'Player',
-                numCases: 20,
-                smallAmounts: '100,200,300,400,500,750,1000,1500,2000,2500',
-                bigAmounts: '5000,7500,10000,15000,20000,25000,50000,75000,100000,250000',
-                levels: {1: 5, 2: 3, 3: 3, 4: 2, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1},
-                christmasTheme: true,
-                musicSettings: {}
-            };
-            debugLog('Using default settings');
-        }
-
-        // Initialize audio system
-        async function initializeAudio() {
-            const audioFiles = {
-                intro: '1-intro.mp3',
-                selectCase: '2-case.mp3',
-                offer: '3-offer.mp3',
-                loop: '4-loop.mp3',
-                revealSmall: '5-smallcase.mp3',
-                revealBig: '6-bigcase.mp3',
-                win: '5-smallcase.mp3',
-                lose: '6-bigcase.mp3'
-            };
-
-            for (const [track, file] of Object.entries(audioFiles)) {
-                await gameState.audioController.loadTrack(track, file);
-                
-                // Set enabled state from settings
-                const enabled = gameState.settings.musicSettings?.[track]?.enabled ?? true;
-                gameState.audioController.setEnabled(track, enabled);
-            }
-
-            debugLog('Audio system initialized');
-        }
-
-        // Setup game from settings
-        function setupGameFromSettings() {
-            // Player info
-            gameState.playerName = gameState.settings.playerName;
-            document.getElementById('playerNameDisplay').textContent = gameState.playerName;
-            document.getElementById('welcomePlayerName').textContent = gameState.playerName;
-
-            // Parse amounts
-            const smallAmounts = gameState.settings.smallAmounts.split(',').map(amt => parseInt(amt.trim()));
-            const bigAmounts = gameState.settings.bigAmounts.split(',').map(amt => parseInt(amt.trim()));
-            gameState.amounts = [...smallAmounts, ...bigAmounts].sort((a, b) => a - b);
-            gameState.remainingAmounts = [...gameState.amounts];
-
-            // Setup cases
-            gameState.totalCases = Math.min(parseInt(gameState.settings.numCases), 26);
-            gameState.cases = Array.from({length: gameState.totalCases}, (_, i) => ({
-                number: i + 1,
-                amount: gameState.amounts[i % gameState.amounts.length],
-                opened: false,
-                selected: false
-            }));
-
-            // Shuffle amounts among cases
-            shuffleArray(gameState.amounts);
-            gameState.cases.forEach((c, i) => {
-                c.amount = gameState.amounts[i];
-            });
-
-            // Christmas theme
-            gameState.christmasTheme = gameState.settings.christmasTheme ?? true;
-            document.getElementById('christmasToggle').checked = gameState.christmasTheme;
-            initChristmasTheme();
-
-            debugLog(`Game setup: ${gameState.totalCases} cases, ${gameState.amounts.length} amounts`);
-        }
-
-        // Start the game
-        function startGame() {
-            debugLog('Starting game...');
-            // Stop intro music
-            gameState.audioController.stop();
-            hideAllSplashes();
-            
-            // Add 5-second delay before showing case selection
-            setTimeout(() => {
-                showCaseSelection();
-            }, 5000);
-        }
-
-        // Show case selection
-        function showCaseSelection() {
-            showSplash('caseSelectSplash');
-            gameState.audioController.play('selectCase', true);
-            gameState.gamePhase = 'caseSelect';
-            
-            // Start countdown timer
-            startCaseSelectionCountdown();
-        }
-
-        // Start countdown timer for case selection
-        function startCaseSelectionCountdown() {
-            gameState.countdownTime = 10;
-            updateCountdownDisplay();
-            
-            gameState.caseSelectionTimer = setInterval(() => {
-                gameState.countdownTime--;
-                updateCountdownDisplay();
-                
-                if (gameState.countdownTime <= 0) {
-                    clearInterval(gameState.caseSelectionTimer);
-                    startCaseSelectionPhase();
-                }
-            }, 1000);
-        }
-
-        // Update countdown display
-        function updateCountdownDisplay() {
-            const countdownElement = document.getElementById('countdownTimer');
-            if (countdownElement) {
-                countdownElement.textContent = gameState.countdownTime;
-                
-                if (gameState.countdownTime <= 3) {
-                    countdownElement.style.color = '#ff4444';
-                    countdownElement.style.animation = 'pulse 0.5s infinite';
-                } else {
-                    countdownElement.style.color = '#FFD700';
-                    countdownElement.style.animation = 'none';
-                }
-            }
-        }
-
-        // Skip case selection countdown
-        function skipCaseSelection() {
-            debugLog('Skipping case selection countdown');
-            clearInterval(gameState.caseSelectionTimer);
-            startCaseSelectionPhase();
-        }
-
-        // Start actual case selection phase
-        function startCaseSelectionPhase() {
-            hideAllSplashes();
-            gameState.gamePhase = 'caseSelectActive';
-            renderCases();
-            renderAmounts();
-            
-            // Add 5-second delay before cases become selectable
-            setTimeout(() => {
-                const cases = document.querySelectorAll('.case');
-                cases.forEach(caseElement => {
-                    caseElement.classList.add('selectable');
-                });
-                debugLog('Cases are now selectable');
-            }, 5000);
-        }
-
-        // Render cases grid - 7x4 layout
-        function renderCases() {
-            const grid = document.getElementById('casesGrid');
-            grid.innerHTML = '';
-
-            gameState.cases.forEach(caseItem => {
-                const caseElement = document.createElement('div');
-                caseElement.className = `case ${caseItem.opened ? 'opened' : ''} ${caseItem.selected ? 'selected faded' : ''} ${!caseItem.opened && !caseItem.selected ? 'highlighted' : ''}`;
-                caseElement.innerHTML = `
-                    <div class="case-number">${caseItem.number}</div>
-                    <div class="case-amount">₱${caseItem.amount.toLocaleString()}</div>
-                `;
-                
-                if (!caseItem.opened && !caseItem.selected && gameState.gamePhase === 'caseSelectActive') {
-                    caseElement.onclick = () => selectCase(caseItem.number);
-                } else if (!caseItem.opened && !caseItem.selected && gameState.gamePhase === 'playing') {
-                    caseElement.onclick = () => openCase(caseItem.number);
-                }
-                
-                grid.appendChild(caseElement);
-            });
-
-            updateCaseSizes();
-        }
-
-        // Render amounts grid - 2 columns
-        function renderAmounts() {
-            const grid = document.getElementById('amountsGrid');
-            grid.innerHTML = '';
-
-            // Find jackpot (largest amount)
-            const jackpotAmount = gameState.remainingAmounts.length > 0 ? 
-                Math.max(...gameState.remainingAmounts) : 0;
-
-            gameState.remainingAmounts.sort((a, b) => a - b).forEach(amount => {
-                const amountElement = document.createElement('div');
-                const isJackpot = amount === jackpotAmount;
-                const isEliminated = gameState.openedCases.includes(amount);
-                
-                amountElement.className = `amount-item ${isEliminated ? 'eliminated' : ''} ${isJackpot && !isEliminated ? 'jackpot' : ''}`;
-                amountElement.innerHTML = `
-                    <div class="amount-value">₱${amount.toLocaleString()}</div>
-                    <div class="amount-label">${isJackpot ? 'JACKPOT' : 'AMOUNT'}</div>
-                `;
-                
-                grid.appendChild(amountElement);
-            });
-        }
-
-        // Select a case (player's personal case)
-        function selectCase(caseNumber) {
-            if (gameState.gamePhase !== 'caseSelectActive') return;
-            
-            debugLog(`Player selected case: ${caseNumber}`);
-            gameState.audioController.stop();
-            
-            const caseElement = document.querySelector(`.case:nth-child(${caseNumber})`);
-            if (caseElement) {
-                caseElement.classList.add('selected', 'faded');
-                caseElement.classList.remove('selectable', 'highlighted');
-                
-                // Fade other cases but don't remove them
-                const allCases = document.querySelectorAll('.case');
-                allCases.forEach((c, index) => {
-                    if (index + 1 !== caseNumber) {
-                        c.classList.add('faded');
-                        c.classList.remove('selectable', 'highlighted');
-                    }
-                });
-                
-                // Add 5-second delay before proceeding
-                setTimeout(() => {
-                    gameState.playerCase = caseNumber;
-                    gameState.cases[caseNumber - 1].selected = true;
-                    document.getElementById('playerCaseDisplay').textContent = caseNumber;
-                    startFirstLevel();
-                }, 5000);
-            }
-        }
-
-        // Start first level
-        function startFirstLevel() {
-            gameState.currentLevel = 1;
-            startLevel();
-        }
-
-        // Start a level
-        function startLevel() {
-            const casesThisLevel = gameState.settings.levels[gameState.currentLevel] || 1;
-            gameState.casesToOpenThisLevel = Math.min(casesThisLevel, getRemainingCasesCount() - 1);
-            
-            showLevelSplash(gameState.currentLevel, gameState.casesToOpenThisLevel);
-            gameState.gamePhase = 'playing';
-        }
-
-        // Hide level splash and continue to gameplay
-        function hideLevelSplash() {
-            hideAllSplashes();
-            renderCases();
-            renderAmounts();
-        }
-
-        // Show level splash screen
-        function showLevelSplash(level, casesToOpen) {
-            document.getElementById('levelTitle').textContent = `LEVEL ${level}`;
-            document.getElementById('levelMessage').textContent = `Open ${casesToOpen} case${casesToOpen > 1 ? 's' : ''} in this round`;
-            showSplash('levelSplash');
-        }
-
-        // Open a case during gameplay
-        function openCase(caseNumber) {
-            if (gameState.gamePhase !== 'playing' || gameState.casesToOpenThisLevel <= 0) return;
-            
-            const caseIndex = caseNumber - 1;
-            const caseItem = gameState.cases[caseIndex];
-            
-            if (caseItem.opened || caseItem.selected) return;
-
-            debugLog(`Opening case ${caseNumber}`);
-            
-            const caseElement = document.querySelector(`.case:nth-child(${caseNumber})`);
-            if (caseElement) {
-                caseElement.style.pointerEvents = 'none';
-            }
-            
-            // Add 5-second delay before opening
-            setTimeout(() => {
-                if (caseElement) {
-                    caseElement.classList.add('opening');
-                }
-                
-                setTimeout(() => {
-                    caseItem.opened = true;
-                    gameState.openedCases.push(caseItem.amount);
-                    gameState.remainingAmounts = gameState.remainingAmounts.filter(amt => amt !== caseItem.amount);
-                    gameState.casesToOpenThisLevel--;
-
-                    // Play appropriate reveal sound
-                    const isSmallAmount = caseItem.amount <= 2500;
-                    if (isSmallAmount) {
-                        gameState.audioController.play('revealSmall');
-                    } else {
-                        gameState.audioController.play('revealBig');
-                    }
-
-                    // After reveal, play case selection music on loop
-                    setTimeout(() => {
-                        gameState.audioController.play('selectCase', true);
-                    }, 1000);
-
-                    renderCases();
-                    renderAmounts();
-
-                    if (gameState.casesToOpenThisLevel === 0) {
-                        setTimeout(() => {
-                            gameState.audioController.stop();
-                            showBankerOffer();
-                        }, 2000);
-                    }
-                }, 500);
-            }, 5000);
-        }
-
-        // Show banker offer modal
-        function showBankerOffer() {
-            gameState.audioController.play('offer');
-            document.getElementById('bankerOfferModal').style.display = 'flex';
-            document.getElementById('bankerOfferInput').value = '';
-            document.getElementById('bankerOfferInput').focus();
-        }
-
-        // Submit banker offer
-        function submitOffer() {
-            const offerInput = document.getElementById('bankerOfferInput');
-            const offerAmount = parseInt(offerInput.value);
-            
-            if (isNaN(offerAmount) || offerAmount <= 0) {
-                alert('Please enter a valid offer amount');
-                return;
-            }
-
-            gameState.bankerOffer = offerAmount;
-            document.getElementById('bankerOfferDisplay').textContent = `₱${offerAmount.toLocaleString()}`;
-            document.getElementById('amountOfferedDisplay').textContent = `₱${offerAmount.toLocaleString()}`;
-            
-            document.getElementById('bankerOfferModal').style.display = 'none';
-            
-            setTimeout(() => {
-                showOfferDisplay();
-            }, 500);
-        }
-
-        // Show offer display splash
-        function showOfferDisplay() {
-            document.getElementById('displayOfferAmount').textContent = `₱${gameState.bankerOffer.toLocaleString()}`;
-            document.getElementById('offerDisplaySplash').style.display = 'flex';
-        }
-
-        // Handle deal decision
-        function handleDealDecision(acceptDeal) {
-            document.getElementById('offerDisplaySplash').style.display = 'none';
-            
-            // Play loop music for both decisions
-            gameState.audioController.play('loop', true);
-            
-            if (acceptDeal) {
-                debugLog('Deal accepted!');
-                const isWin = gameState.bankerOffer >= Math.max(...gameState.remainingAmounts);
-                if (isWin) {
-                    gameState.audioController.play('win');
-                } else {
-                    gameState.audioController.play('lose');
-                }
-                
-                setTimeout(() => {
-                    showGameEnd(true);
-                }, 5000);
-            } else {
-                debugLog('Deal rejected!');
-                gameState.currentLevel++;
-                
-                setTimeout(() => {
-                    if (getRemainingCasesCount() > 1) {
-                        startLevel();
-                    } else {
-                        showGameEnd(false);
-                    }
-                }, 5000);
-            }
-        }
-
-        // Show game end splash
-        function showGameEnd(dealAccepted) {
-            gameState.gamePhase = 'ended';
-            
-            const playerCaseAmount = getPlayerCaseAmount();
-            document.getElementById('finalCaseNumber').textContent = gameState.playerCase;
-            document.getElementById('finalAmount').textContent = `₱${playerCaseAmount.toLocaleString()}`;
-            document.getElementById('finalCaseNum').textContent = gameState.playerCase;
-            
-            let message = dealAccepted ? 
-                `You accepted the deal for ₱${gameState.bankerOffer.toLocaleString()}!` :
-                `Game Over! Your case contained: ₱${playerCaseAmount.toLocaleString()}`;
-            
-            document.getElementById('endGameMessage').textContent = message;
-            document.getElementById('gameEndSplash').style.display = 'flex';
-            
-            startAutoCloseTimer();
-        }
-
-        // Start auto-close timer for game end splash
-        function startAutoCloseTimer() {
-            let timeLeft = 10;
-            const timerElement = document.getElementById('autoCloseTimer');
-            
-            gameState.gameEndTimer = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = `Auto-closing in ${timeLeft} seconds...`;
-                
-                if (timeLeft <= 0) {
-                    closeGameEndSplash();
-                }
-            }, 1000);
-        }
-
-        // Close game end splash and show all cases
-        function closeGameEndSplash() {
-            if (gameState.gameEndTimer) {
-                clearInterval(gameState.gameEndTimer);
-            }
-            
-            document.getElementById('gameEndSplash').style.display = 'none';
-            showAllCasesWithAmounts();
-        }
-
-        // Show all cases with their amounts revealed
-        function showAllCasesWithAmounts() {
-            gameState.cases.forEach(caseItem => {
-                caseItem.opened = true;
-            });
-            
-            renderCases();
-            renderAmounts();
-            debugLog('All cases revealed with their amounts');
-        }
-
-        // Get player's case amount
-        function getPlayerCaseAmount() {
-            if (gameState.playerCase) {
-                return gameState.cases[gameState.playerCase - 1].amount;
-            }
-            return 0;
-        }
-
-        // Get remaining cases count
-        function getRemainingCasesCount() {
-            return gameState.cases.filter(c => !c.opened).length;
-        }
-
-        // Utility functions
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        function showSplash(splashId) {
-            hideAllSplashes();
-            document.getElementById(splashId).style.display = 'flex';
-        }
-
-        function hideAllSplashes() {
-            document.querySelectorAll('.splash-screen, .offer-display, .game-end-splash').forEach(splash => {
-                splash.style.display = 'none';
-            });
-        }
-
-        // Christmas theme functions
-        function initChristmasTheme() {
-            if (gameState.christmasTheme) {
-                document.body.classList.remove('no-christmas');
-            } else {
-                document.body.classList.add('no-christmas');
-            }
-        }
-
-        // Control functions
-        function adjustCaseSize(change) {
-            gameState.caseSize = Math.max(100, Math.min(180, gameState.caseSize + change));
-            updateCaseSizes();
-            debugLog(`Case size adjusted to: ${gameState.caseSize}px`);
-        }
-
-        function updateCaseSizes() {
-            const cases = document.querySelectorAll('.case');
-            cases.forEach(caseElement => {
-                caseElement.style.width = `${gameState.caseSize}px`;
-                caseElement.style.height = `${gameState.caseSize * 1.14}px`;
-            });
-        }
-
-        function restartGame() {
-            if (confirm('Are you sure you want to restart the game?')) {
-                location.reload();
-            }
-        }
-
-        function toggleDebug() {
-            const debugPanel = document.getElementById('debugPanel');
-            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function openSettings() {
-            window.open('settingsdod.html', '_blank');
-        }
-
-        function debugLog(message) {
-            const debugInfo = document.getElementById('debugInfo');
-            const timestamp = new Date().toLocaleTimeString();
-            debugInfo.innerHTML = `[${timestamp}] ${message}<br>${debugInfo.innerHTML}`;
-        }
-
-        // Event listeners
-        document.getElementById('christmasToggle').addEventListener('change', function() {
-            gameState.christmasTheme = this.checked;
-            initChristmasTheme();
-        });
-
-        // Handle Enter key in banker offer input
-        document.getElementById('bankerOfferInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitOffer();
-            }
-        });
-
-        // Initialize game when page loads
-        window.onload = initGame;
-    </script>
-</body>
-</html>
