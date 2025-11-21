@@ -283,14 +283,17 @@
             font-size: 0.7em;
             color: #FFD700;
             margin-top: 2px;
+            display: none; /* Hide text labels */
         }
 
         .amount-item.jackpot .amount-label {
             color: #aaffaa;
+            display: none;
         }
 
         .amount-item.jackpot.eliminated .amount-label {
             color: #888;
+            display: none;
         }
 
         /* Footer - Removed Deal/No Deal buttons */
@@ -925,7 +928,7 @@
         <div class="header" id="headerElement">
             <div class="logo-section">
                 <div class="logo">
-                    <img src="company.png" alt="Company Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='Company Logo';">
+                    <img src="company.png" alt="Company Logo" class="company-logo" onerror="this.style.display='none'; this.parentElement.innerHTML='Company Logo';">
                 </div>
             </div>
             <div class="game-title">
@@ -1116,3 +1119,361 @@
             settings: null,
             audioController: null,
             caseSize: 140,
+            visitorId: null,
+            sessionId: null
+        };
+
+        // Audio Controller
+        const audioController = {
+            introAudio: null,
+            bigCaseAudio: null,
+            smallCaseAudio: null,
+            
+            init: function() {
+                this.introAudio = new Audio('1-intro.mp3');
+                this.introAudio.loop = true;
+                this.bigCaseAudio = new Audio('6-bigcase.mp3');
+                this.smallCaseAudio = new Audio('5-smallcase.mp3');
+                
+                // Log audio initialization
+                this.logToFile('debug.txt', 'Audio controller initialized');
+            },
+            
+            playIntro: function() {
+                if (this.introAudio) {
+                    this.introAudio.play().catch(e => {
+                        this.logToFile('debug.txt', `Audio play error: ${e.message}`);
+                    });
+                    this.logToFile('debug.txt', 'Intro audio started playing');
+                }
+            },
+            
+            stopIntro: function() {
+                if (this.introAudio) {
+                    this.introAudio.pause();
+                    this.introAudio.currentTime = 0;
+                }
+            },
+            
+            playCaseComparison: function(isBigCase) {
+                if (isBigCase && this.bigCaseAudio) {
+                    this.bigCaseAudio.play().catch(e => {
+                        this.logToFile('debug.txt', `Big case audio error: ${e.message}`);
+                    });
+                    this.logToFile('debug.txt', 'Big case audio played - Player case was higher than offer');
+                } else if (this.smallCaseAudio) {
+                    this.smallCaseAudio.play().catch(e => {
+                        this.logToFile('debug.txt', `Small case audio error: ${e.message}`);
+                    });
+                    this.logToFile('debug.txt', 'Small case audio played - Player case was lower than offer');
+                }
+            },
+            
+            logToFile: function(filename, message) {
+                // Simulate logging to file - in real implementation, this would be a server call
+                console.log(`[${new Date().toISOString()}] ${message}`);
+            }
+        };
+
+        // Tracking System
+        const trackingSystem = {
+            init: function() {
+                this.generateVisitorId();
+                this.generateSessionId();
+                this.trackPageView();
+                this.logToFile('tracking.txt', `VISITOR_${gameState.visitorId}_SESSION_${gameState.sessionId}_PAGE_LOADED`);
+            },
+            
+            generateVisitorId: function() {
+                let visitorId = localStorage.getItem('dealOrNoDeal_visitorId');
+                if (!visitorId) {
+                    visitorId = 'VISITOR_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('dealOrNoDeal_visitorId', visitorId);
+                }
+                gameState.visitorId = visitorId;
+            },
+            
+            generateSessionId: function() {
+                gameState.sessionId = 'SESSION_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            },
+            
+            trackPageView: function() {
+                const data = {
+                    visitorId: gameState.visitorId,
+                    sessionId: gameState.sessionId,
+                    timestamp: new Date().toISOString(),
+                    action: 'PAGE_VIEW',
+                    userAgent: navigator.userAgent,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    language: navigator.language
+                };
+                this.logToAnalytics(data);
+            },
+            
+            trackGameAction: function(action, details = {}) {
+                const data = {
+                    visitorId: gameState.visitorId,
+                    sessionId: gameState.sessionId,
+                    timestamp: new Date().toISOString(),
+                    action: action,
+                    details: details,
+                    gamePhase: gameState.gamePhase,
+                    currentLevel: gameState.currentLevel
+                };
+                this.logToAnalytics(data);
+            },
+            
+            logToAnalytics: function(data) {
+                // Simulate sending to analytics - in real implementation, this would be a server call
+                const logEntry = `[${data.timestamp}] ${data.visitorId} - ${data.sessionId} - ${data.action} - ${JSON.stringify(data.details)}\n`;
+                console.log('ANALYTICS:', logEntry);
+                this.logToFile('tracking.txt', logEntry);
+            },
+            
+            logToFile: function(filename, message) {
+                // Simulate logging to file - in real implementation, this would be a server call
+                console.log(`[${filename}] ${message}`);
+            }
+        };
+
+        // Debug Logger
+        const debugLogger = {
+            log: function(message, level = 'INFO') {
+                const timestamp = new Date().toISOString();
+                const logMessage = `[${timestamp}] [${level}] ${message}\n`;
+                
+                // Update debug panel
+                const debugInfo = document.getElementById('debugInfo');
+                if (debugInfo) {
+                    debugInfo.innerHTML += logMessage.replace(/\n/g, '<br>');
+                    debugInfo.scrollTop = debugInfo.scrollHeight;
+                }
+                
+                // Log to console
+                console.log(`[DEBUG] ${logMessage}`);
+                
+                // Simulate writing to file
+                this.writeToDebugFile(logMessage);
+            },
+            
+            error: function(message) {
+                this.log(message, 'ERROR');
+            },
+            
+            warn: function(message) {
+                this.log(message, 'WARN');
+            },
+            
+            writeToDebugFile: function(message) {
+                // Simulate writing to debug.txt - in real implementation, this would be a server call
+                // This is where you would send the log to your backend
+                console.log(`[DEBUG_FILE] ${message}`);
+            }
+        };
+
+        // Initialize the game
+        function initGame() {
+            debugLogger.log('Game initialization started');
+            trackingSystem.init();
+            audioController.init();
+            
+            // Set company logo to same width as game title
+            const companyLogo = document.querySelector('.company-logo');
+            const gameTitleImg = document.querySelector('.game-title-img');
+            if (companyLogo && gameTitleImg) {
+                companyLogo.style.maxWidth = '350px';
+                companyLogo.style.maxHeight = '80px';
+                debugLogger.log('Company logo dimensions set to match game title');
+            }
+            
+            // Play intro audio
+            audioController.playIntro();
+            
+            // Load settings and initialize game state
+            loadSettings();
+            generateAmounts();
+            generateCases();
+            
+            // Set player name
+            const playerName = prompt('Enter your name:', 'Player') || 'Player';
+            gameState.playerName = playerName;
+            document.getElementById('playerNameDisplay').textContent = playerName;
+            document.getElementById('welcomePlayerName').textContent = playerName;
+            
+            debugLogger.log(`Game initialized for player: ${playerName}`);
+            trackingSystem.trackGameAction('GAME_INIT', { playerName: playerName });
+        }
+
+        // Enhanced handleDealDecision function
+        function handleDealDecision(acceptDeal) {
+            debugLogger.log(`Deal decision: ${acceptDeal ? 'DEAL' : 'NO DEAL'}`);
+            trackingSystem.trackGameAction('DEAL_DECISION', { 
+                accepted: acceptDeal, 
+                bankerOffer: gameState.bankerOffer 
+            });
+            
+            if (acceptDeal) {
+                // Compare amounts and play appropriate audio
+                const playerCaseAmount = gameState.playerCase ? gameState.playerCase.amount : 0;
+                const isBigCase = playerCaseAmount > gameState.bankerOffer;
+                
+                debugLogger.log(`Case comparison - Player case: ${playerCaseAmount}, Banker offer: ${gameState.bankerOffer}, Result: ${isBigCase ? 'BIG CASE' : 'SMALL CASE'}`);
+                
+                // Play comparison audio
+                audioController.playCaseComparison(isBigCase);
+                
+                // Log result
+                if (isBigCase) {
+                    debugLogger.warn('Player took deal but their case was worth MORE than the offer');
+                } else {
+                    debugLogger.log('Player took deal and their case was worth LESS than the offer');
+                }
+                
+                endGame(acceptDeal);
+            } else {
+                hideOfferDisplay();
+                continueGame();
+            }
+        }
+
+        // Enhanced amount item creation (remove text labels)
+        function createAmountItem(amount, index) {
+            const amountItem = document.createElement('div');
+            amountItem.className = 'amount-item';
+            amountItem.id = `amount-${index}`;
+            
+            // Remove text labels, only show the value
+            amountItem.innerHTML = `
+                <div class="amount-value">${formatAmount(amount)}</div>
+            `;
+            
+            if (amount >= 1000000) {
+                amountItem.classList.add('jackpot');
+            }
+            
+            return amountItem;
+        }
+
+        // Enhanced case selection with fade effect
+        function selectCase(caseElement, caseNumber) {
+            const caseObj = gameState.cases.find(c => c.number === caseNumber);
+            if (!caseObj || caseObj.opened) return;
+            
+            // Fade the selected case
+            caseElement.classList.add('faded');
+            caseElement.classList.remove('selectable');
+            
+            debugLogger.log(`Case ${caseNumber} selected and faded`);
+            trackingSystem.trackGameAction('CASE_SELECTED', { caseNumber: caseNumber });
+            
+            // Rest of the case selection logic...
+            if (gameState.gamePhase === 'caseSelect') {
+                gameState.playerCase = caseObj;
+                document.getElementById('playerCaseDisplay').textContent = caseNumber;
+                hideCaseSelectSplash();
+            } else if (gameState.gamePhase === 'playing') {
+                openCase(caseObj);
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            initGame();
+            debugLogger.log('Page fully loaded');
+        });
+
+        // Additional utility functions would go here...
+        function loadSettings() {
+            // Load game settings
+            gameState.settings = {
+                soundEnabled: true,
+                animationsEnabled: true,
+                autoPlay: true
+            };
+            debugLogger.log('Game settings loaded');
+        }
+
+        function generateAmounts() {
+            // Generate game amounts
+            gameState.amounts = [
+                1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750,
+                1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000,
+                300000, 400000, 500000, 750000, 1000000, 2500000, 5000000, 10000000
+            ];
+            gameState.remainingAmounts = [...gameState.amounts];
+            debugLogger.log('Game amounts generated');
+        }
+
+        function generateCases() {
+            // Generate cases
+            gameState.cases = [];
+            for (let i = 1; i <= 28; i++) {
+                gameState.cases.push({
+                    number: i,
+                    amount: 0, // Will be assigned randomly
+                    opened: false
+                });
+            }
+            debugLogger.log('Game cases generated');
+        }
+
+        function formatAmount(amount) {
+            return `₱${amount.toLocaleString()}`;
+        }
+
+        function hideCaseSelectSplash() {
+            document.getElementById('caseSelectSplash').style.display = 'none';
+            gameState.gamePhase = 'playing';
+            debugLogger.log('Case selection splash hidden, game phase: playing');
+        }
+
+        function hideOfferDisplay() {
+            document.getElementById('offerDisplaySplash').style.display = 'none';
+            debugLogger.log('Offer display hidden');
+        }
+
+        function openCase(caseObj) {
+            caseObj.opened = true;
+            gameState.openedCases.push(caseObj);
+            debugLogger.log(`Case ${caseObj.number} opened`);
+            trackingSystem.trackGameAction('CASE_OPENED', { caseNumber: caseObj.number });
+        }
+
+        function continueGame() {
+            debugLogger.log('Continuing game after NO DEAL');
+            // Continue game logic
+        }
+
+        function endGame(acceptedDeal) {
+            gameState.gamePhase = 'ended';
+            debugLogger.log(`Game ended - Deal accepted: ${acceptedDeal}`);
+            trackingSystem.trackGameAction('GAME_ENDED', { 
+                acceptedDeal: acceptedDeal,
+                finalOffer: gameState.bankerOffer 
+            });
+        }
+
+        // Placeholder functions for other game mechanics
+        function startGame() { debugLogger.log('Game started'); }
+        function skipCaseSelection() { debugLogger.log('Case selection skipped'); }
+        function hideLevelSplash() { debugLogger.log('Level splash hidden'); }
+        function submitOffer() { debugLogger.log('Offer submitted'); }
+        function cancelOffer() { debugLogger.log('Offer cancelled'); }
+        function closeGameEndSplash() { debugLogger.log('Game end splash closed'); }
+        function restartGame() { 
+            debugLogger.log('Game restarted');
+            trackingSystem.trackGameAction('GAME_RESTARTED');
+        }
+        function toggleDebug() { 
+            const debugPanel = document.getElementById('debugPanel');
+            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+            debugLogger.log('Debug panel toggled');
+        }
+        function openSettings() { debugLogger.log('Settings opened'); }
+        function adjustCaseSize(change) { 
+            gameState.caseSize += change;
+            debugLogger.log(`Case size adjusted: ${change}, new size: ${gameState.caseSize}`);
+        }
+    </script>
+</body>
+</html>
