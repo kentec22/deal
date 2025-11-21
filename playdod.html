@@ -424,6 +424,109 @@
             margin-top: 30px;
         }
 
+        /* Offer Display Splash */
+        .offer-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+
+        .offer-display-content {
+            background: linear-gradient(135deg, #2d1a6c, #1f1fb2);
+            border: 5px solid gold;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 70%;
+        }
+
+        .banker-offer-amount {
+            font-size: 5em;
+            color: #FFD700;
+            margin: 30px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            animation: offerPulse 2s infinite;
+        }
+
+        .decision-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .decision-btn {
+            padding: 20px 40px;
+            font-size: 1.8em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .deal-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .no-deal-btn {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .decision-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Game End Splash */
+        .game-end-splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1003;
+        }
+
+        .game-end-content {
+            background: linear-gradient(135deg, #1a6c2d, #1fb26c);
+            border: 5px solid #FFD700;
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .final-case {
+            font-size: 4em;
+            color: #FFD700;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+        }
+
+        .final-amount {
+            font-size: 6em;
+            color: #4CAF50;
+            margin: 30px 0;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.8);
+            animation: finalReveal 2s ease-out;
+        }
+
         /* Controls */
         .size-controls {
             display: flex;
@@ -483,10 +586,6 @@
             100% { transform: scale(1); }
         }
 
-        .case.opening {
-            animation: caseOpen 0.5s ease-in-out;
-        }
-
         @keyframes amountReveal {
             0% { opacity: 0; transform: translateY(-20px) scale(0.8); }
             70% { opacity: 1; transform: translateY(0) scale(1.1); }
@@ -496,6 +595,17 @@
         @keyframes fadeOut {
             from { opacity: 1; }
             to { opacity: 0.5; }
+        }
+
+        @keyframes offerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes finalReveal {
+            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            70% { opacity: 1; transform: scale(1.1) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
         }
 
         .fade-out {
@@ -544,6 +654,14 @@
                 grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(5, 1fr);
             }
+
+            .banker-offer-amount {
+                font-size: 4em;
+            }
+
+            .final-amount {
+                font-size: 5em;
+            }
         }
 
         @media (max-width: 768px) {
@@ -574,6 +692,19 @@
             .amounts-grid {
                 grid-template-columns: 1fr;
             }
+
+            .banker-offer-amount {
+                font-size: 3em;
+            }
+
+            .final-amount {
+                font-size: 4em;
+            }
+
+            .decision-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -600,6 +731,19 @@
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr 1fr;
                 height: 12vh;
+            }
+
+            .banker-offer-amount {
+                font-size: 2.5em;
+            }
+
+            .final-amount {
+                font-size: 3em;
+            }
+
+            .decision-btn {
+                padding: 15px 30px;
+                font-size: 1.5em;
             }
         }
     </style>
@@ -731,6 +875,38 @@
                     CANCEL
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Offer Display Splash -->
+    <div class="offer-display" id="offerDisplaySplash">
+        <div class="offer-display-content">
+            <div class="splash-title">BANKER'S OFFER</div>
+            <div class="splash-message">The banker is offering you:</div>
+            <div class="banker-offer-amount" id="displayOfferAmount">₱0</div>
+            <div class="splash-message">Will you take the deal?</div>
+            <div class="decision-buttons">
+                <button class="decision-btn deal-btn" onclick="handleDealDecision(true)">
+                    DEAL
+                </button>
+                <button class="decision-btn no-deal-btn" onclick="handleDealDecision(false)">
+                    NO DEAL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game End Splash -->
+    <div class="game-end-splash" id="gameEndSplash">
+        <div class="game-end-content">
+            <div class="splash-title">GAME OVER</div>
+            <div class="splash-message">Your final case contained:</div>
+            <div class="final-case">Case #<span id="finalCaseNumber">0</span></div>
+            <div class="final-amount" id="finalAmount">₱0</div>
+            <div class="splash-message" id="endGameMessage">Thank you for playing!</div>
+            <button class="btn btn-primary btn-lg" onclick="restartGame()" style="font-size: 1.5em; padding: 15px 30px; margin-top: 30px;">
+                PLAY AGAIN
+            </button>
         </div>
     </div>
 
@@ -1156,9 +1332,10 @@
 
                     // Check if level is complete
                     if (gameState.casesToOpenThisLevel === 0) {
+                        // Add delay before showing banker offer
                         setTimeout(() => {
                             showBankerOffer();
-                        }, 1500);
+                        }, 2000); // 2-second delay after last case opens
                     } else {
                         debugLog(`${gameState.casesToOpenThisLevel} cases remaining to open this level`);
                     }
@@ -1195,49 +1372,70 @@
             document.getElementById('amountOfferedDisplay').textContent = `₱${offerAmount.toLocaleString()}`;
             
             document.getElementById('bankerOfferModal').style.display = 'none';
-            enableGameButtons(true);
+            
+            // Show offer display splash with 5-second delay
+            setTimeout(() => {
+                showOfferDisplay();
+            }, 500);
         }
 
-        // Accept deal
-        function acceptDeal() {
-            debugLog('Deal accepted!');
-            gameState.audioController.stop();
+        // Show offer display splash
+        function showOfferDisplay() {
+            document.getElementById('displayOfferAmount').textContent = `₱${gameState.bankerOffer.toLocaleString()}`;
+            document.getElementById('offerDisplaySplash').style.display = 'flex';
+        }
+
+        // Handle deal decision
+        function handleDealDecision(acceptDeal) {
+            document.getElementById('offerDisplaySplash').style.display = 'none';
             
-            const isWin = gameState.bankerOffer >= Math.max(...gameState.remainingAmounts);
-            if (isWin) {
-                gameState.audioController.play('win');
+            if (acceptDeal) {
+                debugLog('Deal accepted!');
+                gameState.audioController.stop();
+                
+                const isWin = gameState.bankerOffer >= Math.max(...gameState.remainingAmounts);
+                if (isWin) {
+                    gameState.audioController.play('win');
+                } else {
+                    gameState.audioController.play('lose');
+                }
+                
+                // Show game end splash after 5-second delay
+                setTimeout(() => {
+                    showGameEnd(true);
+                }, 5000);
             } else {
-                gameState.audioController.play('lose');
-            }
-            
-            endGame(true);
-        }
-
-        // Reject deal
-        function rejectDeal() {
-            debugLog('Deal rejected!');
-            gameState.audioController.play('loop');
-            enableGameButtons(false);
-            gameState.currentLevel++;
-            
-            if (getRemainingCasesCount() > 1) {
-                startLevel();
-            } else {
-                endGame(false);
+                debugLog('Deal rejected!');
+                gameState.audioController.play('loop');
+                enableGameButtons(false);
+                gameState.currentLevel++;
+                
+                // Add 5-second delay before next level
+                setTimeout(() => {
+                    if (getRemainingCasesCount() > 1) {
+                        startLevel();
+                    } else {
+                        showGameEnd(false);
+                    }
+                }, 5000);
             }
         }
 
-        // End game
-        function endGame(dealAccepted) {
+        // Show game end splash
+        function showGameEnd(dealAccepted) {
             gameState.gamePhase = 'ended';
             enableGameButtons(false);
             
+            const playerCaseAmount = getPlayerCaseAmount();
+            document.getElementById('finalCaseNumber').textContent = gameState.playerCase;
+            document.getElementById('finalAmount').textContent = `₱${playerCaseAmount.toLocaleString()}`;
+            
             let message = dealAccepted ? 
                 `You accepted the deal for ₱${gameState.bankerOffer.toLocaleString()}!` :
-                `Game Over! Your case contained: ₱${getPlayerCaseAmount().toLocaleString()}`;
+                `Game Over! Your case contained: ₱${playerCaseAmount.toLocaleString()}`;
             
-            alert(message);
-            debugLog(`Game ended: ${message}`);
+            document.getElementById('endGameMessage').textContent = message;
+            document.getElementById('gameEndSplash').style.display = 'flex';
         }
 
         // Get player's case amount
@@ -1267,7 +1465,7 @@
         }
 
         function hideAllSplashes() {
-            document.querySelectorAll('.splash-screen').forEach(splash => {
+            document.querySelectorAll('.splash-screen, .offer-display, .game-end-splash').forEach(splash => {
                 splash.style.display = 'none';
             });
         }
