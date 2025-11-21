@@ -342,6 +342,17 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
+        .countdown-timer {
+            font-size: 2em;
+            color: #FFD700;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .skip-button {
+            margin-top: 20px;
+        }
+
         /* Banker Offer Modal */
         .offer-modal {
             position: fixed;
@@ -628,9 +639,13 @@
         <div class="splash-content">
             <div class="splash-title">SELECT YOUR CASE</div>
             <div class="splash-message">Click on any case to select it as your personal case</div>
+            <div class="countdown-timer" id="countdownTimer">10</div>
             <div class="splash-message" style="font-size: 1.2em; color: gold; margin-top: 20px;">
                 Cases are displayed below - click one to continue
             </div>
+            <button class="btn btn-warning skip-button" onclick="skipCaseSelection()">
+                SKIP (Auto-select case 1)
+            </button>
         </div>
     </div>
 
@@ -685,7 +700,9 @@
             settings: null,
             audioController: null,
             caseSize: 100,
-            christmasTheme: true
+            christmasTheme: true,
+            caseSelectionTimer: null,
+            countdownTime: 10
         };
 
         // Audio Controller
@@ -721,7 +738,7 @@
                     this.currentAudio.play().catch(e => {
                         debugLog(`Audio play error: ${e.message}`);
                     });
-                    debugLog(`Playing: ${trackName}`);
+                    debugLog(`Playing: ${trackName} ${loop ? '(looping)' : ''}`);
                 }
             }
 
@@ -729,6 +746,7 @@
                 if (this.currentAudio) {
                     this.currentAudio.pause();
                     this.currentAudio.currentTime = 0;
+                    this.currentAudio = null;
                 }
             }
 
@@ -865,10 +883,52 @@
         // Show case selection
         function showCaseSelection() {
             showSplash('caseSelectSplash');
-            gameState.audioController.play('selectCase');
+            gameState.audioController.play('selectCase', true); // Loop the case selection music
             gameState.gamePhase = 'caseSelect';
             renderCases();
             renderAmounts();
+            
+            // Start countdown timer
+            startCaseSelectionCountdown();
+        }
+
+        // Start countdown timer for case selection
+        function startCaseSelectionCountdown() {
+            gameState.countdownTime = 10;
+            updateCountdownDisplay();
+            
+            gameState.caseSelectionTimer = setInterval(() => {
+                gameState.countdownTime--;
+                updateCountdownDisplay();
+                
+                if (gameState.countdownTime <= 0) {
+                    skipCaseSelection();
+                }
+            }, 1000);
+        }
+
+        // Update countdown display
+        function updateCountdownDisplay() {
+            const countdownElement = document.getElementById('countdownTimer');
+            if (countdownElement) {
+                countdownElement.textContent = gameState.countdownTime;
+                
+                // Add visual feedback for low time
+                if (gameState.countdownTime <= 3) {
+                    countdownElement.style.color = '#ff4444';
+                    countdownElement.style.animation = 'pulse 0.5s infinite';
+                } else {
+                    countdownElement.style.color = '#FFD700';
+                    countdownElement.style.animation = 'none';
+                }
+            }
+        }
+
+        // Skip case selection (auto-select case 1)
+        function skipCaseSelection() {
+            debugLog('Skipping case selection - auto-selecting case 1');
+            clearInterval(gameState.caseSelectionTimer);
+            selectCase(1);
         }
 
         // Render cases grid
@@ -918,6 +978,9 @@
         // Select a case (player's personal case)
         function selectCase(caseNumber) {
             if (gameState.gamePhase !== 'caseSelect') return;
+            
+            // Clear the countdown timer
+            clearInterval(gameState.caseSelectionTimer);
             
             debugLog(`Player selected case: ${caseNumber}`);
             gameState.playerCase = caseNumber;
