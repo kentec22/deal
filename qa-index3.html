@@ -106,7 +106,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo"><div style="font-size:12px;text-align:center;color:gold">Company<br>Logo</div></div>
+           <div class="logo">
+    <img src="company.png" 
+         alt="Company Logo" 
+         style="width:100%;height:auto;object-fit:contain;" />
+</div>
             <div class="game-title">
                 <img src="dodTransparent.png" alt="DEAL OR NO DEAL" class="game-title-img" onerror="this.style.display='none';document.querySelector('.game-title').textContent='DEAL OR NO DEAL'">
             </div>
@@ -477,10 +481,20 @@
         // keyboard quick shortcuts (for pro testing)
         window.addEventListener('keydown',(e)=>{ if(e.key==='d') toggleDebug(); if(e.key==='r') restartGame(); if(e.key==='s') openSettings(); });
 
-    // Added: play intro on load
+   // Added: play intro on load (with autoplay fallback)
 window.addEventListener('load', () => {
-    AudioController.playLoop('intro');
+    try {
+        AudioController.playLoop('intro');
+    } catch (e) {
+        console.warn("Autoplay blocked:", e);
+    }
+
+    // Force playback on first user click if blocked
+    document.body.addEventListener('click', () => {
+        try { AudioController.playLoop('intro'); } catch(e){}
+    }, { once: true });
 });
+
 
 // Modify startGame to delay 10 seconds
 if (typeof startGame === 'function') {
@@ -488,7 +502,7 @@ if (typeof startGame === 'function') {
     startGame = function() {
         setTimeout(() => {
             originalStartGame();
-        }, 10000);
+        }, 20000);
     }
 }
 </script>
