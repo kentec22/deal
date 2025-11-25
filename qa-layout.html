@@ -1,44 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Layout</title>
-  <style>
+<meta charset="UTF-8">
+<title>Deal or No Deal Layout</title>
+<style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
+        margin: 0;
+        padding: 0;
+        background: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
     }
-    .image-container {
-      margin: 20px 0;
+
+    .sidebar {
+        width: 20%;
+        border-right: 4px solid black;
+        padding: 10px;
+        box-sizing: border-box;
     }
-    h1 {
-      color: #333;
+
+    .rightbar {
+        width: 20%;
+        border-left: 4px solid black;
+        padding: 10px;
+        box-sizing: border-box;
     }
-    p {
-      color: #666;
+
+    .center {
+        width: 60%;
+        padding: 10px;
+        box-sizing: border-box;
     }
-  </style>
+
+    .logo-box,
+    .settings-box {
+        border: 4px solid black;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .amount-box {
+        border: 3px solid black;
+        padding: 10px;
+        margin-bottom: 10px;
+        font-size: 24px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .board {
+        border: 4px solid black;
+        height: calc(100% - 110px);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+        gap: 15px;
+    }
+
+    .case {
+        border: 4px solid black;
+        width: 130px;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .case-opened {
+        flex-direction: column;
+        font-size: 28px;
+    }
+
+    .footer-label {
+        position: absolute;
+        bottom: 10px;
+        width: 20%;
+        text-align: center;
+        font-size: 18px;
+        color: gray;
+    }
+
+    .footer-center {
+        width: 60% !important;
+    }
+</style>
 </head>
 <body>
 
-  <h1>Your Image Title</h1>
-  
-  <div class="image-container">
-    <img src="path/to/your/image.jpg" alt="Description of Image" style="max-width: 100%; height: auto;">
-  </div>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="logo-box">company.png</div>
 
-  <p>This is a description of the image. You can add more information here if needed.</p>
+        <div class="amount-box">100</div>
+        <div class="amount-box">200</div>
+        <div class="amount-box"></div>
+        <div class="amount-box"></div>
 
-  <div class="additional-info">
-    <h2>Additional Info</h2>
-    <p>More details or context about the image can go here.</p>
-  </div>
+        <div class="footer-label">lower amount</div>
+    </div>
 
-  <footer>
-    <p>&copy; 2023 Your Company Name</p>
-  </footer>
+    <!-- Center Board -->
+    <div class="center">
+        <div class="logo-box">dodTransparent.png</div>
+
+        <div class="board">
+
+            <div style="text-align:center; margin-bottom:10px; font-size:18px;">
+                unopened case &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; opened case
+            </div>
+
+            <!-- TOP ROW -->
+            <div class="row">
+                <div class="case">1</div>
+                <div class="case">2</div>
+                <div class="case case-opened">3<br><span style="font-size:20px;">300</span></div>
+                <div class="case"></div>
+            </div>
+
+            <!-- MID ROWS -->
+            <div class="row">
+                <div class="case"></div>
+                <div class="case"></div>
+                <div class="case"></div>
+                <div class="case"></div>
+            </div>
+
+            <div class="row">
+                <div class="case"></div>
+                <div class="case"></div>
+                <div class="case"></div>
+                <div class="case"></div>
+            </div>
+
+            <!-- BOTTOM SUITCASE ROW -->
+            <div class="row">
+                <div class="case"></div>
+                <div class="case"></div>
+                <div class="case"></div>
+            </div>
+
+        </div>
+
+        <div class="footer-label footer-center">suitcase.png</div>
+
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="rightbar">
+        <div class="settings-box">
+            settings button,<br>
+            debug button,<br>
+            reset button
+        </div>
+
+        <div class="amount-box">2,000</div>
+        <div class="amount-box">3,000</div>
+        <div class="amount-box"></div>
+        <div class="amount-box"></div>
+
+        <div class="footer-label">higher amount</div>
+    </div>
 
 </body>
 </html>
