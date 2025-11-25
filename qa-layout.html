@@ -1,56 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Selection</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .color-div {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="color"] {
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Layout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+    }
+    .image-container {
+      margin: 20px 0;
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      color: #666;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Choose Your Colors</h1>
+  <h1>Your Image Title</h1>
+  
+  <div class="image-container">
+    <img src="path/to/your/image.jpg" alt="Description of Image" style="max-width: 100%; height: auto;">
+  </div>
 
-    <div class="color-div">
-        <label for="color1">Select Color 1:</label>
-        <input type="color" id="color1" name="color1">
-    </div>
+  <p>This is a description of the image. You can add more information here if needed.</p>
 
-    <div class="color-div">
-        <label for="color2">Select Color 2:</label>
-        <input type="color" id="color2" name="color2">
-    </div>
+  <div class="additional-info">
+    <h2>Additional Info</h2>
+    <p>More details or context about the image can go here.</p>
+  </div>
 
-    <div class="color-div">
-        <label for="color3">Select Color 3:</label>
-        <input type="color" id="color3" name="color3">
-    </div>
-
-    <div class="color-div">
-        <label for="color4">Select Color 4:</label>
-        <input type="color" id="color4" name="color4">
-    </div>
-
-    <div class="color-div">
-        <label for="color5">Select Color 5:</label>
-        <input type="color" id="color5" name="color5">
-    </div>
-
-    <button type="submit">Submit Colors</button>
+  <footer>
+    <p>&copy; 2023 Your Company Name</p>
+  </footer>
 
 </body>
 </html>
