@@ -1,61 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Deal or No Deal — Remote</title>
+<meta charset="UTF-8">
+<title>Deal Remote</title>
 <style>
-  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b0b0b;color:#fff;display:flex;flex-direction:column;min-height:100vh;align-items:center;gap:12px;padding:12px}
-  h1{color:#ffcc33;margin:6px;font-size:20px}
-  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:420px}
-  button{padding:14px;font-weight:900;border-radius:8px;border:none;background:#ffcc33;color:#000;cursor:pointer}
-  .ctrls{display:flex;gap:8px;width:100%;max-width:420px}
-  .btn-ghost{background:#111;color:#ffcc33;border:2px solid #333}
-  .big{padding:16px;font-size:18px}
-  .note{color:#aaa;font-size:13px;text-align:center}
+    body { background:black; color:white; text-align:center; font-family:Arial; }
+    input { font-size:30px; padding:10px; margin-top:20px; text-align:center; }
+    button { font-size:30px; padding:15px 30px; margin-top:20px; background:gold; border:0; border-radius:10px; }
 </style>
 </head>
+
 <body>
-  <h1>Remote Controller</h1>
-  <div class="ctrls">
-    <button id="start" class="big">START</button>
-    <button id="reset" class="btn-ghost big">RESET</button>
-  </div>
 
-  <div class="note">Tap the case number to select (or open) it on the main board.</div>
+<h1>Enter Pair Code</h1>
+<input id="codeInput" placeholder="000000" maxlength="6" />
+<button onclick="join()">PAIR</button>
 
-  <div class="grid" id="grid">
-    <!-- buttons inserted by script -->
-  </div>
+<div id="remoteArea" style="display:none;">
+    <h1>Banker Panel</h1>
+    <p>Enter Offer (₱)</p>
+    <input id="offerInput" />
+    <button onclick="sendOffer()">SEND OFFER</button>
+</div>
 
 <script>
-(function(){
-  const KEY = 'dond_remote_action';
-  const grid = document.getElementById('grid');
-  for(let i=1;i<=15;i++){
-    const b = document.createElement('button');
-    b.textContent = i;
-    b.addEventListener('click', ()=> {
-      const payload = {type:'select', case:i, ts:Date.now()};
-      localStorage.setItem(KEY, JSON.stringify(payload));
-      // small visual feedback
-      b.style.transform = 'scale(0.96)';
-      setTimeout(()=>b.style.transform='',120);
-    });
-    grid.appendChild(b);
-  }
+let ws = new WebSocket("ws://localhost:8080");
 
-  document.getElementById('start').addEventListener('click', ()=>{
-    localStorage.setItem(KEY, JSON.stringify({type:'start', ts:Date.now()}));
-    alert('Start sent');
-  });
-  document.getElementById('reset').addEventListener('click', ()=>{
-    if(confirm('Reset game on main board?')) {
-      localStorage.setItem(KEY, JSON.stringify({type:'reset', ts:Date.now()}));
-      alert('Reset sent');
+function join() {
+    ws.send(JSON.stringify({
+        type:"joinPair",
+        code: document.getElementById("codeInput").value
+    }));
+}
+
+ws.onmessage = msg => {
+    let data = JSON.parse(msg.data);
+
+    if (data.type === "pairJoined") {
+        document.getElementById("remoteArea").style.display = "block";
     }
-  });
-})();
+};
+
+function sendOffer() {
+    let amount = parseInt(document.getElementById("offerInput").value);
+    ws.send(JSON.stringify({
+        type:"remoteCommand",
+        command:"setOffer",
+        amount
+    }));
+}
 </script>
+
 </body>
 </html>
