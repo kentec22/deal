@@ -1,518 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Deal or No Deal — Main</title>
+<meta charset="UTF-8" />
+<title>Deal or No Deal - Main Board</title>
+
 <style>
-:root{
-  --gold:#ffcc33; --gold-dark:#cc9900; --gold-border:#ffdd55; --bg:#000;
-  --panel:#111; --muted:#aaa;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:white;font-family:"Arial Black",Arial,Helvetica,sans-serif}
-.app{display:flex;height:100vh;gap:8px;padding:8px}
-.panel{padding:12px;min-width:160px}
-.left,.right{width:18%;min-width:160px;background:linear-gradient(#090909,#141414);border-radius:6px;display:flex;flex-direction:column}
-.center{flex:1;display:flex;flex-direction:column}
-.logo {max-height:84px;width:100%;object-fit:contain}
-.amount-box{background:#151515;border:3px solid rgba(255,255,255,0.06);padding:12px;text-align:center;font-size:20px;font-weight:800;color:var(--gold);margin-bottom:8px}
-.amount-box.struck{opacity:0.25;color:#999;text-decoration:line-through}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.controls{display:flex;gap:8px;align-items:center}
-.btn{background:var(--gold);color:#000;padding:10px 14px;border-radius:6px;font-weight:900;cursor:pointer;border:none}
-.btn.secondary{background:#111;color:var(--gold);border:2px solid var(--gold)}
-.board{flex:1;border:6px solid var(--gold-border);margin-top:10px;padding:18px;display:flex;flex-direction:column;background:linear-gradient(#100,#000);border-radius:6px}
-.board-title{display:flex;justify-content:space-between;color:var(--gold);font-weight:900}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;flex:1;align-items:stretch;margin-top:12px}
-.grid-3{grid-template-columns:repeat(3,1fr)}
-.case{
-  background:var(--gold);border:6px solid var(--gold-border);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:#000;font-weight:900;cursor:pointer;min-height:150px;font-size:56px;transition:transform .15s,box-shadow .15s,background .15s;
-  position:relative;overflow:hidden;border-radius:6px;
-}
-.case.small{min-height:110px;font-size:40px}
-.case:hover{transform:scale(1.05);box-shadow:0 16px 40px rgba(255,204,51,0.12)}
-.case.selected{background:var(--gold-dark);border-color:#ffaa00}
-.case.revealed{background:#0b0b0b;color:var(--gold);border-color:#222}
-.case .label-number{z-index:2}
-.case .label-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:3;opacity:0;transform:translateY(10px);transition:opacity .28s,transform .28s}
-.case.revealed .label-value{opacity:1;transform:translateY(0)}
-.case-overlay{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.98}
-.flip-container {perspective:1200px;width:100%;height:100%}
-.flipper{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
-.flip-front, .flip-back{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center}
-.flip-front{z-index:2;transform:rotateY(0)}
-.flip-back{transform:rotateY(180deg);color:var(--gold);background:#0b0b0b}
-.flipped .flipper{transform:rotateY(180deg)}
-.suitcase-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:12px}
-.footer-note{text-align:center;color:var(--gold);font-weight:900;font-size:24px;margin-top:12px}
-.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:999}
-.modal{background:#070707;border:6px solid var(--gold-border);padding:18px;border-radius:8px;text-align:center;min-width:300px}
-.offers-list{max-height:140px;overflow:auto;padding:8px;background:#060606;border-radius:6px;border:1px solid rgba(255,255,255,0.03);margin-top:8px}
-.stats{display:flex;gap:12px;align-items:center}
-.stat{background:#080808;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);min-width:120px;text-align:center}
-.controls-bottom{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
-.slider{width:180px}
-.small-muted{color:var(--muted);font-size:13px}
-@media(max-width:1000px){
-  .left,.right{display:none}
-  .grid{grid-template-columns:repeat(3,1fr)}
-  .case{min-height:110px;font-size:40px}
-}
-@media(max-width:560px){
-  .grid{grid-template-columns:repeat(2,1fr)}
-  .suitcase-row{grid-template-columns:repeat(2,1fr)}
-  .case{min-height:86px;font-size:32px}
-  .footer-note{font-size:18px}
-}
+    body {
+        margin: 0;
+        background: black;
+        color: white;
+        font-family: Arial Black;
+        overflow: hidden;
+    }
+
+    #pairingBox {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255,255,255,0.15);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .case {
+        width: 160px;
+        height: 120px;
+        background: url("images/suitcase.png");
+        background-size: cover;
+        border: 4px solid gold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 50px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .case:hover {
+        transform: scale(1.1);
+    }
+
+    .opened {
+        background: url("images/suitcase-open.png");
+        background-size: cover;
+        color: gold;
+    }
+
+    #offerPopup {
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #222;
+        border: 4px solid gold;
+        padding: 40px;
+        display: none;
+        text-align: center;
+        font-size: 36px;
+        border-radius: 20px;
+    }
+
+    #offerAmount {
+        font-size: 60px;
+        margin-top: 20px;
+        color: gold;
+    }
+
+    #startGameBtn {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 20px 40px;
+        background: gold;
+        font-size: 30px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    #casesToOpen {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 40px;
+        color: gold;
+    }
 </style>
 </head>
+
 <body>
 
-<div class="app">
-  <!-- LEFT -->
-  <div class="left panel">
-    <div style="padding:8px;text-align:center">
-      <img src="company.png" alt="company" class="logo">
-    </div>
-
-    <div id="left-amounts" style="margin-top:8px"></div>
-    <div style="flex:1"></div>
-    <div style="text-align:center;color:var(--muted);padding:8px">lower amount</div>
-  </div>
-
-  <!-- CENTER -->
-  <div class="center panel">
-    <div class="topbar">
-      <img src="dodTransparent.png" alt="logo" class="logo" style="height:80px;max-width:60%">
-      <div class="controls">
-        <div class="small-muted">Round: <span id="round-label">0</span></div>
-        <button id="startBtn" class="btn">START GAME</button>
-        <button id="resetBtn" class="btn secondary">RESET</button>
-      </div>
-    </div>
-
-    <div class="board" id="board">
-      <div class="board-title"><div>UNOPENED CASES</div><div>OPENED CASES</div></div>
-
-      <div id="cases-grid" class="grid"></div>
-
-      <div id="suitcase-row" class="suitcase-row"></div>
-
-      <div class="footer-note">Cases to Open: <span id="cases-to-open">0</span></div>
-
-      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
-        <div class="stats">
-          <div class="stat">EV: <div id="ev" style="font-size:20px">₱0</div></div>
-          <div class="stat">StdDev: <div id="std" style="font-size:20px">₱0</div></div>
-          <div class="stat">Remaining: <div id="remaining-count" style="font-size:20px">15</div></div>
-        </div>
-
-        <div>
-          <div style="text-align:right" class="small-muted">Risk Aversion</div>
-          <input id="riskSlider" class="slider" type="range" min="50" max="120" value="100">
-        </div>
-      </div>
-
-      <div class="controls-bottom">
-        <div class="small-muted">Past Offers:</div>
-        <div id="offers" class="offers-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT -->
-  <div class="right panel">
-    <div style="padding:8px;text-align:center">
-      <div style="display:inline-block;padding:8px;border:3px solid var(--gold-border);border-radius:6px">settings<br><span class="small-muted">debug / remote</span></div>
-    </div>
-
-    <div id="right-amounts" style="margin-top:8px"></div>
-    <div style="flex:1"></div>
-    <div style="text-align:center;color:var(--muted);padding:8px">higher amount</div>
-  </div>
+<div id="pairingBox">
+    <button onclick="createPair()">Generate Pair Code</button><br>
+    <span id="pairCode"></span>
 </div>
 
-<!-- Offer Modal -->
-<div id="offerModal" class="modal-backdrop" aria-hidden="true">
-  <div class="modal">
-    <h2 style="color:var(--gold)">Banker's Offer</h2>
-    <div style="font-size:34px;font-weight:900;color:var(--gold)">₱<span id="offerAmount">0</span></div>
-    <div style="margin-top:12px">
-      <button id="acceptOffer" class="btn">ACCEPT</button>
-      <button id="declineOffer" class="btn secondary">NO DEAL</button>
-    </div>
-  </div>
+<div id="board"></div>
+
+<div id="offerPopup">
+    BANKER OFFER
+    <div id="offerAmount"></div>
 </div>
+
+<div id="casesToOpen"></div>
+
+<div id="startGameBtn" onclick="startGame()">START GAME</div>
 
 <!-- Audio -->
-<audio id="audio-intro" src="intro.mp3" loop></audio>
-<audio id="audio-select" src="selecting_case.mp3"></audio>
-<audio id="audio-offer" src="offer.mp3"></audio>
-<audio id="audio-loop" src="loop.mp3" loop></audio>
-<audio id="audio-reveal-small" src="reveal_small.mp3"></audio>
-<audio id="audio-reveal-big" src="reveal_big.mp3"></audio>
+<audio id="intro" src="audio/intro.mp3" loop></audio>
+<audio id="select" src="audio/selecting_case.mp3"></audio>
+<audio id="offerSound" src="audio/offer.mp3"></audio>
+<audio id="smallReveal" src="audio/case_reveal_small.mp3"></audio>
+<audio id="bigReveal" src="audio/case_reveal_big.mp3"></audio>
 
 <script>
-/* Main game script with banker calculation, flip animation, remote support via localStorage */
-(function(){
-  /* Data (from ingestion) */
-  const allAmounts = [0,10,100,250,500,750,1000,1500,2000,2500,3000,4000,5000,7000,10000];
+let ws = new WebSocket("ws://localhost:8080");
+let currentRound = 1;
+let roundCases = {1:4, 2:3, 3:2, 4:1, 5:1, 6:1, 7:1, 8:1};
+let toOpen = roundCases[currentRound];
+let caseValues = [
+    0,10,100,250,500,750,
+    1000,1500,2000,2500,3000,
+    4000,5000,7000,10000
+];
+let casesOpened = 0;
 
-  /* DOM refs */
-  const leftPanel = document.getElementById('left-amounts');
-  const rightPanel = document.getElementById('right-amounts');
-  const grid = document.getElementById('cases-grid');
-  const suitcaseRow = document.getElementById('suitcase-row');
-  const casesToOpenEl = document.getElementById('cases-to-open');
-  const roundLabel = document.getElementById('round-label');
-  const evEl = document.getElementById('ev');
-  const stdEl = document.getElementById('std');
-  const remainingCountEl = document.getElementById('remaining-count');
-  const offersEl = document.getElementById('offers');
-  const offerModal = document.getElementById('offerModal');
-  const offerAmountEl = document.getElementById('offerAmount');
+document.getElementById("casesToOpen").innerText =
+    "Cases to Open: " + toOpen;
 
-  /* audio */
-  const audioIntro = document.getElementById('audio-intro');
-  const audioSelect = document.getElementById('audio-select');
-  const audioOffer = document.getElementById('audio-offer');
-  const audioLoop = document.getElementById('audio-loop');
-  const audioRevealSmall = document.getElementById('audio-reveal-small');
-  const audioRevealBig = document.getElementById('audio-reveal-big');
+window.onload = () => {
+    intro.play();
+    buildBoard();
+};
 
-  const startBtn = document.getElementById('startBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const acceptOfferBtn = document.getElementById('acceptOffer');
-  const declineOfferBtn = document.getElementById('declineOffer');
-  const riskSlider = document.getElementById('riskSlider');
+function buildBoard() {
+    const board = document.getElementById("board");
+    board.style.display = "grid";
+    board.style.gridTemplateColumns = "repeat(5, 1fr)";
+    board.style.gridGap = "20px";
+    board.style.padding = "40px";
 
-  /* rounds classic-ish */
-  const rounds = [6,5,4,3,2,1,1,1];
-  let roundIndex = 0;
-  let casesToOpenThisRound = 0;
-  let mapping = {}; // case -> amount
-  let openedCases = new Set();
-  let selectedCaseNumber = null;
-  let remainingAmounts = [];
-  let offerHistory = [];
-  let gameStarted = false;
-
-  /* remote polling / control via localStorage */
-  const REMOTE_KEY = 'dond_remote_action';
-  let lastRemoteTs = 0;
-  function pollRemote(){
-    try{
-      const raw = localStorage.getItem(REMOTE_KEY);
-      if(!raw) return;
-      const data = JSON.parse(raw);
-      if(data.ts && data.ts > lastRemoteTs){
-        lastRemoteTs = data.ts;
-        handleRemoteAction(data);
-      }
-    }catch(e){}
-  }
-  setInterval(pollRemote, 400);
-
-  function handleRemoteAction(action){
-    if(action.type === 'start'){
-      if(!gameStarted) startGame();
-    } else if(action.type === 'select'){
-      // emulate click on case number
-      const n = Number(action.case);
-      const el = document.querySelector(`.case[data-case="${n}"]`);
-      if(el) el.click();
-    } else if(action.type === 'reset'){
-      resetGame();
+    for (let i = 1; i <= 15; i++) {
+        let div = document.createElement("div");
+        div.className = "case";
+        div.innerText = i;
+        div.onclick = () => selectCase(i, div);
+        board.appendChild(div);
     }
-  }
+}
 
-  /* UI helpers */
-  function peso(v){ return '₱' + Number(v).toLocaleString(); }
+function startGame() {
+    document.getElementById("startGameBtn").style.display = "none";
+    intro.pause();
+}
 
-  function renderAmountPanels(){
-    leftPanel.innerHTML=''; rightPanel.innerHTML='';
-    const left = allAmounts.slice(0,8), right = allAmounts.slice(8);
-    left.forEach(v=>{
-      const d = document.createElement('div'); d.className='amount-box'; d.dataset.value=v; d.textContent = peso(v);
-      leftPanel.appendChild(d);
+function selectCase(num, el) {
+    if (el.classList.contains("opened") || toOpen === 0) return;
+
+    select.play();
+
+    let value = caseValues[num - 1];
+
+    setTimeout(() => {
+        el.classList.add("opened");
+        if (value <= 1500) smallReveal.play();
+        else bigReveal.play();
+
+        toOpen--;
+        casesOpened++;
+        document.getElementById("casesToOpen").innerText =
+            "Cases to Open: " + toOpen;
+
+        if (toOpen === 0) bankerTurn();
+    }, 800);
+}
+
+function bankerTurn() {
+    let offer = calculateOffer();
+    ws.send(JSON.stringify({type:"hostCommand", command:"offer", offer}));
+    showOffer(offer);
+
+    currentRound++;
+    toOpen = roundCases[currentRound] ?? 1;
+}
+
+function calculateOffer() {
+    let remaining = caseValues.filter((v, i) => {
+        let c = document.getElementsByClassName("case")[i];
+        return !c.classList.contains("opened");
     });
-    right.forEach(v=>{
-      const d = document.createElement('div'); d.className='amount-box'; d.dataset.value=v; d.textContent = peso(v);
-      rightPanel.appendChild(d);
-    });
-  }
 
-  function initMapping(){
-    const caseNums = Array.from({length:15},(_,i)=>i+1);
-    const shuffled = shuffle([...allAmounts]);
-    mapping = {};
-    caseNums.forEach((num,i)=> mapping[num] = shuffled[i]);
-    remainingAmounts = [...allAmounts];
-  }
+    let avg = remaining.reduce((a,b)=>a+b)/remaining.length;
+    return Math.round(avg * 0.55); // banker deal factor
+}
 
-  function buildGrid(){
-    grid.innerHTML=''; suitcaseRow.innerHTML='';
-    for(let n=1;n<=12;n++){
-      const el = createCaseElement(n);
-      grid.appendChild(el);
+function showOffer(amount) {
+    offerSound.play();
+    document.getElementById("offerAmount").innerText = "₱" + amount.toLocaleString();
+    document.getElementById("offerPopup").style.display = "block";
+    setTimeout(() => {
+        document.getElementById("offerPopup").style.display = "none";
+    }, 6000);
+}
+
+function createPair() {
+    ws.send(JSON.stringify({type:"createPair"}));
+}
+
+ws.onmessage = msg => {
+    let data = JSON.parse(msg.data);
+
+    if (data.type === "pairCreated") {
+        document.getElementById("pairCode").innerText =
+            "Code: " + data.code;
     }
-    // last three into suitcaseRow with small class
-    for(let n=13;n<=15;n++){
-      const el = createCaseElement(n, true);
-      suitcaseRow.appendChild(el);
+
+    if (data.type === "remoteConnected") {
+        document.getElementById("pairCode").innerText += "\nRemote Connected!";
     }
-  }
 
-  function createCaseElement(num, small=false){
-    const el = document.createElement('div');
-    el.className = 'case' + (small ? ' small' : '');
-    el.dataset.case = num;
-    // flip structure for animation
-    el.innerHTML = `
-      <div class="flip-container">
-        <div class="flipper">
-          <div class="flip-front">
-            <div class="label-number">${num}</div>
-          </div>
-          <div class="flip-back">
-            <div class="label-value">?</div>
-          </div>
-        </div>
-      </div>
-    `;
-    el.addEventListener('click', onCaseClick);
-    return el;
-  }
-
-  /* shuffle util */
-  function shuffle(a){
-    for(let i=a.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];
+    // remote banker sends new offer
+    if (data.type === "remoteCommand" && data.command === "setOffer") {
+        showOffer(data.amount);
     }
-    return a;
-  }
-
-  /* click handling */
-  function onCaseClick(e){
-    const el = e.currentTarget;
-    const num = Number(el.dataset.case);
-    // if not started: first click selects player's personal case
-    if(!gameStarted){
-      selectedCaseNumber = num;
-      el.classList.add('selected');
-      // playback selecting audio
-      audioSelect.currentTime=0; audioSelect.play().catch(()=>{});
-      // mark selected but don't remove from board; start button will begin rounds
-      return;
-    }
-    // if already opened or it's player's own case (can't open it), ignore
-    if(openedCases.has(num) || num === selectedCaseNumber) return;
-    // only allow open if casesToOpenThisRound > 0
-    if(casesToOpenThisRound <= 0) return;
-    openCase(el, num);
-  }
-
-  function openCase(el, num){
-    // reveal animation: add flipped class to container
-    const flipCont = el.querySelector('.flip-container');
-    // play select audio to cue
-    audioSelect.currentTime=0; audioSelect.play().catch(()=>{});
-    // flip by toggling .flipped
-    el.classList.add('flipped');
-    const val = mapping[num];
-    // after flip time show value on back
-    setTimeout(()=>{
-      const back = el.querySelector('.flip-back .label-value');
-      back.textContent = peso(val);
-      el.classList.add('revealed');
-      // choose appropriate reveal sound
-      if(val >= 1000) { audioRevealBig.currentTime = 0; audioRevealBig.play().catch(()=>{}); }
-      else { audioRevealSmall.currentTime = 0; audioRevealSmall.play().catch(()=>{}); }
-      // strike amount in side panels
-      strikeAmount(val);
-      openedCases.add(num);
-      casesToOpenThisRound--;
-      updateFooter();
-      // if round finished, banker call
-      if(casesToOpenThisRound === 0){
-        setTimeout(()=>makeBankerOffer(), 700);
-      }
-    }, 700); // flip duration
-  }
-
-  function strikeAmount(val){
-    // mark UI boxes
-    const boxes = document.querySelectorAll('.amount-box');
-    boxes.forEach(d=>{
-      if(Number(d.dataset.value) === Number(val)){
-        d.classList.add('struck');
-      }
-    });
-    remainingAmounts = remainingAmounts.filter(v=>v !== val);
-    updateStats();
-  }
-
-  /* banker calculation */
-  function computeEV(arr){
-    const sum = arr.reduce((a,b)=>a+b,0);
-    return sum / arr.length;
-  }
-  function computeStd(arr){
-    const m = computeEV(arr);
-    const s = Math.sqrt(arr.reduce((a,b)=>a+(b-m)*(b-m),0)/arr.length);
-    return s;
-  }
-
-  function makeBankerOffer(){
-    // compute EV and std
-    const ev = computeEV(remainingAmounts);
-    const std = computeStd(remainingAmounts);
-    // progress factor: 0..1 over rounds
-    const progress = Math.min(1, roundIndex / (rounds.length - 1));
-    // base factor increases with progress
-    const base = 0.45 + (0.35 * progress); // 0.45..0.8
-    // risk slider: 50..120 -> 0.5..1.2 multiplier
-    const riskVal = Number(riskSlider.value) / 100;
-    // banker uses EV * base * riskAdjustment and also considers std (higher std -> slightly lower offer)
-    const stdAdj = 1 - Math.min(0.25, std / (ev + 1) * 0.5); // small adjustment
-    let offer = Math.round( ev * base * riskVal * stdAdj / 50 ) * 50;
-    if(offer < 0) offer = 0;
-    // add some variability
-    offer = Math.round((offer * (0.95 + Math.random()*0.1))/50)*50;
-    // record & show
-    offerHistory.push({round: roundIndex+1, offer});
-    showOfferModal(offer);
-    appendOfferToList(offer);
-    // play offer audio
-    audioOffer.currentTime = 0; audioOffer.play().catch(()=>{});
-  }
-
-  function showOfferModal(amount){
-    offerAmountEl.textContent = Number(amount).toLocaleString();
-    offerModal.style.display = 'flex';
-    offerModal.setAttribute('aria-hidden','false');
-  }
-
-  function appendOfferToList(amount){
-    const el = document.createElement('div');
-    el.style.padding='6px';
-    el.style.borderBottom='1px solid rgba(255,255,255,0.03)';
-    el.innerHTML = `<strong>Round ${roundIndex+1}:</strong> <span style="color:var(--gold);font-weight:900">₱${Number(amount).toLocaleString()}</span>`;
-    offersEl.prepend(el);
-  }
-
-  /* handle accepting/declining offer */
-  acceptOfferBtn.addEventListener('click', ()=>{
-    offerModal.style.display='none';
-    offerModal.setAttribute('aria-hidden','true');
-    // stop loop audio, end game
-    audioLoop.pause();
-    alert('Deal accepted — game over.');
-    gameStarted = false;
-  });
-  declineOfferBtn.addEventListener('click', ()=>{
-    offerModal.style.display='none';
-    offerModal.setAttribute('aria-hidden','true');
-    // next round
-    roundIndex++;
-    if(roundIndex >= rounds.length) {
-      // final phase: set 1 case to open
-      casesToOpenThisRound = 1;
-    } else {
-      casesToOpenThisRound = rounds[roundIndex];
-    }
-    roundLabel.textContent = (roundIndex+1);
-    updateFooter();
-  });
-
-  /* stats update */
-  function updateStats(){
-    const ev = remainingAmounts.length ? computeEV(remainingAmounts) : 0;
-    const std = remainingAmounts.length ? computeStd(remainingAmounts) : 0;
-    evEl.textContent = peso(Math.round(ev));
-    stdEl.textContent = peso(Math.round(std));
-    remainingCountEl.textContent = remainingAmounts.length;
-  }
-
-  /* footer update */
-  function updateFooter(){
-    casesToOpenEl.textContent = casesToOpenThisRound;
-  }
-
-  /* start/reset */
-  function startGame(){
-    if(!selectedCaseNumber){
-      alert('Please choose your personal case first by clicking one case (on the board). Then press START.');
-      return;
-    }
-    if(gameStarted) return;
-    gameStarted = true;
-    // stop intro, start ambience loop
-    try{ audioIntro.pause(); }catch(e){}
-    try{ audioLoop.currentTime = 0; audioLoop.volume = 0.35; audioLoop.play().catch(()=>{}); }catch(e){}
-    // set round
-    roundIndex = 0;
-    casesToOpenThisRound = rounds[roundIndex];
-    roundLabel.textContent = (roundIndex+1);
-    updateFooter();
-  }
-
-  function resetGame(){
-    if(!confirm('Reset game?')) return;
-    setupGame();
-  }
-
-  /* full init */
-  function setupGame(){
-    renderAmountPanels();
-    initMapping();
-    buildGrid();
-    offerHistory = [];
-    offersEl.innerHTML='';
-    openedCases = new Set();
-    selectedCaseNumber = null;
-    // set UI initial values
-    roundLabel.textContent = '0';
-    casesToOpenThisRound = 0;
-    updateFooter();
-    updateStats();
-    // show selected case instruction
-    // ensure intro plays on loop until start clicked
-    try{ audioLoop.pause(); }catch(e){}
-    try{ audioIntro.currentTime = 0; audioIntro.volume = 0.9; audioIntro.play().catch(()=>{});}catch(e){}
-    gameStarted = false;
-    // unstrike all amount boxes
-    document.querySelectorAll('.amount-box').forEach(d=>d.classList.remove('struck'));
-    // remove any flipped/revealed classes
-    document.querySelectorAll('.case').forEach(c=>{ c.classList.remove('revealed','flipped','selected'); });
-  }
-
-  startBtn.addEventListener('click', ()=>{
-    // also write to remote that game started
-    localStorage.setItem('dond_remote_action', JSON.stringify({type:'start',ts:Date.now()}));
-    startGame();
-  });
-  resetBtn.addEventListener('click', ()=>{
-    localStorage.setItem('dond_remote_action', JSON.stringify({type:'reset',ts:Date.now()}));
-    resetGame();
-  });
-
-  /* helper: when the page loads, clicking a case before start selects player's case; after start it opens */
-  // initialize
-  setupGame();
-
-  // expose a small debug object
-  window.DOND = {
-    mapping: mapping,
-    startGame: startGame,
-    setupGame: setupGame,
-    remainingAmounts: ()=>remainingAmounts,
-    openCases: ()=>Array.from(openedCases)
-  };
-
-})();
+};
 </script>
+
 </body>
 </html>
