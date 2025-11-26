@@ -4,7 +4,65 @@
 <meta charset="UTF-8" />
 <title>Deal or No Deal - Main Board</title>
 
+
+    
 <style>
+
+@keyframes caseShake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+.case.shake {
+    animation: caseShake 0.4s ease-in-out;
+}
+
+    
+#cinematic-intro {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    animation: fadeIn 1s ease;
+}
+
+.intro-logo {
+    width: 320px;
+    filter: drop-shadow(0 0 25px gold);
+}
+
+.intro-title {
+    color: gold;
+    font-size: 4rem;
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 0 0 20px gold;
+}
+
+.start-btn {
+    margin-top: 40px;
+    padding: 20px 40px;
+    font-size: 2rem;
+    background: gold;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    color: black;
+}
+
+.start-btn:hover {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+}
+
+    
     body {
         margin: 0;
         background: black;
@@ -92,7 +150,15 @@
 </head>
 
 <body>
+<div id="cinematic-intro">
+    <div class="intro-content">
+        <img src="dodTransparent.png" class="intro-logo">
+        <h1 class="intro-title">DEAL OR NO DEAL</h1>
+        <button id="startGameBtn" class="start-btn">START GAME</button>
+    </div>
+</div>
 
+    
 <div id="pairingBox">
     <button onclick="createPair()">Generate Pair Code</button><br>
     <span id="pairCode"></span>
@@ -117,6 +183,17 @@
 <audio id="bigReveal" src="audio/case_reveal_big.mp3"></audio>
 
 <script>
+
+    function shakeCase(id) {
+    const c = document.getElementById("case-" + id);
+    c.classList.add("shake");
+    setTimeout(() => c.classList.remove("shake"), 400);
+}
+
+    shakeCase(caseId);
+setTimeout(() => openCase(caseId), 350);
+
+    
 let ws = new WebSocket("ws://localhost:8080");
 let currentRound = 1;
 let roundCases = {1:4, 2:3, 3:2, 4:1, 5:1, 6:1, 7:1, 8:1};
@@ -228,6 +305,25 @@ ws.onmessage = msg => {
     }
 };
 </script>
+
+    <script>
+const introAudio = new Audio("1-intro.mp3");
+introAudio.loop = true;
+introAudio.volume = 1.0;
+
+window.addEventListener("load", () => {
+    introAudio.play();
+});
+
+document.getElementById("startGameBtn").onclick = () => {
+    document.getElementById("cinematic-intro").style.opacity = "0";
+    setTimeout(() => {
+        document.getElementById("cinematic-intro").remove();
+    }, 800);
+    introAudio.pause();
+};
+</script>
+
 
 </body>
 </html>
