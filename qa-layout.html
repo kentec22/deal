@@ -1,250 +1,451 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Deal or No Deal Layout</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Deal or No Deal — Demo</title>
 <style>
-    :root {
-        --gold: #d4af37;
-        --dark: #111;
-        --case-bg: #f7f7f7;
-    }
-
-    body {
-        margin: 0;
-        padding: 0;
-        background: var(--dark);
-        font-family: Arial, sans-serif;
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-        color: white;
-    }
-
-    /* Layout Containers */
-    .sidebar, .rightbar {
-        width: 20%;
-        min-width: 180px;
-        padding: 10px;
-        box-sizing: border-box;
-    }
-
-    .center {
-        flex-grow: 1;
-        padding: 10px;
-        box-sizing: border-box;
-    }
-
-    /* Boxes */
-    .logo-box img,
-    .header-img img {
-        width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .logo-box, .settings-box {
-        border: 3px solid var(--gold);
-        height: 110px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 15px;
-        background: var(--dark);
-        padding: 5px;
-    }
-
-    .amount-box {
-        border: 3px solid white;
-        background: #222;
-        color: var(--gold);
-        padding: 15px;
-        margin-bottom: 12px;
-        font-size: 26px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .board {
-        border: 4px solid var(--gold);
-        height: calc(100% - 130px);
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-        background: #000;
-    }
-
-    /* Case Grid */
-    .row {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .case {
-        border: 4px solid var(--gold);
-        width: 150px;
-        height: 110px;
-        background: var(--case-bg);
-        color: black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 48px;
-        font-weight: bold;
-        transition: 0.2s ease;
-        cursor: pointer;
-    }
-
-    /* Hover Animation */
-    .case:hover {
-        transform: scale(1.12);
-        box-shadow: 0 0 15px var(--gold);
-    }
-
-    .case-opened {
-        flex-direction: column;
-        font-size: 34px;
-    }
-
-    .footer-label {
-        position: absolute;
-        bottom: 10px;
-        font-size: 18px;
-        width: 20%;
-        text-align: center;
-        color: var(--gold);
-    }
-
-    .footer-center {
-        width: 100% !important;
-        left: 0;
-        text-align: center;
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 1100px) {
-        .case {
-            width: 120px;
-            height: 90px;
-            font-size: 38px;
-        }
-    }
-
-    @media (max-width: 900px) {
-        body {
-            flex-direction: column;
-            overflow-y: auto;
-            height: auto;
-        }
-        .sidebar, .rightbar {
-            width: 100%;
-            border: none;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .center {
-            width: 100%;
-        }
-        .board {
-            height: auto;
-        }
-    }
-
+  :root{
+    --gold:#ffcc33;
+    --gold-dark:#cc9900;
+    --gold-border:#ffdd55;
+    --bg:#000;
+    --panel:#111;
+    --text:#fff;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family: "Arial Black", Arial, sans-serif;}
+  .app{display:flex;height:100vh;box-sizing:border-box;}
+  .panel{padding:14px;box-sizing:border-box;min-width:160px}
+  .left, .right{width:18%;background:linear-gradient(#080808,#141414);border-left:4px solid #000;border-right:4px solid #000;display:flex;flex-direction:column;align-items:stretch;gap:8px}
+  .center{flex:1;display:flex;flex-direction:column;padding:12px}
+  /* Amount boxes */
+  .amount-box{background:#151515;border:3px solid rgba(255,255,255,0.06);padding:12px;text-align:center;font-size:20px;font-weight:700;color:var(--gold);box-shadow:inset 0 -4px rgba(0,0,0,0.6)}
+  .amount-box.struck{opacity:0.25;text-decoration:line-through;color:#999}
+  /* Board */
+  .board{flex:1;border:6px solid var(--gold-border);margin-top:4px;padding:18px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(#100,#000)}
+  .board-title{display:flex;justify-content:space-between;align-items:center;color:var(--gold);font-size:20px;font-weight:800}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;align-items:stretch;flex:1}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .case{
+    background:var(--gold);border:6px solid var(--gold-border);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-size:46px;font-weight:900;color:#000;padding:6px;cursor:pointer;user-select:none;min-height:120px;transition:transform .12s,box-shadow .12s,background .12s;
+    box-shadow:0 4px 0 rgba(0,0,0,0.6);
+  }
+  .case.small{font-size:40px;min-height:100px}
+  .case:hover{transform:scale(1.06);box-shadow:0 14px 30px rgba(255,204,51,0.18)}
+  .case.selected{background:var(--gold-dark);border-color:#ffaa00;transform:scale(1.02)}
+  .case.revealed{background:#222;color:var(--gold);border-color:#333}
+  .case .label-number{font-size:56px;font-weight:900}
+  .case .label-value{font-size:20px;margin-top:6px}
+  .suitcase-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+  .footer-note{text-align:center;color:var(--gold);font-weight:800;font-size:22px;margin-top:6px}
+  /* modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal{background:#0b0b0b;border:6px solid var(--gold-border);padding:20px;min-width:320px;text-align:center}
+  .modal h2{color:var(--gold);margin:6px 0;font-size:28px}
+  .btn{display:inline-block;margin:6px;padding:12px 18px;border-radius:6px;background:var(--gold);color:#000;font-weight:800;cursor:pointer}
+  .btn.secondary{background:#222;color:var(--gold);border:2px solid var(--gold)}
+  /* top controls */
+  .top-controls{display:flex;gap:10px;align-items:center}
+  .logo{height:70px;width:80%;max-width:420px;object-fit:contain}
+  .small-muted{color:#ccc;font-size:14px}
+  /* responsive */
+  @media (max-width:1000px){
+    .left,.right{display:none}
+    .grid{grid-template-columns:repeat(3,1fr)}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .case{font-size:36px;min-height:90px}
+  }
+  @media (max-width:560px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .suitcase-row{grid-template-columns:repeat(2,1fr)}
+    .case{font-size:28px;min-height:74px}
+    .footer-note{font-size:18px}
+  }
 </style>
 </head>
 <body>
 
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar">
-        <div class="logo-box">
-            <img src="company.png">
-        </div>
-
-<div class="amount-box">0</div>
-<div class="amount-box">10</div>
-<div class="amount-box">100</div>
-<div class="amount-box">250</div>
-<div class="amount-box">500</div>
-<div class="amount-box">750</div>
-<div class="amount-box">1,000</div>
-<div class="amount-box">1,500</div>
-
-        <div class="footer-label">lower amount</div>
+<div class="app">
+  <!-- LEFT AMOUNTS -->
+  <div class="left panel">
+    <div style="height:84px;display:flex;align-items:center;justify-content:center">
+      <!-- company image placeholder -->
+      <img src="company.png" alt="company" class="logo">
     </div>
 
-    <!-- MAIN CENTER PANEL -->
-    <div class="center">
+    <div id="left-amounts" style="margin-top:4px">
+      <!-- populated by JS -->
+    </div>
+    <div style="flex:1"></div>
+    <div class="small-muted" style="text-align:center;margin-top:8px">lower amount</div>
+  </div>
 
-        <div class="logo-box header-img">
-            <img src="dodTransparent.png">
-        </div>
-
-        <div class="board">
-            <div style="text-align:center; margin-bottom:15px; font-size:20px; color:var(--gold);">
-                unopened case &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; opened case
-            </div>
-
-            <!-- ROW 1 -->
-            <div class="row">
-                <div class="case">1</div>
-                <div class="case">2</div>
-                <div class="case case-opened">3<br><span style="font-size:22px;">300</span></div>
-                <div class="case"></div>
-            </div>
-
-            <!-- ROW 2 -->
-            <div class="row">
-                <div class="case"></div>
-                <div class="case"></div>
-                <div class="case"></div>
-                <div class="case"></div>
-            </div>
-
-            <!-- ROW 3 -->
-            <div class="row">
-                <div class="case"></div>
-                <div class="case"></div>
-                <div class="case"></div>
-                <div class="case"></div>
-            </div>
-
-            <!-- ROW 4 -->
-            <div class="row">
-                <div class="case"></div>
-                <div class="case"></div>
-                <div class="case"></div>
-            </div>
-        </div>
-
-        <div class="footer-label footer-center">suitcase.png</div>
+  <!-- CENTER BOARD -->
+  <div class="center panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <img src="dodTransparent.png" style="height:72px;object-fit:contain" alt="logo">
+      <div class="top-controls">
+        <div class="small-muted">Round: <span id="round-label">1</span></div>
+        <div style="width:10px"></div>
+        <button id="resetBtn" class="btn secondary" style="padding:8px 12px">Reset</button>
+      </div>
     </div>
 
-    <!-- RIGHT SIDEBAR -->
-    <div class="rightbar">
-        <div class="settings-box">
-            <div style="text-align:center;">
-                settings button<br>
-                debug button<br>
-                reset button
-            </div>
-        </div>
+    <div class="board" id="board">
+      <div class="board-title">
+        <div>UNOPENED CASES</div>
+        <div>OPENED CASES</div>
+      </div>
 
-<div class="amount-box">2,000</div>
-<div class="amount-box">2,500</div>
-<div class="amount-box">3,000</div>
-<div class="amount-box">4,000</div>
-<div class="amount-box">5,000</div>
-<div class="amount-box">7,000</div>
-<div class="amount-box">10,000</div>
+      <!-- grid: first 3 rows 4 columns, last row 3 columns -->
+      <div id="cases-grid" class="grid" style="align-items:stretch;flex:1">
+        <!-- cases inserted by JS -->
+      </div>
 
+      <div class="suitcase-row" id="suitcase-row">
+        <!-- 3 suitcases inserted by JS -->
+      </div>
 
-        <div class="footer-label">higher amount</div>
+      <div class="footer-note">Cases to Open: <span id="cases-to-open">0</span></div>
+    </div>
+  </div>
+
+  <!-- RIGHT AMOUNTS -->
+  <div class="right panel">
+    <div style="height:84px;display:flex;align-items:center;justify-content:center">
+      <div style="text-align:center;background:#050505;border:3px solid var(--gold-border);padding:8px;border-radius:6px">
+        settings<br><span class="small-muted">debug / reset</span>
+      </div>
     </div>
 
+    <div id="right-amounts" style="margin-top:4px">
+      <!-- populated by JS -->
+    </div>
+
+    <div style="flex:1"></div>
+    <div class="small-muted" style="text-align:center;margin-top:8px">higher amount</div>
+  </div>
+</div>
+
+<!-- Banker modal -->
+<div id="offerModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <h2>Banker's Offer</h2>
+    <div style="font-size:34px;color:var(--gold);font-weight:900;margin:8px">₱<span id="offerAmount">0</span></div>
+    <div style="margin-top:14px">
+      <button id="acceptOffer" class="btn">ACCEPT</button>
+      <button id="declineOffer" class="btn secondary">NO DEAL</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audio (file names you supplied earlier) -->
+<audio id="audio-intro" src="intro.mp3"></audio>
+<audio id="audio-select" src="selecting_case.mp3"></audio>
+<audio id="audio-offer" src="offer.mp3"></audio>
+<audio id="audio-loop" src="loop.mp3" loop></audio>
+<audio id="audio-reveal-small" src="reveal_small.mp3"></audio>
+<audio id="audio-reveal-big" src="reveal_big.mp3"></audio>
+
+<script>
+/*
+ Game logic for Deal or No Deal (simplified)
+ - Uses amounts provided earlier (left 8, right 7)
+ - Cases numbered 1..15 assigned randomly to amounts
+ - Player picks one case to keep (click to choose). After picking, rounds start.
+ - Rounds: array of counts showing how many cases to open in that round.
+ - After each round, banker offers average * factor. Offer modal appears.
+ - Accept ends the game. No deal continues to next round.
+ - Sound files (provided) are used at key events.
+*/
+
+(function(){
+  // amount list (ingested list; left 8 lower, right 7 higher)
+  const allAmounts = [
+    0,10,100,250,500,750,1000,1500,2000,2500,3000,4000,5000,7000,10000
+  ];
+
+  // UI references
+  const leftPanel = document.getElementById('left-amounts');
+  const rightPanel = document.getElementById('right-amounts');
+  const casesGrid = document.getElementById('cases-grid');
+  const suitcaseRow = document.getElementById('suitcase-row');
+  const footerCount = document.getElementById('cases-to-open');
+  const roundLabel = document.getElementById('round-label');
+  const offerModal = document.getElementById('offerModal');
+  const offerAmountEl = document.getElementById('offerAmount');
+
+  // audio elements
+  const audioIntro = document.getElementById('audio-intro');
+  const audioSelect = document.getElementById('audio-select');
+  const audioOffer = document.getElementById('audio-offer');
+  const audioLoop = document.getElementById('audio-loop');
+  const audioRevealSmall = document.getElementById('audio-reveal-small');
+  const audioRevealBig = document.getElementById('audio-reveal-big');
+
+  // rounds (classic-ish): number of cases to open each round
+  const rounds = [6,5,4,3,2,1,1,1]; // can be adjusted
+  let roundIndex = 0;
+  let casesToOpenThisRound = rounds[roundIndex];
+  let playerCase = null;
+  let mapping = {}; // caseNumber -> amount
+  let openedCases = new Set();
+  let selectedCaseNumber = null;
+  let remainingAmounts = [...allAmounts];
+  let gameActive = false;
+
+  // utilities
+  const formatMoney = v => v.toLocaleString();
+  const peso = v => `₱${formatMoney(v)}`;
+
+  // shuffle helper
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  // build UI panels for amounts
+  function renderAmountPanels(){
+    leftPanel.innerHTML='';
+    rightPanel.innerHTML='';
+
+    const leftAmounts = allAmounts.slice(0,8);
+    const rightAmounts = allAmounts.slice(8);
+
+    leftAmounts.forEach(v=>{
+      const d=document.createElement('div');
+      d.className='amount-box';
+      d.dataset.value=v;
+      d.textContent = peso(v);
+      leftPanel.appendChild(d);
+    });
+
+    rightAmounts.forEach(v=>{
+      const d=document.createElement('div');
+      d.className='amount-box';
+      d.dataset.value=v;
+      d.textContent = peso(v);
+      rightPanel.appendChild(d);
+    });
+  }
+
+  // initialize cases, assign amounts randomly
+  function initCases(){
+    casesGrid.innerHTML='';
+    suitcaseRow.innerHTML='';
+    casesGrid.className='grid';
+    // numbering 1..15
+    const caseNumbers = Array.from({length:15},(_,i)=>i+1);
+    const amountsShuffled = shuffle([...allAmounts]);
+    mapping = {};
+    caseNumbers.forEach((num,i)=>{
+      mapping[num]=amountsShuffled[i];
+      // add case to grid
+      const el = document.createElement('div');
+      el.className='case';
+      // for last row (13-15) we'll add later to a 3-grid; but keep same grid and allow flexible layout
+      el.dataset.case = num;
+      el.innerHTML = `<div class="label-number">${num}</div><div class="label-value"></div>`;
+      el.addEventListener('click', onCaseClick);
+      casesGrid.appendChild(el);
+    });
+
+    // handle layout: move last 3 into a new row grid-3 style (to match show)
+    // We'll simulate by making the container grid have 4 columns but setting last row items to span
+    // Simpler: after 12th element, create a new container with class grid-3 and append last 3
+    const allChildren = Array.from(casesGrid.children);
+    if(allChildren.length===15){
+      // keep first 12 in casesGrid, move last 3 into separate grid that spans width
+      for(let i=14;i>=12;i--){
+        const node = allChildren[i];
+        casesGrid.removeChild(node);
+        // add to suitcaseRow as a similar visual (these are actual cases 13..15)
+        const box = node.cloneNode(true);
+        box.classList.add('small');
+        suitcaseRow.appendChild(box);
+      }
+    }
+
+    // update UI counters
+    roundIndex=0;
+    casesToOpenThisRound = rounds[roundIndex];
+    updateFooter();
+    roundLabel.textContent = (roundIndex+1);
+    openedCases = new Set();
+    playerCase = null;
+    selectedCaseNumber = null;
+    remainingAmounts = [...allAmounts];
+    markAmountsUI();
+    gameActive = false;
+
+    // autoplay loop bg audio lightly
+    try{ audioLoop.volume=0.35; audioLoop.play().catch(()=>{}); }catch(e){}
+    // play intro
+    try{ audioIntro.play().catch(()=>{}); }catch(e){}
+  }
+
+  function onCaseClick(e){
+    const el = e.currentTarget;
+    const caseNum = Number(el.dataset.case);
+    // If game not started, first click selects player's personal case
+    if(!gameActive){
+      selectedCaseNumber = caseNum;
+      playerCase = {num:caseNum,amount:mapping[caseNum]};
+      // mark selected visually
+      document.querySelectorAll('.case').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+      // play selecting sound
+      audioSelect.currentTime=0; audioSelect.play().catch(()=>{});
+      // enable game
+      gameActive = true;
+      // show how many to open
+      updateFooter();
+      return;
+    }
+
+    // if clicking an already opened case, ignore
+    if(openedCases.has(caseNum) || caseNum===selectedCaseNumber) return;
+
+    // allow opening cases only if there are slots to open
+    if(casesToOpenThisRound<=0){
+      // no more to open this round
+      return;
+    }
+
+    // Open the case: reveal amount, mark amount panel
+    openedCases.add(caseNum);
+    revealCase(el, caseNum);
+
+    casesToOpenThisRound--;
+    updateFooter();
+
+    // If finished round - trigger banker after small delay
+    if(casesToOpenThisRound===0){
+      setTimeout(()=>triggerBankerOffer(),600);
+    }
+  }
+
+  function revealCase(el, caseNum){
+    const val = mapping[caseNum];
+    // show value inside case
+    const lab = el.querySelector('.label-value');
+    lab.textContent = peso(val);
+    el.classList.add('revealed');
+    // strike out amount in side panels
+    strikeAmount(val);
+    // play reveal sound small vs big
+    if(val >= 1000){
+      audioRevealBig.currentTime=0; audioRevealBig.play().catch(()=>{});
+    } else {
+      audioRevealSmall.currentTime=0; audioRevealSmall.play().catch(()=>{});
+    }
+  }
+
+  function strikeAmount(val){
+    // find div in left or right panel that has data-value==val and add class struck
+    const all = document.querySelectorAll('.amount-box');
+    all.forEach(d=>{
+      if(Number(d.dataset.value)===Number(val)){
+        d.classList.add('struck');
+      }
+    });
+    // remove from remainingAmounts
+    remainingAmounts = remainingAmounts.filter(v=>v!==val);
+  }
+
+  function updateFooter(){
+    footerCount.textContent = casesToOpenThisRound;
+  }
+
+  function triggerBankerOffer(){
+    // compute offer = Math.round(avgRemaining * factor)
+    const avg = remainingAmounts.reduce((a,b)=>a+b,0)/remainingAmounts.length;
+    // factor grows as game progresses (start low, get higher)
+    const progress = Math.min(1, roundIndex/(rounds.length-1));
+    const minFactor = 0.45 + progress*0.2; // between 0.45..0.65-ish
+    const maxFactor = 0.75 + progress*0.2; // between 0.75..0.95-ish
+    const factor = (minFactor + maxFactor)/2 * (0.9 + Math.random()*0.2); // add slight noise
+    let offer = Math.round(avg * factor / 50) * 50; // round to nearest 50
+    if(offer < 1) offer = 0;
+    // show modal with offer
+    showOffer(offer);
+  }
+
+  function showOffer(amount){
+    offerAmountEl.textContent = formatMoney(amount);
+    offerModal.style.display = 'flex';
+    offerModal.setAttribute('aria-hidden','false');
+    try{ audioOffer.currentTime=0; audioOffer.play().catch(()=>{}); }catch(e){}
+    // wire up accept/decline handled outside
+    // freeze input while modal open
+  }
+
+  // accept or decline offer
+  document.getElementById('acceptOffer').addEventListener('click', ()=>{
+    // end game: show accepted
+    offerModal.style.display='none';
+    offerModal.setAttribute('aria-hidden','true');
+    endGame(true);
+  });
+
+  document.getElementById('declineOffer').addEventListener('click', ()=>{
+    offerModal.style.display='none';
+    offerModal.setAttribute('aria-hidden','true');
+    // move to next round
+    roundIndex++;
+    if(roundIndex >= rounds.length){
+      // no more rounds, final phase - open remaining or showdown
+      casesToOpenThisRound = 1;
+      updateFooter();
+    } else {
+      casesToOpenThisRound = rounds[roundIndex];
+      roundLabel.textContent = (roundIndex+1);
+      updateFooter();
+    }
+  });
+
+  function endGame(accepted){
+    // stop loop audio
+    try{ audioLoop.pause(); }catch(e){}
+    // If accepted, show message with offer value (simple alert)
+    if(accepted){
+      alert('Deal accepted — game over. (You accepted the banker offer)');
+    } else {
+      alert('Game ended.');
+    }
+    // Deactivate further clicks
+    gameActive=false;
+  }
+
+  // Reset logic
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if(confirm('Reset the game?')) initCases();
+  });
+
+  // initial rendering of amount panels
+  function renderAmountsOnce(){
+    renderAmountPanels();
+  }
+
+  // create initial layout + cases
+  renderAmountsOnce();
+  initCases();
+
+  // helper: formatMoney for UI
+  function formatMoney(n){
+    return n.toLocaleString();
+  }
+
+  // expose a simple console API for debugging (optional)
+  window.DOND = {
+    mapping, reset:initCases, remainingAmounts:()=>remainingAmounts, openCases:()=>Array.from(openedCases)
+  };
+
+})();
+</script>
 </body>
 </html>
