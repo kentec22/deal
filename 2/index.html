@@ -4,16 +4,20 @@
     <meta charset="UTF-8" />
     <title>Deal or No Deal - Kenneth</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ===========================
+         GLOBAL STYLES
+    ============================ -->
     <style>
         :root {
-            --bg-color: #050816;
-            --bg-color-light: #121926;
-            --fg-color: #ffffff;
+            --bg-dark: #050816;
+            --bg-light: #121926;
+            --fg: #ffffff;
             --accent: #f7b500;
-            --accent-soft: rgba(247, 181, 0, 0.2);
+            --accent-soft: rgba(247,181,0,0.25);
             --danger: #ff4b4b;
-            --muted: #888;
-            --panel-bg: rgba(0, 0, 0, 0.65);
+            --muted: #9ca3af;
+            --panel-bg: rgba(0,0,0,0.65);
         }
 
         * {
@@ -22,15 +26,13 @@
 
         body {
             margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background: radial-gradient(circle at top, #1b2845 0, #050816 45%, #020308 100%);
-            color: var(--fg-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            color: var(--fg);
+            font-family: system-ui, sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Background decorative image (dodTransparent.png) */
+        /* Background decorative image */
         body::before {
             content: "";
             position: fixed;
@@ -42,23 +44,21 @@
         }
 
         header {
-            padding: 16px;
             text-align: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.3));
+            padding: 16px;
+            background: rgba(0,0,0,0.6);
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         header img.logo {
             max-width: 220px;
-            height: auto;
-            display: block;
-            margin: 0 auto 8px;
+            margin-bottom: 8px;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 0.14em;
+            font-size: 2rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
         }
 
@@ -66,162 +66,118 @@
             color: var(--accent);
         }
 
+        /* ===========================
+           START GAME SCREEN
+        ============================ */
+        #start-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #start-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #start-btn {
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #f7b500, #ffdf6f);
+            color: #000;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        #start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ===========================
+           MAIN LAYOUT
+        ============================ */
         main {
-            flex: 1;
             display: grid;
-            grid-template-columns: minmax(120px, 220px) minmax(0, 1fr) minmax(120px, 220px);
+            grid-template-columns: 260px 1fr 260px;
             gap: 16px;
-            padding: 12px 16px 80px;
+            padding: 16px;
+            min-height: calc(100vh - 80px);
         }
 
         /* Prize columns */
-
         .prize-column {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            align-items: stretch;
-            justify-content: center;
+            gap: 10px;
+            padding: 10px;
         }
 
         .prize-item {
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(0,0,0,0.35);
-            font-size: 0.9rem;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: 1.1rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s, transform 0.2s, opacity 0.3s;
-        }
-
-        .prize-item span.label {
-            font-weight: 500;
-        }
-
-        .prize-item span.value {
-            color: var(--accent);
         }
 
         .prize-item.revealed {
+            opacity: 0.35;
             text-decoration: line-through;
-            color: var(--muted);
-            opacity: 0.4;
-            transform: scale(0.96);
         }
 
-        /* Center area */
-
-        .center-area {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .top-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-
-        button {
-            cursor: pointer;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(0,0,0,0.65);
-            color: var(--fg-color);
-            padding: 6px 14px;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
-        }
-
-        button:hover {
-            background: rgba(255,255,255,0.06);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
-        }
-
-        button:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-        button.primary {
-            background: linear-gradient(135deg, #f7b500, #ffdf6f);
-            color: #000;
-        }
-
-        button.primary:hover {
-            background: linear-gradient(135deg, #ffdf6f, #f7b500);
-        }
-
-        button.danger {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        button.small {
-            padding: 4px 10px;
-            font-size: 0.78rem;
-        }
-
-        .briefcase-grid {
-            position: relative;
+        /* ===========================
+           CASE GRID (4×4)
+        ============================ */
+        #case-grid {
             display: grid;
-            grid-template-columns: repeat(5, minmax(60px, 90px));
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            border-radius: 18px;
-            background: radial-gradient(circle at top, var(--accent-soft), rgba(0,0,0,0.9));
-            box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            padding: 20px;
+            background: rgba(0,0,0,0.35);
+            border-radius: 16px;
         }
 
         .case {
             position: relative;
             width: 100%;
-            aspect-ratio: 4 / 3;
-            border-radius: 10px;
+            aspect-ratio: 4/3;
+            border-radius: 12px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.18);
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.6);
+            transition: transform 0.2s;
         }
 
-        .case-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        .case:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
         }
 
         .case img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
-            pointer-events: none;
         }
 
         .case-number {
             position: absolute;
-            bottom: 3px;
-            right: 5px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 2px 6px;
+            bottom: 4px;
+            right: 6px;
+            background: rgba(0,0,0,0.7);
+            padding: 4px 8px;
             border-radius: 8px;
-            background: rgba(0,0,0,0.75);
+            font-weight: 700;
         }
 
         .case-value {
@@ -230,856 +186,428 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.3rem;
             font-weight: 700;
-            font-size: 0.9rem;
             color: var(--accent);
-            text-shadow: 0 0 10px rgba(0,0,0,0.9);
             opacity: 0;
-            transform: scale(0.7);
+        }
+
+        .case.opened {
             pointer-events: none;
+            opacity: 0.7;
         }
 
-        .case:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
-            border-color: var(--accent);
-            transform: translateY(-2px) scale(1.02);
+        /* ===========================
+           MAIN CASE (below grid)
+        ============================ */
+        #main-case-wrapper {
+            margin-top: 20px;
+            text-align: center;
         }
 
-        .case.disabled {
-            cursor: default;
-            opacity: 0.6;
-            transform: none;
-            box-shadow: none;
+        #main-case {
+            width: 200px;
+            margin: 0 auto;
+            aspect-ratio: 4/3;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 3px solid var(--accent);
+            background: rgba(0,0,0,0.8);
         }
 
-        .case.disabled:hover {
-            border-color: rgba(255,255,255,0.18);
-            transform: none;
+        #main-case img {
+            width: 100%;
+            height: 100%;
         }
 
-        /* Main (chosen) center briefcase */
-
-        .main-case-wrapper {
-            margin-top: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .main-case-label {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+        #main-case-label {
+            margin-top: 6px;
+            font-size: 1rem;
             color: var(--muted);
         }
 
-        .main-case {
-            width: 140px;
-            max-width: 40vw;
-            aspect-ratio: 4 / 3;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 2px solid var(--accent);
-            background: rgba(0,0,0,0.8);
-            display: flex;
+        /* ===========================
+           REMAINING CASES COUNTER
+        ============================ */
+        #round-info {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-top: 10px;
+            color: var(--accent);
+        }
+
+        /* ===========================
+           OFFER POPUP
+        ============================ */
+        #offer-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.9);
-            position: relative;
+            z-index: 200;
         }
 
-        .main-case img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        #offer-box {
+            background: #050814;
+            padding: 20px;
+            border-radius: 16px;
+            width: 300px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .main-case-tag {
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 2px 10px;
+        #offer-amount {
+            font-size: 1.6rem;
+            color: var(--accent);
+            margin: 10px 0;
+        }
+
+        .offer-btn {
+            padding: 10px 20px;
+            margin: 6px;
             border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .deal {
             background: var(--accent);
             color: #000;
         }
 
-        /* Settings panel */
+        .no-deal {
+            background: var(--danger);
+            color: #fff;
+        }
 
-        .side-panel {
+        /* ===========================
+           SETTINGS PANEL
+        ============================ */
+        #settings-panel {
             position: fixed;
-            top: 70px;
             right: 10px;
+            top: 80px;
             width: 260px;
-            max-width: 80vw;
             background: var(--panel-bg);
-            border-radius: 16px;
-            padding: 10px 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 1px solid rgba(255,255,255,0.12);
-            backdrop-filter: blur(12px);
-            transform: translateX(110%);
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.22s ease, opacity 0.22s ease;
-            z-index: 20;
-        }
-
-        .side-panel.open {
-            transform: translateX(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .side-panel h3 {
-            margin: 0 0 6px;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--accent);
-        }
-
-        .side-panel .section {
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .side-panel label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 3px 0;
-            font-size: 0.82rem;
-        }
-
-        .side-panel input[type="checkbox"],
-        .side-panel select,
-        .side-panel input[type="text"] {
-            margin-left: 8px;
-        }
-
-        .side-panel select,
-        .side-panel input[type="text"] {
-            width: 100%;
-            padding: 4px 6px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.24);
-            background: rgba(0,0,0,0.65);
-            color: var(--fg-color);
-            font-size: 0.8rem;
-        }
-
-        .side-panel small {
-            font-size: 0.7rem;
-            color: var(--muted);
-        }
-
-        /* Debug console */
-
-        .debug-console {
-            position: fixed;
-            bottom: 60px;
-            left: 10px;
-            width: 290px;
-            max-width: 85vw;
-            max-height: 40vh;
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 6px 8px;
-            font-size: 0.72rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            transform: translateY(110%);
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.22s ease, opacity 0.22s ease;
-            z-index: 18;
-        }
-
-        .debug-console.open {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .debug-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
-        .debug-header span {
-            font-weight: 600;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .debug-log {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 2px;
-        }
-
-        .debug-entry {
-            margin-bottom: 3px;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            padding-bottom: 2px;
-        }
-
-        .debug-entry time {
-            color: var(--muted);
-            margin-right: 4px;
-        }
-
-        /* Offer popup */
-
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
+            padding: 12px;
+            border-radius: 14px;
             display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 30;
+            z-index: 150;
         }
 
-        .modal-backdrop.open {
-            display: flex;
-        }
-
-        .modal {
-            background: #050814;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.18);
-            padding: 16px 18px 14px;
-            max-width: 320px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
-            animation: modalIn 0.25s ease-out;
-        }
-
-        .modal h2 {
-            margin: 0 0 10px;
-            font-size: 1.1rem;
-        }
-
-        .modal .amount {
-            font-size: 1.4rem;
-            font-weight: 700;
+        #settings-panel h3 {
+            margin-top: 0;
             color: var(--accent);
-            margin-bottom: 10px;
         }
 
-        .modal-actions {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        /* Animations */
-
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .anim-hover-glow {
-            box-shadow: 0 0 0 rgba(247,181,0,0);
-        }
-
-        .anim-hover-glow:hover {
-            box-shadow: 0 0 18px rgba(247,181,0,0.5);
-        }
-
-        .anim-open {
-            animation: caseOpen 0.45s ease-out forwards;
-        }
-
-        @keyframes caseOpen {
-            0% { transform: rotateX(0deg); }
-            40% { transform: rotateX(-25deg); }
-            100% { transform: rotateX(0deg); }
-        }
-
-        .anim-reveal {
-            animation: revealIn 0.35s ease-out forwards;
-        }
-
-        @keyframes revealIn {
-            0% { opacity: 0; transform: scale(0.7); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .anim-cross-out {
-            animation: crossOut 0.5s ease-out forwards;
-        }
-
-        @keyframes crossOut {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0.4; transform: scale(0.96); }
-        }
-
-        .background-pulse {
-            animation: bgPulse 6s ease-in-out infinite;
-        }
-
-        @keyframes bgPulse {
-            0%, 100% { box-shadow: 0 0 25px rgba(247,181,0,0.2); }
-            50% { box-shadow: 0 0 40px rgba(247,181,0,0.45); }
+        /* ===========================
+           DEBUG CONSOLE
+        ============================ */
+        #debug-console {
+            position: fixed;
+            left: 10px;
+            bottom: 60px;
+            width: 300px;
+            max-height: 40vh;
+            overflow-y: auto;
+            background: var(--panel-bg);
+            padding: 10px;
+            border-radius: 12px;
+            display: none;
+            z-index: 150;
         }
 
         footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            font-size: 0.75rem;
             text-align: center;
-            padding: 5px 8px;
-            background: rgba(0,0,0,0.92);
-            border-top: 1px solid rgba(255,255,255,0.15);
-            z-index: 50;
-        }
-
-        @media (max-width: 900px) {
-            main {
-                grid-template-columns: 1fr;
-            }
-            .prize-column {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .prize-item {
-                min-width: 120px;
-            }
-            .debug-console {
-                left: 50%;
-                transform: translate(-50%, 110%);
-            }
-            .debug-console.open {
-                transform: translate(-50%, 0);
-            }
+            padding: 10px;
+            background: rgba(0,0,0,0.85);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.8rem;
         }
     </style>
 </head>
+
 <body>
+
+    <!-- ===========================
+         START GAME SCREEN
+    ============================ -->
+    <div id="start-screen">
+        <h2>Deal or No Deal</h2>
+        <button id="start-btn">Start Game</button>
+    </div>
+
+    <!-- ===========================
+         HEADER
+    ============================ -->
     <header>
-        <!-- company.png logo placeholder -->
-        <img src="company.png" alt="Company Logo" class="logo" />
+        <img src="company.png" class="logo" />
         <h1><span>Deal</span> or <span>No Deal</span></h1>
     </header>
 
+    <!-- ===========================
+         MAIN CONTENT
+    ============================ -->
     <main>
+
         <!-- LEFT PRIZE COLUMN -->
-        <div class="prize-column" id="prize-column-left">
-            <!-- Populated by JS -->
-        </div>
+        <div class="prize-column" id="prize-left"></div>
 
-        <!-- CENTER AREA -->
-        <div class="center-area">
-            <div class="top-controls">
-                <button id="settings-toggle" class="small">Settings</button>
-                <button id="debug-toggle" class="small">Debug</button>
-                <button id="offer-page-btn" class="small primary">Enter Banker Offer</button>
-                <button id="reset-btn" class="small danger">Reset</button>
-            </div>
+        <!-- CASE GRID -->
+        <div>
+            <div id="case-grid"></div>
 
-            <div class="briefcase-grid background-pulse" id="briefcase-grid">
-                <!-- 15 briefcases, populated by JS -->
-            </div>
-
-            <div class="main-case-wrapper">
-                <div class="main-case-label">Your Case</div>
-                <div class="main-case anim-hover-glow" id="main-case">
-                    <!-- suitcase.png main case image placeholder -->
-                    <img src="suitcase.png" alt="Main Case" />
-                    <div class="main-case-tag">Not Revealed</div>
+            <div id="main-case-wrapper">
+                <div id="main-case">
+                    <img src="suitcase.png" />
                 </div>
+                <div id="main-case-label">Your Case</div>
             </div>
+
+            <div id="round-info"></div>
         </div>
 
         <!-- RIGHT PRIZE COLUMN -->
-        <div class="prize-column" id="prize-column-right">
-            <!-- Populated by JS -->
-        </div>
+        <div class="prize-column" id="prize-right"></div>
+
     </main>
 
-    <!-- SETTINGS PANEL -->
-    <aside class="side-panel" id="settings-panel">
+    <!-- ===========================
+         OFFER POPUP
+    ============================ -->
+    <div id="offer-modal">
+        <div id="offer-box">
+            <h2>Banker's Offer</h2>
+            <div id="offer-amount"></div>
+            <button class="offer-btn deal" id="deal-btn">Deal</button>
+            <button class="offer-btn no-deal" id="no-deal-btn">No Deal</button>
+        </div>
+    </div>
+
+    <!-- ===========================
+         SETTINGS PANEL
+    ============================ -->
+    <div id="settings-panel">
         <h3>Settings</h3>
-        <div class="section">
-            <label>
-                Sound
-                <input type="checkbox" id="sound-toggle" checked />
-            </label>
-            <label>
-                Animations
-                <input type="checkbox" id="animation-toggle" checked />
-            </label>
-            <label>
-                Theme
-                <select id="theme-select">
-                    <option value="dark" selected>Dark</option>
-                    <option value="light">Light</option>
-                </select>
-            </label>
-        </div>
-
-        <div class="section">
-            <strong style="font-size:0.8rem;">Amount Options</strong>
-            <label>
-                Preset prize list
-                <select id="prize-preset">
-                    <option value="default">Default</option>
-                    <option value="low">Low stakes</option>
-                    <option value="high">High stakes</option>
-                </select>
-            </label>
-            <small>Custom list (comma separated):</small>
-            <input type="text" id="custom-prizes-input" placeholder="e.g. 1,5,10,20,50,100..." />
-            <button class="small" id="apply-custom-prizes">Apply Custom Prizes</button>
-        </div>
-
-        <div class="section">
-            <button class="small" id="close-settings">Close</button>
-        </div>
-    </aside>
-
-    <!-- DEBUG CONSOLE -->
-    <div class="debug-console" id="debug-console">
-        <div class="debug-header">
-            <span>Debug</span>
-            <button class="small" id="clear-debug">Clear</button>
-        </div>
-        <div class="debug-log" id="debug-log"></div>
+        <label><input type="checkbox" id="sound-toggle" checked /> Sound</label>
+        <label><input type="checkbox" id="anim-toggle" checked /> Animations</label>
+        <label><input type="checkbox" id="debug-toggle" /> Debug Console</label>
+        <button onclick="window.location='custom-amounts.html'">Custom Amounts</button>
+        <button onclick="window.location='offer.html'">Enter Offer</button>
+        <button onclick="location.reload()">Reset Game</button>
     </div>
 
-    <!-- OFFER POPUP -->
-    <div class="modal-backdrop" id="offer-modal-backdrop">
-        <div class="modal">
-            <h2>Banker’s Offer</h2>
-            <div class="amount" id="offer-amount"></div>
-            <div style="margin-bottom:8px;font-size:0.8rem;color:var(--muted);">
-                Do you accept this deal?
-            </div>
-            <div class="modal-actions">
-                <button class="primary" id="deal-btn">Deal</button>
-                <button class="danger" id="no-deal-btn">No Deal</button>
-            </div>
-        </div>
-    </div>
+    <!-- ===========================
+         DEBUG CONSOLE
+    ============================ -->
+    <div id="debug-console"></div>
 
-    <!-- AUDIO ELEMENTS (placeholders) -->
-    <!-- You can replace src values with your actual files -->
+    <!-- ===========================
+         AUDIO
+    ============================ -->
     <audio id="audio-intro" src="1-intro.mp3"></audio>
+    <audio id="audio-loop" src="4-loop.mp3" loop></audio>
     <audio id="audio-case" src="2-case.mp3"></audio>
     <audio id="audio-offer1" src="3-offer-1.mp3"></audio>
     <audio id="audio-offer" src="3-offer.mp3"></audio>
-    <audio id="audio-loop" src="4-loop.mp3" loop></audio>
     <audio id="audio-small" src="5-smallcase.mp3"></audio>
     <audio id="audio-big" src="6-bigcase.mp3"></audio>
 
-    <footer>
-        Created by: Kenneth with AI
-    </footer>
-
+    <!-- ===========================
+         GAME SCRIPT
+    ============================ -->
     <script>
-        // ------------- CONFIGURATION & STATE -------------
+        /* ============================================================
+           GAME CONFIG
+        ============================================================ */
+        const ROUND_STRUCTURE = [4, 3, 2, 2, 1, 1, 1];
 
-        const state = {
-            prizes: [],
-            prizeMap: new Map(), // prize -> prize element
-            cases: [],
-            mainCaseIndex: null,
-            mainCaseValue: null,
-            soundOn: true,
-            animationsOn: true,
-            theme: 'dark',
-            gameOver: false
-        };
+        let prizes = [
+            1, 5, 10, 20, 50,
+            100, 200, 500, 1000, 2000,
+            5000, 10000, 25000, 50000, 100000
+        ];
 
-        // Default prize sets (you can edit these)
-        const prizePresets = {
-            default: [1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000],
-            low: [1, 2, 5, 10, 20, 50, 75, 100, 150, 200, 250, 300, 400, 500, 750],
-            high: [100, 200, 500, 1000, 2000, 5000, 10000, 25000, 50000, 75000, 100000, 250000, 500000, 750000, 1000000]
-        };
+        let shuffled = [];
+        let mainCaseIndex = null;
+        let mainCaseValue = null;
 
-        // DOM references
-        const prizeColumnLeft = document.getElementById('prize-column-left');
-        const prizeColumnRight = document.getElementById('prize-column-right');
-        const briefcaseGrid = document.getElementById('briefcase-grid');
-        const mainCaseEl = document.getElementById('main-case');
-        const mainCaseTag = mainCaseEl.querySelector('.main-case-tag');
+        let currentRound = 0;
+        let casesToOpen = ROUND_STRUCTURE[0];
+        let openedThisRound = 0;
 
-        const settingsPanel = document.getElementById('settings-panel');
-        const settingsToggleBtn = document.getElementById('settings-toggle');
-        const closeSettingsBtn = document.getElementById('close-settings');
-        const soundToggle = document.getElementById('sound-toggle');
-        const animationToggle = document.getElementById('animation-toggle');
-        const themeSelect = document.getElementById('theme-select');
-        const prizePresetSelect = document.getElementById('prize-preset');
-        const customPrizesInput = document.getElementById('custom-prizes-input');
-        const applyCustomPrizesBtn = document.getElementById('apply-custom-prizes');
+        let soundOn = true;
+        let animOn = true;
 
-        const debugConsole = document.getElementById('debug-console');
-        const debugToggleBtn = document.getElementById('debug-toggle');
-        const debugLogEl = document.getElementById('debug-log');
-        const clearDebugBtn = document.getElementById('clear-debug');
+        const prizeLeft = document.getElementById("prize-left");
+        const prizeRight = document.getElementById("prize-right");
+        const caseGrid = document.getElementById("case-grid");
+        const mainCase = document.getElementById("main-case");
+        const roundInfo = document.getElementById("round-info");
+        const offerModal = document.getElementById("offer-modal");
+        const offerAmountEl = document.getElementById("offer-amount");
+        const debugConsole = document.getElementById("debug-console");
 
-        const offerPageBtn = document.getElementById('offer-page-btn');
-        const offerModalBackdrop = document.getElementById('offer-modal-backdrop');
-        const offerAmountEl = document.getElementById('offer-amount');
-        const dealBtn = document.getElementById('deal-btn');
-        const noDealBtn = document.getElementById('no-deal-btn');
-        const resetBtn = document.getElementById('reset-btn');
-
-        // Audio elements
-        const audioIntro = document.getElementById('audio-intro');
-        const audioCase = document.getElementById('audio-case');
-        const audioOffer1 = document.getElementById('audio-offer1');
-        const audioOffer = document.getElementById('audio-offer');
-        const audioLoop = document.getElementById('audio-loop');
-        const audioSmall = document.getElementById('audio-small');
-        const audioBig = document.getElementById('audio-big');
-
-        // ------------- UTILS -------------
-
-        function logDebug(message, data = null) {
-            const entry = document.createElement('div');
-            entry.className = 'debug-entry';
-            const t = document.createElement('time');
-            t.textContent = new Date().toLocaleTimeString();
-            entry.appendChild(t);
-            const text = document.createElement('span');
-            text.textContent = ' ' + message;
-            entry.appendChild(text);
-            if (data !== null) {
-                const d = document.createElement('div');
-                d.textContent = JSON.stringify(data);
-                d.style.color = '#9fa6ff';
-                entry.appendChild(d);
-            }
-            debugLogEl.appendChild(entry);
-            debugLogEl.scrollTop = debugLogEl.scrollHeight;
+        /* ============================================================
+           UTILITY
+        ============================================================ */
+        function log(msg) {
+            if (!document.getElementById("debug-toggle").checked) return;
+            const div = document.createElement("div");
+            div.textContent = msg;
+            debugConsole.appendChild(div);
         }
 
-        function playSound(audioEl) {
-            if (!state.soundOn || !audioEl) return;
-            try {
-                audioEl.currentTime = 0;
-                audioEl.play();
-            } catch (e) {
-                logDebug('Audio play blocked or failed');
-            }
+        function play(audio) {
+            if (!soundOn) return;
+            audio.currentTime = 0;
+            audio.play();
         }
 
-        function shuffle(array) {
-            const arr = array.slice();
-            for (let i = arr.length - 1; i > 0; i--) {
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+                [a[i], a[j]] = [a[j], a[i]];
             }
-            return arr;
+            return a;
         }
 
-        // ------------- PRIZES & UI SETUP -------------
+        /* ============================================================
+           START GAME
+        ============================================================ */
+        document.getElementById("start-btn").onclick = () => {
+            document.getElementById("start-screen").style.display = "none";
+            play(document.getElementById("audio-loop"));
+            initGame();
+        };
 
-        function initPrizes(prizes) {
-            state.prizes = prizes;
-            state.prizeMap.clear();
-            prizeColumnLeft.innerHTML = '';
-            prizeColumnRight.innerHTML = '';
+        play(document.getElementById("audio-intro"));
+
+        /* ============================================================
+           INITIALIZE GAME
+        ============================================================ */
+        function initGame() {
+            // Load custom amounts if available
+            const custom = localStorage.getItem("customAmounts");
+            if (custom) {
+                prizes = JSON.parse(custom);
+            }
+
+            shuffled = shuffle(prizes);
+            mainCaseIndex = Math.floor(Math.random() * 15);
+            mainCaseValue = shuffled[mainCaseIndex];
+
+            buildPrizeColumns();
+            buildCaseGrid();
+            updateRoundInfo();
+        }
+
+        /* ============================================================
+           PRIZE COLUMNS
+        ============================================================ */
+        function buildPrizeColumns() {
+            prizeLeft.innerHTML = "";
+            prizeRight.innerHTML = "";
 
             const half = Math.ceil(prizes.length / 2);
-            const leftValues = prizes.slice(0, half);
-            const rightValues = prizes.slice(half);
+            const left = prizes.slice(0, half);
+            const right = prizes.slice(half);
 
-            function createPrizeItem(value) {
-                const el = document.createElement('div');
-                el.className = 'prize-item';
-                const label = document.createElement('span');
-                label.className = 'label';
-                label.textContent = '₱';
-                const val = document.createElement('span');
-                val.className = 'value';
-                val.textContent = value.toLocaleString();
-                el.appendChild(label);
-                el.appendChild(val);
-                state.prizeMap.set(value, state.prizeMap.get(value) || []);
-                state.prizeMap.get(value).push(el);
-                return el;
-            }
+            left.forEach(v => {
+                const item = document.createElement("div");
+                item.className = "prize-item";
+                item.id = "prize-" + v;
+                item.textContent = "₱" + v.toLocaleString();
+                prizeLeft.appendChild(item);
+            });
 
-            leftValues.forEach(v => prizeColumnLeft.appendChild(createPrizeItem(v)));
-            rightValues.forEach(v => prizeColumnRight.appendChild(createPrizeItem(v)));
-        }
-
-        function markPrizeRevealed(value) {
-            const elements = state.prizeMap.get(value);
-            if (!elements) return;
-            elements.forEach(el => {
-                el.classList.add('revealed');
-                if (state.animationsOn) el.classList.add('anim-cross-out');
+            right.forEach(v => {
+                const item = document.createElement("div");
+                item.className = "prize-item";
+                item.id = "prize-" + v;
+                item.textContent = "₱" + v.toLocaleString();
+                prizeRight.appendChild(item);
             });
         }
 
-        // ------------- BRIEFCASES -------------
+        /* ============================================================
+           CASE GRID
+        ============================================================ */
+        function buildCaseGrid() {
+            caseGrid.innerHTML = "";
 
-        function initCases() {
-            briefcaseGrid.innerHTML = '';
-            state.cases = [];
+            for (let i = 0; i < 16; i++) {
+                const div = document.createElement("div");
+                div.className = "case";
 
-            const shuffledPrizes = shuffle(state.prizes);
-            state.mainCaseIndex = Math.floor(Math.random() * shuffledPrizes.length);
-            state.mainCaseValue = shuffledPrizes[state.mainCaseIndex];
-            mainCaseTag.textContent = 'Case #' + (state.mainCaseIndex + 1);
-            logDebug('Main case chosen', { index: state.mainCaseIndex + 1, value: state.mainCaseValue });
+                if (i < 15) {
+                    div.dataset.index = i;
+                    div.dataset.value = shuffled[i];
+                    div.onclick = () => openCase(i);
+                } else {
+                    // Empty slot for 4×4 symmetry
+                    div.style.visibility = "hidden";
+                }
 
-            for (let i = 0; i < shuffledPrizes.length; i++) {
-                const caseEl = document.createElement('div');
-                caseEl.className = 'case anim-hover-glow';
-                caseEl.dataset.index = i;
-                caseEl.dataset.value = shuffledPrizes[i];
+                const img = document.createElement("img");
+                img.src = "suitcase.png";
 
-                const inner = document.createElement('div');
-                inner.className = 'case-inner';
+                const num = document.createElement("div");
+                num.className = "case-number";
+                num.textContent = i < 15 ? i + 1 : "";
 
-                const img = document.createElement('img');
-                // suitcase.png initially
-                img.src = 'suitcase.png';
-                img.alt = 'Case ' + (i + 1);
+                const val = document.createElement("div");
+                val.className = "case-value";
+                val.textContent = "₱" + (shuffled[i] || "").toLocaleString();
 
-                const number = document.createElement('div');
-                number.className = 'case-number';
-                number.textContent = i + 1;
+                div.appendChild(img);
+                div.appendChild(num);
+                div.appendChild(val);
 
-                const value = document.createElement('div');
-                value.className = 'case-value';
-                value.textContent = '₱' + shuffledPrizes[i].toLocaleString();
-
-                inner.appendChild(img);
-                inner.appendChild(number);
-                inner.appendChild(value);
-                caseEl.appendChild(inner);
-                briefcaseGrid.appendChild(caseEl);
-
-                state.cases.push({ el: caseEl, img, number, valueEl: value, opened: false });
-
-                caseEl.addEventListener('click', () => onCaseClick(i));
+                caseGrid.appendChild(div);
             }
         }
 
-        function onCaseClick(index) {
-            if (state.gameOver) return;
-            const c = state.cases[index];
-            if (!c || c.opened || index === state.mainCaseIndex) return;
+        /* ============================================================
+           OPEN CASE
+        ============================================================ */
+        function openCase(i) {
+            if (openedThisRound >= casesToOpen) return;
 
-            c.opened = true;
-            c.el.classList.add('disabled');
-            logDebug('Case opened', { index: index + 1, value: c.el.dataset.value });
+            const div = caseGrid.children[i];
+            const value = Number(div.dataset.value);
 
-            // suitcase-open.jpg when opened
-            c.img.src = 'suitcase-open.jpg';
+            div.classList.add("opened");
+            div.querySelector("img").src = "suitcase-open.jpg";
+            div.querySelector(".case-value").style.opacity = 1;
 
-            if (state.animationsOn) {
-                c.el.classList.add('anim-open');
-                c.valueEl.classList.add('anim-reveal');
-            }
-            c.valueEl.style.opacity = '1';
+            play(document.getElementById("audio-case"));
 
-            const prizeValue = Number(c.el.dataset.value);
-            markPrizeRevealed(prizeValue);
-
-            playSound(audioCase);
-
-            // small / big prize sounds
-            const maxValue = Math.max(...state.prizes);
-            if (prizeValue >= maxValue * 0.5) {
-                playSound(audioBig);
+            // Small/big sound
+            if (value >= Math.max(...prizes) * 0.5) {
+                play(document.getElementById("audio-big"));
             } else {
-                playSound(audioSmall);
+                play(document.getElementById("audio-small"));
             }
 
-            checkGameEnd();
-        }
+            // Cross out prize
+            document.getElementById("prize-" + value).classList.add("revealed");
 
-        function checkGameEnd() {
-            const unopened = state.cases.filter((c, i) => !c.opened && i !== state.mainCaseIndex).length;
-            if (unopened === 0) {
-                state.gameOver = true;
-                // Reveal main case
-                mainCaseEl.querySelector('img').src = 'suitcase-open.jpg';
-                mainCaseTag.textContent = '₱' + state.mainCaseValue.toLocaleString();
-                if (state.animationsOn) {
-                    mainCaseEl.classList.add('anim-open');
-                }
-                logDebug('Game ended. Main case value revealed.', { value: state.mainCaseValue });
+            openedThisRound++;
+            updateRoundInfo();
+
+            if (openedThisRound === casesToOpen) {
+                setTimeout(checkOffer, 1200);
             }
         }
 
-        // ------------- SETTINGS & THEME -------------
-
-        function applyTheme(theme) {
-            if (theme === 'light') {
-                document.documentElement.style.setProperty('--bg-color', '#f5f5f5');
-                document.documentElement.style.setProperty('--bg-color-light', '#ffffff');
-                document.documentElement.style.setProperty('--fg-color', '#111827');
-            } else {
-                document.documentElement.style.setProperty('--bg-color', '#050816');
-                document.documentElement.style.setProperty('--bg-color-light', '#121926');
-                document.documentElement.style.setProperty('--fg-color', '#ffffff');
-            }
-        }
-
-        // ------------- OFFER SYSTEM (MANUAL, SEPARATE PAGE) -------------
-
-        function checkForIncomingOffer() {
-            const offerDataRaw = localStorage.getItem('dod_offer');
-            if (!offerDataRaw) return;
-            localStorage.removeItem('dod_offer');
-            let offerData;
-            try {
-                offerData = JSON.parse(offerDataRaw);
-            } catch (e) {
-                return;
-            }
-            if (!offerData || typeof offerData.amount !== 'number') return;
-            showOfferModal(offerData.amount);
-        }
-
-        function showOfferModal(amount) {
-            offerAmountEl.textContent = '₱' + amount.toLocaleString();
-            offerModalBackdrop.classList.add('open');
-            playSound(Math.random() < 0.5 ? audioOffer1 : audioOffer);
-            logDebug('Offer received', { amount });
-        }
-
-        function closeOfferModal() {
-            offerModalBackdrop.classList.remove('open');
-        }
-
-        // ------------- INIT & EVENTS -------------
-
-        function resetGame(prizes) {
-            state.gameOver = false;
-            initPrizes(prizes);
-            initCases();
-            mainCaseEl.querySelector('img').src = 'suitcase.png';
-            mainCaseTag.textContent = 'Not Revealed';
-            logDebug('Game reset');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initial game setup
-            resetGame(prizePresets.default);
-
-            // Intro & loop music (intro once, then loop optional)
-            playSound(audioIntro);
-            setTimeout(() => playSound(audioLoop), 3000);
-
-            // Settings toggle
-            settingsToggleBtn.addEventListener('click', () => {
-                settingsPanel.classList.toggle('open');
-            });
-            closeSettingsBtn.addEventListener('click', () => {
-                settingsPanel.classList.remove('open');
-            });
-
-            // Debug toggle
-            debugToggleBtn.addEventListener('click', () => {
-                debugConsole.classList.toggle('open');
-            });
-            clearDebugBtn.addEventListener('click', () => {
-                debugLogEl.innerHTML = '';
-            });
-
-            soundToggle.addEventListener('change', (e) => {
-                state.soundOn = e.target.checked;
-                logDebug('Sound toggled', { on: state.soundOn });
-                if (!state.soundOn) {
-                    [audioIntro, audioCase, audioOffer1, audioOffer, audioLoop, audioSmall, audioBig].forEach(a => {
-                        if (!a) return;
-                        a.pause();
-                    });
-                }
-            });
-
-            animationToggle.addEventListener('change', (e) => {
-                state.animationsOn = e.target.checked;
-                logDebug('Animations toggled', { on: state.animationsOn });
-            });
-
-            themeSelect.addEventListener('change', (e) => {
-                state.theme = e.target.value;
-                applyTheme(state.theme);
-                logDebug('Theme changed', { theme: state.theme });
-            });
-
-            prizePresetSelect.addEventListener('change', (e) => {
-                const preset = e.target.value;
-                const prizes = prizePresets[preset] || prizePresets.default;
-                resetGame(prizes);
-                logDebug('Prize preset applied', { preset });
-            });
-
-            applyCustomPrizesBtn.addEventListener('click', () => {
-                const text = customPrizesInput.value.trim();
-                if (!text) return;
-                const parts = text.split(',').map(v => Number(v.trim())).filter(v => !isNaN(v) && v > 0);
-                if (parts.length !== 15) {
-                    alert('Please provide exactly 15 numeric prize values.');
-                    return;
-                }
-                parts.sort((a, b) => a - b);
-                resetGame(parts);
-                logDebug('Custom prize list applied', { prizes: parts });
-            });
-
-            offerPageBtn.addEventListener('click', () => {
-                // Opens separate manual offer page
-                window.open('offer.html', '_blank');
-            });
-
-            dealBtn.addEventListener('click', () => {
-                logDebug('Player selected DEAL');
-                closeOfferModal();
-                state.gameOver = true;
-                alert('You accepted the deal of ' + offerAmountEl.textContent);
-            });
-
-            noDealBtn.addEventListener('click', () => {
-                logDebug('Player selected NO DEAL');
-                closeOfferModal();
-            });
-
-            resetBtn.addEventListener('click', () => {
-                const currentPreset = prizePresetSelect.value;
-                const prizes = prizePresets[currentPreset] || prizePresets.default;
-                resetGame(prizes);
-            });
-
-            // Check for incoming offer every 1.5 seconds
-            setInterval(checkForIncomingOffer, 1500);
-        });
-    </script>
-</body>
-</html>
+        /* ============================================================
+           ROUND INFO
+        ============================================================ */
+        function updateRoundInfo() {
+            roundInfo.textContent =
+                "Round " + (currentRound + 1)
