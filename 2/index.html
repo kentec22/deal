@@ -1,613 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Deal or No Deal - Kenneth</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ===========================
-         GLOBAL STYLES
-    ============================ -->
-    <style>
-        :root {
-            --bg-dark: #050816;
-            --bg-light: #121926;
-            --fg: #ffffff;
-            --accent: #f7b500;
-            --accent-soft: rgba(247,181,0,0.25);
-            --danger: #ff4b4b;
-            --muted: #9ca3af;
-            --panel-bg: rgba(0,0,0,0.65);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: radial-gradient(circle at top, #1b2845 0, #050816 45%, #020308 100%);
-            color: var(--fg);
-            font-family: system-ui, sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* Background decorative image */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: url("dodTransparent.png") center/contain no-repeat;
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        header {
-            text-align: center;
-            padding: 16px;
-            background: rgba(0,0,0,0.6);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        header img.logo {
-            max-width: 220px;
-            margin-bottom: 8px;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
-        header h1 span {
-            color: var(--accent);
-        }
-
-        /* ===========================
-           START GAME SCREEN
-        ============================ */
-        #start-screen {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(6px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        #start-screen h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        #start-btn {
-            padding: 14px 28px;
-            font-size: 1.2rem;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #f7b500, #ffdf6f);
-            color: #000;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        #start-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* ===========================
-           MAIN LAYOUT
-        ============================ */
-        main {
-            display: grid;
-            grid-template-columns: 260px 1fr 260px;
-            gap: 16px;
-            padding: 16px;
-            min-height: calc(100vh - 80px);
-        }
-
-        /* Prize columns */
-        .prize-column {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 10px;
-        }
-
-        .prize-item {
-            padding: 10px 14px;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.45);
-            border: 1px solid rgba(255,255,255,0.15);
-            font-size: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .prize-item.revealed {
-            opacity: 0.35;
-            text-decoration: line-through;
-        }
-
-        /* ===========================
-           CASE GRID (4×4)
-        ============================ */
-        #case-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            padding: 20px;
-            background: rgba(0,0,0,0.35);
-            border-radius: 16px;
-        }
-
-        .case {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4/3;
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.6);
-            transition: transform 0.2s;
-        }
-
-        .case:hover {
-            transform: scale(1.05);
-            border-color: var(--accent);
-        }
-
-        .case img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .case-number {
-            position: absolute;
-            bottom: 4px;
-            right: 6px;
-            background: rgba(0,0,0,0.7);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-weight: 700;
-        }
-
-        .case-value {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--accent);
-            opacity: 0;
-        }
-
-        .case.opened {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        /* ===========================
-           MAIN CASE (below grid)
-        ============================ */
-        #main-case-wrapper {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #main-case {
-            width: 200px;
-            margin: 0 auto;
-            aspect-ratio: 4/3;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 3px solid var(--accent);
-            background: rgba(0,0,0,0.8);
-        }
-
-        #main-case img {
-            width: 100%;
-            height: 100%;
-        }
-
-        #main-case-label {
-            margin-top: 6px;
-            font-size: 1rem;
-            color: var(--muted);
-        }
-
-        /* ===========================
-           REMAINING CASES COUNTER
-        ============================ */
-        #round-info {
-            text-align: center;
-            font-size: 1.3rem;
-            margin-top: 10px;
-            color: var(--accent);
-        }
-
-        /* ===========================
-           OFFER POPUP
-        ============================ */
-        #offer-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.75);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-        }
-
-        #offer-box {
-            background: #050814;
-            padding: 20px;
-            border-radius: 16px;
-            width: 300px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        #offer-amount {
-            font-size: 1.6rem;
-            color: var(--accent);
-            margin: 10px 0;
-        }
-
-        .offer-btn {
-            padding: 10px 20px;
-            margin: 6px;
-            border-radius: 999px;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .deal {
-            background: var(--accent);
-            color: #000;
-        }
-
-        .no-deal {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        /* ===========================
-           SETTINGS PANEL
-        ============================ */
-        #settings-panel {
-            position: fixed;
-            right: 10px;
-            top: 80px;
-            width: 260px;
-            background: var(--panel-bg);
-            padding: 12px;
-            border-radius: 14px;
-            display: none;
-            z-index: 150;
-        }
-
-        #settings-panel h3 {
-            margin-top: 0;
-            color: var(--accent);
-        }
-
-        /* ===========================
-           DEBUG CONSOLE
-        ============================ */
-        #debug-console {
-            position: fixed;
-            left: 10px;
-            bottom: 60px;
-            width: 300px;
-            max-height: 40vh;
-            overflow-y: auto;
-            background: var(--panel-bg);
-            padding: 10px;
-            border-radius: 12px;
-            display: none;
-            z-index: 150;
-        }
-
-        footer {
-            text-align: center;
-            padding: 10px;
-            background: rgba(0,0,0,0.85);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.8rem;
-        }
-    </style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Deal or No Deal</title><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<style>
+body{margin:0;background:#050816;color:#fff;font-family:sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:url("dodTransparent.png") center/contain no-repeat;opacity:.05;pointer-events:none;z-index:-1}
+header{text-align:center;padding:16px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.1)}
+header img{max-width:200px}
+header h1{margin:0;font-size:1.8rem;letter-spacing:.1em;text-transform:uppercase}
+header h1 span{color:#f7b500}
+#start-screen{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+#start-btn{padding:14px 28px;font-size:1.2rem;border-radius:999px;border:none;background:linear-gradient(135deg,#f7b500,#ffdf6f);color:#000;font-weight:700;cursor:pointer}
+main{display:grid;grid-template-columns:260px 1fr 260px;gap:12px;padding:12px}
+.prize-column{display:flex;flex-direction:column;gap:8px}
+.prize-item{padding:8px 12px;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);font-size:1.1rem}
+.prize-item.revealed{opacity:.3;text-decoration:line-through}
+#case-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:12px}
+.case{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.2);cursor:pointer}
+.case:hover{transform:scale(1.05);border-color:#f7b500}
+.case img{width:100%;height:100%;object-fit:cover}
+.case-number{position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.7);padding:3px 6px;border-radius:6px;font-size:.8rem}
+.case-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#f7b500;opacity:0}
+.case.opened{pointer-events:none;opacity:.7}
+#main-case-wrapper{text-align:center;margin-top:10px}
+#main-case{width:180px;margin:auto;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:3px solid #f7b500}
+#main-case img{width:100%;height:100%}
+#round-info{text-align:center;margin-top:10px;font-size:1.2rem;color:#f7b500}
+#offer-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200}
+#offer-box{background:#050814;padding:16px;border-radius:14px;width:280px;text-align:center;border:1px solid rgba(255,255,255,.2)}
+.offer-btn{padding:8px 16px;border-radius:999px;border:none;font-weight:700;cursor:pointer;margin:4px}
+.deal{background:#f7b500;color:#000}
+.no-deal{background:#ff4b4b;color:#fff}
+#settings-panel{position:fixed;right:10px;top:80px;width:240px;background:rgba(0,0,0,.6);padding:10px;border-radius:12px;display:none;z-index:150}
+#debug-console{position:fixed;left:10px;bottom:60px;width:280px;max-height:40vh;overflow-y:auto;background:rgba(0,0,0,.6);padding:8px;border-radius:10px;display:none;z-index:150;font-size:.8rem}
+footer{text-align:center;padding:8px;background:rgba(0,0,0,.85);font-size:.8rem;margin-top:10px}
+</style>
 </head>
 
 <body>
+<div id="start-screen"><h2>Deal or No Deal</h2><button id="start-btn">Start Game</button></div>
 
-    <!-- ===========================
-         START GAME SCREEN
-    ============================ -->
-    <div id="start-screen">
-        <h2>Deal or No Deal</h2>
-        <button id="start-btn">Start Game</button>
-    </div>
+<header><img src="company.png"/><h1><span>Deal</span> or <span>No Deal</span></h1></header>
 
-    <!-- ===========================
-         HEADER
-    ============================ -->
-    <header>
-        <img src="company.png" class="logo" />
-        <h1><span>Deal</span> or <span>No Deal</span></h1>
-    </header>
+<main>
+<div class="prize-column" id="prize-left"></div>
+<div>
+<div id="case-grid"></div>
+<div id="main-case-wrapper"><div id="main-case"><img src="suitcase.png"/></div><div>Your Case</div></div>
+<div id="round-info"></div>
+</div>
+<div class="prize-column" id="prize-right"></div>
+</main>
 
-    <!-- ===========================
-         MAIN CONTENT
-    ============================ -->
-    <main>
+<div id="offer-modal"><div id="offer-box"><h2>Banker's Offer</h2><div id="offer-amount"></div><button class="offer-btn deal" id="deal-btn">Deal</button><button class="offer-btn no-deal" id="no-deal-btn">No Deal</button></div></div>
 
-        <!-- LEFT PRIZE COLUMN -->
-        <div class="prize-column" id="prize-left"></div>
+<div id="settings-panel">
+<label><input type="checkbox" id="sound-toggle" checked/> Sound</label>
+<label><input type="checkbox" id="anim-toggle" checked/> Anim</label>
+<label><input type="checkbox" id="debug-toggle"/> Debug</label>
+<button onclick="location='custom-amounts.html'">Custom Amounts</button>
+<button onclick="location='offer.html'">Enter Offer</button>
+<button onclick="location.reload()">Reset</button>
+</div>
 
-        <!-- CASE GRID -->
-        <div>
-            <div id="case-grid"></div>
+<div id="debug-console"></div>
 
-            <div id="main-case-wrapper">
-                <div id="main-case">
-                    <img src="suitcase.png" />
-                </div>
-                <div id="main-case-label">Your Case</div>
-            </div>
+<audio id="a-intro" src="1-intro.mp3"></audio>
+<audio id="a-loop" src="4-loop.mp3" loop></audio>
+<audio id="a-case" src="2-case.mp3"></audio>
+<audio id="a-off1" src="3-offer-1.mp3"></audio>
+<audio id="a-off2" src="3-offer.mp3"></audio>
+<audio id="a-small" src="5-smallcase.mp3"></audio>
+<audio id="a-big" src="6-bigcase.mp3"></audio>
 
-            <div id="round-info"></div>
-        </div>
+<script>
+const R=[4,3,2,2,1,1,1];let P=[1,5,10,20,50,100,200,500,1000,2000,5000,10000,25000,50000,100000];
+let S=[],mI=null,mV=null,r=0,to=R[0],o=0,snd=1,anim=1;
+const L=document.getElementById("prize-left"),Rr=document.getElementById("prize-right"),G=document.getElementById("case-grid"),MC=document.getElementById("main-case"),RI=document.getElementById("round-info"),OM=document.getElementById("offer-modal"),OA=document.getElementById("offer-amount"),DBG=document.getElementById("debug-console");
+function log(x){if(!document.getElementById("debug-toggle").checked)return;DBG.innerHTML+=x+"<br>"}
+function play(a){if(!snd)return;a.currentTime=0;a.play()}
+function sh(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+document.getElementById("start-btn").onclick=()=>{document.getElementById("start-screen").style.display="none";play(document.getElementById("a-loop"));init()};
+play(document.getElementById("a-intro"));
+function init(){
+let c=localStorage.getItem("customAmounts");if(c)P=JSON.parse(c);
+S=sh(P);mI=Math.floor(Math.random()*15);mV=S[mI];
+buildPrizes();buildCases();upd()
+}
+function buildPrizes(){
+L.innerHTML="";Rr.innerHTML="";
+let h=Math.ceil(P.length/2),a=P.slice(0,h),b=P.slice(h);
+a.forEach(v=>{let d=document.createElement("div");d.className="prize-item";d.id="p-"+v;d.textContent="₱"+v.toLocaleString();L.appendChild(d)});
+b.forEach(v=>{let d=document.createElement("div");d.className="prize-item";d.id="p-"+v;d.textContent="₱"+v.toLocaleString();Rr.appendChild(d)});
+}
+function buildCases(){
+G.innerHTML="";
+for(let i=0;i<16;i++){
+let d=document.createElement("div");d.className="case";
+if(i<15){d.dataset.i=i;d.dataset.v=S[i];d.onclick=()=>openCase(i)}else d.style.visibility="hidden";
+let img=document.createElement("img");img.src="suitcase.png";
+let n=document.createElement("div");n.className="case-number";n.textContent=i<15?i+1:"";
+let v=document.createElement("div");v.className="case-value";v.textContent=i<15?"₱"+S[i].toLocaleString():"";
+d.append(img,n,v);G.appendChild(d)
+}}
+function openCase(i){
+if(o>=to)return;
+let d=G.children[i],v=Number(d.dataset.v);
+d.classList.add("opened");d.querySelector("img").src="suitcase-open.jpg";d.querySelector(".case-value").style.opacity=1;
+play(document.getElementById("a-case"));
+if(v>=Math.max(...P)/2)play(document.getElementById("a-big"));else play(document.getElementById("a-small"));
+document.getElementById("p-"+v).classList.add("revealed");
+o++;upd();
+if(o===to)setTimeout(checkOffer,800)
+}
+function upd(){RI.textContent="Round "+(r+1)+" — Open "+(to-o)+" case(s)"}
+function checkOffer(){OM.style.display="flex";let off=localStorage.getItem("dod_offer");if(!off){OA.textContent="Waiting...";return}
+let oData=JSON.parse(off);OA.textContent="₱"+oData.amount.toLocaleString();play(Math.random()<.5?document.getElementById("a-off1"):document.getElementById("a-off2"))}
+document.getElementById("deal-btn").onclick=()=>{OM.style.display="none";alert("You accepted the deal! Your case had ₱"+mV.toLocaleString());location.reload()}
+document.getElementById("no-deal-btn").onclick=()=>{OM.style.display="none";r++;if(r>=7){alert("Final reveal: ₱"+mV.toLocaleString());location.reload()}to=R[r];o=0;upd()}
+document.getElementById("sound-toggle").onchange=e=>snd=e.target.checked?1:0;
+document.getElementById("anim-toggle").onchange=e=>anim=e.target.checked?1:0;
+document.getElementById("debug-toggle").onchange=e=>DBG.style.display=e.target.checked?"block":"none";
+setInterval(()=>{let off=localStorage.getItem("dod_offer");if(off&&OM.style.display!=="flex")checkOffer()},1000);
+</script>
 
-        <!-- RIGHT PRIZE COLUMN -->
-        <div class="prize-column" id="prize-right"></div>
-
-    </main>
-
-    <!-- ===========================
-         OFFER POPUP
-    ============================ -->
-    <div id="offer-modal">
-        <div id="offer-box">
-            <h2>Banker's Offer</h2>
-            <div id="offer-amount"></div>
-            <button class="offer-btn deal" id="deal-btn">Deal</button>
-            <button class="offer-btn no-deal" id="no-deal-btn">No Deal</button>
-        </div>
-    </div>
-
-    <!-- ===========================
-         SETTINGS PANEL
-    ============================ -->
-    <div id="settings-panel">
-        <h3>Settings</h3>
-        <label><input type="checkbox" id="sound-toggle" checked /> Sound</label>
-        <label><input type="checkbox" id="anim-toggle" checked /> Animations</label>
-        <label><input type="checkbox" id="debug-toggle" /> Debug Console</label>
-        <button onclick="window.location='custom-amounts.html'">Custom Amounts</button>
-        <button onclick="window.location='offer.html'">Enter Offer</button>
-        <button onclick="location.reload()">Reset Game</button>
-    </div>
-
-    <!-- ===========================
-         DEBUG CONSOLE
-    ============================ -->
-    <div id="debug-console"></div>
-
-    <!-- ===========================
-         AUDIO
-    ============================ -->
-    <audio id="audio-intro" src="1-intro.mp3"></audio>
-    <audio id="audio-loop" src="4-loop.mp3" loop></audio>
-    <audio id="audio-case" src="2-case.mp3"></audio>
-    <audio id="audio-offer1" src="3-offer-1.mp3"></audio>
-    <audio id="audio-offer" src="3-offer.mp3"></audio>
-    <audio id="audio-small" src="5-smallcase.mp3"></audio>
-    <audio id="audio-big" src="6-bigcase.mp3"></audio>
-
-    <!-- ===========================
-         GAME SCRIPT
-    ============================ -->
-    <script>
-        /* ============================================================
-           GAME CONFIG
-        ============================================================ */
-        const ROUND_STRUCTURE = [4, 3, 2, 2, 1, 1, 1];
-
-        let prizes = [
-            1, 5, 10, 20, 50,
-            100, 200, 500, 1000, 2000,
-            5000, 10000, 25000, 50000, 100000
-        ];
-
-        let shuffled = [];
-        let mainCaseIndex = null;
-        let mainCaseValue = null;
-
-        let currentRound = 0;
-        let casesToOpen = ROUND_STRUCTURE[0];
-        let openedThisRound = 0;
-
-        let soundOn = true;
-        let animOn = true;
-
-        const prizeLeft = document.getElementById("prize-left");
-        const prizeRight = document.getElementById("prize-right");
-        const caseGrid = document.getElementById("case-grid");
-        const mainCase = document.getElementById("main-case");
-        const roundInfo = document.getElementById("round-info");
-        const offerModal = document.getElementById("offer-modal");
-        const offerAmountEl = document.getElementById("offer-amount");
-        const debugConsole = document.getElementById("debug-console");
-
-        /* ============================================================
-           UTILITY
-        ============================================================ */
-        function log(msg) {
-            if (!document.getElementById("debug-toggle").checked) return;
-            const div = document.createElement("div");
-            div.textContent = msg;
-            debugConsole.appendChild(div);
-        }
-
-        function play(audio) {
-            if (!soundOn) return;
-            audio.currentTime = 0;
-            audio.play();
-        }
-
-        function shuffle(arr) {
-            const a = [...arr];
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
-        }
-
-        /* ============================================================
-           START GAME
-        ============================================================ */
-        document.getElementById("start-btn").onclick = () => {
-            document.getElementById("start-screen").style.display = "none";
-            play(document.getElementById("audio-loop"));
-            initGame();
-        };
-
-        play(document.getElementById("audio-intro"));
-
-        /* ============================================================
-           INITIALIZE GAME
-        ============================================================ */
-        function initGame() {
-            // Load custom amounts if available
-            const custom = localStorage.getItem("customAmounts");
-            if (custom) {
-                prizes = JSON.parse(custom);
-            }
-
-            shuffled = shuffle(prizes);
-            mainCaseIndex = Math.floor(Math.random() * 15);
-            mainCaseValue = shuffled[mainCaseIndex];
-
-            buildPrizeColumns();
-            buildCaseGrid();
-            updateRoundInfo();
-        }
-
-        /* ============================================================
-           PRIZE COLUMNS
-        ============================================================ */
-        function buildPrizeColumns() {
-            prizeLeft.innerHTML = "";
-            prizeRight.innerHTML = "";
-
-            const half = Math.ceil(prizes.length / 2);
-            const left = prizes.slice(0, half);
-            const right = prizes.slice(half);
-
-            left.forEach(v => {
-                const item = document.createElement("div");
-                item.className = "prize-item";
-                item.id = "prize-" + v;
-                item.textContent = "₱" + v.toLocaleString();
-                prizeLeft.appendChild(item);
-            });
-
-            right.forEach(v => {
-                const item = document.createElement("div");
-                item.className = "prize-item";
-                item.id = "prize-" + v;
-                item.textContent = "₱" + v.toLocaleString();
-                prizeRight.appendChild(item);
-            });
-        }
-
-        /* ============================================================
-           CASE GRID
-        ============================================================ */
-        function buildCaseGrid() {
-            caseGrid.innerHTML = "";
-
-            for (let i = 0; i < 16; i++) {
-                const div = document.createElement("div");
-                div.className = "case";
-
-                if (i < 15) {
-                    div.dataset.index = i;
-                    div.dataset.value = shuffled[i];
-                    div.onclick = () => openCase(i);
-                } else {
-                    // Empty slot for 4×4 symmetry
-                    div.style.visibility = "hidden";
-                }
-
-                const img = document.createElement("img");
-                img.src = "suitcase.png";
-
-                const num = document.createElement("div");
-                num.className = "case-number";
-                num.textContent = i < 15 ? i + 1 : "";
-
-                const val = document.createElement("div");
-                val.className = "case-value";
-                val.textContent = "₱" + (shuffled[i] || "").toLocaleString();
-
-                div.appendChild(img);
-                div.appendChild(num);
-                div.appendChild(val);
-
-                caseGrid.appendChild(div);
-            }
-        }
-
-        /* ============================================================
-           OPEN CASE
-        ============================================================ */
-        function openCase(i) {
-            if (openedThisRound >= casesToOpen) return;
-
-            const div = caseGrid.children[i];
-            const value = Number(div.dataset.value);
-
-            div.classList.add("opened");
-            div.querySelector("img").src = "suitcase-open.jpg";
-            div.querySelector(".case-value").style.opacity = 1;
-
-            play(document.getElementById("audio-case"));
-
-            // Small/big sound
-            if (value >= Math.max(...prizes) * 0.5) {
-                play(document.getElementById("audio-big"));
-            } else {
-                play(document.getElementById("audio-small"));
-            }
-
-            // Cross out prize
-            document.getElementById("prize-" + value).classList.add("revealed");
-
-            openedThisRound++;
-            updateRoundInfo();
-
-            if (openedThisRound === casesToOpen) {
-                setTimeout(checkOffer, 1200);
-            }
-        }
-
-        /* ============================================================
-           ROUND INFO
-        ============================================================ */
-        function updateRoundInfo() {
-            roundInfo.textContent =
-                "Round " + (currentRound + 1)
+<footer>Created by: Kenneth with AI</footer>
+</body></html>
