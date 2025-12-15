@@ -7,19 +7,15 @@
   <style>
     :root {
       --bg: #050608;
+      --card: #11131c;
+      --border: #262a33;
       --accent: #ffcc00;
       --text: #f5f5f5;
       --muted: #888;
       --danger: #ff4b4b;
       --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font);
       background: radial-gradient(circle at top, #1a1d24 0, #050608 50%, #000 100%);
@@ -30,100 +26,75 @@
       justify-content: center;
       padding: 16px;
     }
-
     .card {
-      width: min(520px, 100%);
+      width: min(480px, 100%);
       background: linear-gradient(145deg, #0b0e16, #171a26);
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
-      padding: 18px 18px 14px;
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
+      padding: 20px 20px 16px;
       position: relative;
       overflow: hidden;
     }
-
     .card::before {
       content: "";
       position: absolute;
       inset: -120px;
       background: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), transparent 60%);
-      opacity: 0.8;
+      opacity: 0.75;
       pointer-events: none;
     }
-
-    .card-inner {
-      position: relative;
-      z-index: 1;
-    }
-
+    .card-inner { position: relative; z-index: 1; }
     h1 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
-
     .subtitle {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--muted);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
-
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
     }
-
-    @media (max-width: 520px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      font-size: 0.78rem;
-    }
-
-    label {
+    .field-group label {
+      font-size: 0.75rem;
       color: var(--muted);
+      margin-bottom: 3px;
+      display: block;
     }
-
     input[type="number"] {
       width: 100%;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
       background: rgba(0, 0, 0, 0.65);
       color: var(--text);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       outline: none;
     }
-
     input[type="number"]:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(255, 204, 0, 0.3);
     }
-
     .actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
-
     button {
       font-family: inherit;
       cursor: pointer;
       border: none;
       outline: none;
     }
-
     .btn {
       padding: 8px 14px;
       border-radius: 999px;
@@ -139,12 +110,7 @@
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
       transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
     }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
     .btn-secondary {
       background: rgba(255, 255, 255, 0.06);
       color: var(--text);
@@ -154,206 +120,80 @@
       border: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: none;
     }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.16);
-    }
-
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.16); }
     .message {
-      margin-top: 8px;
+      margin-top: 10px;
       font-size: 0.8rem;
       min-height: 16px;
     }
-
-    .message.error {
-      color: var(--danger);
-    }
-
-    .message.success {
-      color: #3fd47a;
-    }
-
-    .note {
-      font-size: 0.76rem;
-      color: var(--muted);
-      margin-top: 4px;
-      line-height: 1.5;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(255, 204, 0, 0.5);
-    }
-
-    a:hover {
-      border-bottom-style: solid;
-    }
+    .message.success { color: #3fd47a; }
+    .message.error { color: var(--danger); }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="card-inner">
-      <h1>Custom prize values</h1>
-      <div class="subtitle">
-        Enter exactly <strong>15</strong> prize values. They will be sorted ascending and used for the next game.
+      <h1>Custom Prize List</h1>
+      <div class="subtitle">Enter 15 prize values. They will be sorted automatically.</div>
+
+      <div class="grid" id="inputGrid"></div>
+
+      <div class="actions">
+        <button class="btn-secondary" id="cancelBtn">Cancel</button>
+        <button class="btn" id="saveBtn">Save Amounts</button>
       </div>
-
-      <form id="customForm">
-        <div class="grid">
-          <div class="field">
-            <label for="v1">Prize 1</label>
-            <input type="number" id="v1" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v2">Prize 2</label>
-            <input type="number" id="v2" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v3">Prize 3</label>
-            <input type="number" id="v3" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v4">Prize 4</label>
-            <input type="number" id="v4" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v5">Prize 5</label>
-            <input type="number" id="v5" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v6">Prize 6</label>
-            <input type="number" id="v6" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v7">Prize 7</label>
-            <input type="number" id="v7" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v8">Prize 8</label>
-            <input type="number" id="v8" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v9">Prize 9</label>
-            <input type="number" id="v9" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v10">Prize 10</label>
-            <input type="number" id="v10" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v11">Prize 11</label>
-            <input type="number" id="v11" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v12">Prize 12</label>
-            <input type="number" id="v12" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v13">Prize 13</label>
-            <input type="number" id="v13" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v14">Prize 14</label>
-            <input type="number" id="v14" min="1" step="1" />
-          </div>
-          <div class="field">
-            <label for="v15">Prize 15</label>
-            <input type="number" id="v15" min="1" step="1" />
-          </div>
-        </div>
-
-        <div class="actions">
-          <button type="button" class="btn-secondary" id="cancelBtn">
-            Cancel
-          </button>
-          <button type="submit" class="btn">Save amounts</button>
-        </div>
-      </form>
 
       <div class="message" id="message"></div>
-
-      <div class="note">
-        On save, amounts will be:
-        <ul style="margin-left: 16px; margin-top: 4px;">
-          <li>Sorted from smallest to largest</li>
-          <li>Stored as <code>dod_custom_prizes</code> in <code>localStorage</code></li>
-          <li>Used automatically when <a href="index.html">starting a new game</a></li>
-        </ul>
-      </div>
     </div>
   </div>
 
   <script>
     (function () {
-      const form = document.getElementById("customForm");
-      const messageEl = document.getElementById("message");
+      const grid = document.getElementById("inputGrid");
+      const saveBtn = document.getElementById("saveBtn");
       const cancelBtn = document.getElementById("cancelBtn");
+      const messageEl = document.getElementById("message");
+
+      // Build 15 input fields
+      for (let i = 1; i <= 15; i++) {
+        const wrap = document.createElement("div");
+        wrap.className = "field-group";
+        wrap.innerHTML = `
+          <label>Value ${i}</label>
+          <input type="number" class="amountInput" min="1" step="1" placeholder="0" />
+        `;
+        grid.appendChild(wrap);
+      }
 
       function showMessage(text, type) {
         messageEl.textContent = text;
         messageEl.className = "message " + (type || "");
       }
 
-      function loadExisting() {
-        try {
-          const stored = localStorage.getItem("dod_custom_prizes");
-          if (!stored) return;
-          const arr = JSON.parse(stored);
-          if (!Array.isArray(arr) || arr.length !== 15) return;
-          const inputs = form.querySelectorAll("input[type='number']");
-          arr.forEach((val, idx) => {
-            if (inputs[idx]) {
-              inputs[idx].value = val;
-            }
-          });
-        } catch (e) {}
-      }
+      saveBtn.addEventListener("click", () => {
+        const inputs = Array.from(document.querySelectorAll(".amountInput"));
+        const values = inputs.map((i) => Number(i.value.trim()));
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const inputs = form.querySelectorAll("input[type='number']");
-        const values = [];
-        for (let i = 0; i < inputs.length; i++) {
-          const raw = inputs[i].value.trim();
-          const num = Number(raw);
-          if (!raw || isNaN(num) || num <= 0) {
-            showMessage("Please enter a positive number for prize " + (i + 1) + ".", "error");
-            return;
-          }
-          values.push(num);
-        }
-
-        if (values.length !== 15) {
-          showMessage("Exactly 15 values are required.", "error");
+        if (values.some((v) => isNaN(v) || v <= 0)) {
+          showMessage("All 15 values must be positive numbers.", "error");
           return;
         }
 
-        const sorted = values.slice().sort((a, b) => a - b);
+        if (!confirm("Save these custom prize values?")) return;
 
-        const confirmText =
-          "Save these 15 values as your custom prize list?" +
-          "\n(They will be sorted ascending and used for the next games.)";
-        if (!confirm(confirmText)) {
-          return;
-        }
+        values.sort((a, b) => a - b);
+        localStorage.setItem("dod_custom_prizes", JSON.stringify(values));
 
-        try {
-          localStorage.setItem("dod_custom_prizes", JSON.stringify(sorted));
-          showMessage("Custom prize list saved. Redirecting to game…", "success");
-          setTimeout(() => {
-            window.location.href = "index.html";
-          }, 800);
-        } catch (e) {
-          showMessage("Failed to write to localStorage.", "error");
-        }
+        showMessage("Saved! Redirecting…", "success");
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 600);
       });
 
       cancelBtn.addEventListener("click", () => {
         window.location.href = "index.html";
       });
-
-      loadExisting();
     })();
   </script>
 </body>
