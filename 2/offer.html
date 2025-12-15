@@ -15,13 +15,7 @@
       --danger: #ff4b4b;
       --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font);
       background: radial-gradient(circle at top, #1a1d24 0, #050608 50%, #000 100%);
@@ -32,7 +26,6 @@
       justify-content: center;
       padding: 16px;
     }
-
     .card {
       width: min(420px, 100%);
       background: linear-gradient(145deg, #0b0e16, #171a26);
@@ -43,7 +36,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .card::before {
       content: "";
       position: absolute;
@@ -52,36 +44,37 @@
       opacity: 0.75;
       pointer-events: none;
     }
-
-    .card-inner {
-      position: relative;
-      z-index: 1;
-    }
-
+    .card-inner { position: relative; z-index: 1; }
     h1 {
       font-size: 1.1rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       margin-bottom: 4px;
     }
-
     .subtitle {
       font-size: 0.8rem;
       color: var(--muted);
       margin-bottom: 14px;
     }
-
-    .field-group {
-      margin-bottom: 10px;
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.75rem;
+      margin-bottom: 6px;
     }
-
+    .pill span { color: var(--accent); font-weight: 600; }
+    .field-group { margin-bottom: 10px; }
     label {
       display: block;
       font-size: 0.8rem;
       margin-bottom: 4px;
       color: var(--muted);
     }
-
     input[type="number"] {
       width: 100%;
       padding: 8px 10px;
@@ -92,12 +85,10 @@
       font-size: 0.9rem;
       outline: none;
     }
-
     input[type="number"]:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(255, 204, 0, 0.3);
     }
-
     .actions {
       display: flex;
       justify-content: flex-end;
@@ -105,14 +96,12 @@
       margin-top: 12px;
       flex-wrap: wrap;
     }
-
     button {
       font-family: inherit;
       cursor: pointer;
       border: none;
       outline: none;
     }
-
     .btn {
       padding: 8px 14px;
       border-radius: 999px;
@@ -128,12 +117,7 @@
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
       transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
     }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
     .btn-secondary {
       background: rgba(255, 255, 255, 0.06);
       color: var(--text);
@@ -143,81 +127,39 @@
       border: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: none;
     }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.16);
-    }
-
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.16); }
     .message {
       margin-top: 8px;
       font-size: 0.8rem;
       min-height: 16px;
     }
-
-    .message.success {
-      color: #3fd47a;
-    }
-
-    .message.error {
-      color: var(--danger);
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      font-size: 0.75rem;
-      margin-bottom: 6px;
-    }
-
-    .pill span {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
+    .message.success { color: #3fd47a; }
+    .message.error { color: var(--danger); }
     .hint {
       font-size: 0.76rem;
       color: var(--muted);
       margin-top: 6px;
       line-height: 1.5;
     }
-
     a {
       color: var(--accent);
       text-decoration: none;
       border-bottom: 1px dashed rgba(255, 204, 0, 0.5);
     }
-
-    a:hover {
-      border-bottom-style: solid;
-    }
+    a:hover { border-bottom-style: solid; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="card-inner">
       <h1>Banker offer</h1>
-      <div class="subtitle">
-        Enter an amount and send it to the main game via Google Sheets.
-      </div>
+      <div class="subtitle">Enter an amount and send it to the main game.</div>
 
-      <div class="pill">
-        Backend: <span>DealOrNoDeal_Offers → Offers</span>
-      </div>
+      <div class="pill">Backend: <span>Google Sheets</span></div>
 
       <div class="field-group">
         <label for="offerAmount">Offer amount (₱)</label>
-        <input
-          type="number"
-          id="offerAmount"
-          min="1"
-          step="1"
-          placeholder="e.g. 50000"
-        />
+        <input type="number" id="offerAmount" min="1" step="1" placeholder="e.g. 50000" />
       </div>
 
       <div class="actions">
@@ -228,17 +170,17 @@
       <div class="message" id="message"></div>
 
       <div class="hint">
-        Keep this page open while the game runs at
+        Keep this page open while the game runs at  
         <a href="index.html" target="_blank">/2/index.html</a>.  
-        Each time you click "Send offer", the game will pick up the latest value within about a second.
+        The game checks for new offers every second.
       </div>
     </div>
   </div>
 
   <script>
     (function () {
-      // Must match the URL used in index.html
-      const GOOGLE_SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec';
+      const GOOGLE_SHEETS_WEBAPP_URL =
+        "https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec";
 
       const sendOfferBtn = document.getElementById("sendOfferBtn");
       const offerInput = document.getElementById("offerAmount");
@@ -251,13 +193,9 @@
       }
 
       async function sendOffer() {
-        if (!GOOGLE_SHEETS_WEBAPP_URL || GOOGLE_SHEETS_WEBAPP_URL === 'https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec') {
-          showMessage("Sheets URL not configured. Edit offer.html.", "error");
-          return;
-        }
-
         const raw = offerInput.value.trim();
         const amount = Number(raw);
+
         if (!raw || isNaN(amount) || amount <= 0) {
           showMessage("Please enter a valid positive amount.", "error");
           return;
@@ -280,7 +218,7 @@
           showMessage(
             "Offer sent: ₱" +
               amount.toLocaleString("en-PH") +
-              ". The game should pick it up shortly.",
+              ". The game will pick it up shortly.",
             "success"
           );
         } catch (e) {
@@ -288,9 +226,7 @@
         }
       }
 
-      sendOfferBtn.addEventListener("click", () => {
-        sendOffer();
-      });
+      sendOfferBtn.addEventListener("click", sendOffer);
 
       offerInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
@@ -299,9 +235,7 @@
         }
       });
 
-      closeBtn.addEventListener("click", () => {
-        window.close();
-      });
+      closeBtn.addEventListener("click", () => window.close());
     })();
   </script>
 </body>
