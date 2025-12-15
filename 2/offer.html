@@ -162,13 +162,6 @@
       color: var(--danger);
     }
 
-    .hint {
-      font-size: 0.76rem;
-      color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-
     .pill {
       display: inline-flex;
       align-items: center;
@@ -184,6 +177,13 @@
     .pill span {
       color: var(--accent);
       font-weight: 600;
+    }
+
+    .hint {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
     }
 
     a {
@@ -202,11 +202,11 @@
     <div class="card-inner">
       <h1>Banker offer</h1>
       <div class="subtitle">
-        Enter an amount and send it to the main game via <code>localStorage</code>.
+        Enter an amount and send it to the main game via Google Sheets.
       </div>
 
       <div class="pill">
-        Storage key: <span>dod_offer</span>
+        Backend: <span>DealOrNoDeal_Offers → Offers</span>
       </div>
 
       <div class="field-group">
@@ -228,17 +228,18 @@
       <div class="message" id="message"></div>
 
       <div class="hint">
-        The main game polls every second for a JSON object:
-        <br />
-        <code>{ "amount": 50000, "time": 123456789 }</code>
-        <br />
-        Keep this tab open and send new offers after each round.
+        Keep this page open while the game runs at
+        <a href="index.html" target="_blank">/2/index.html</a>.  
+        Each time you click "Send offer", the game will pick up the latest value within about a second.
       </div>
     </div>
   </div>
 
   <script>
     (function () {
+      // Must match the URL used in index.html
+      const GOOGLE_SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec';
+
       const sendOfferBtn = document.getElementById("sendOfferBtn");
       const offerInput = document.getElementById("offerAmount");
       const messageEl = document.getElementById("message");
@@ -249,25 +250,52 @@
         messageEl.className = "message " + (type || "");
       }
 
-      sendOfferBtn.addEventListener("click", () => {
+      async function sendOffer() {
+        if (!GOOGLE_SHEETS_WEBAPP_URL || GOOGLE_SHEETS_WEBAPP_URL === 'https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec') {
+          showMessage("Sheets URL not configured. Edit offer.html.", "error");
+          return;
+        }
+
         const raw = offerInput.value.trim();
         const amount = Number(raw);
         if (!raw || isNaN(amount) || amount <= 0) {
           showMessage("Please enter a valid positive amount.", "error");
           return;
         }
-        const payload = {
-          amount: amount,
-          time: Date.now()
-        };
+
         try {
-          localStorage.setItem("dod_offer", JSON.stringify(payload));
+          showMessage("Sending offer…", "");
+          const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ offer: amount })
+          });
+
+          const text = await res.text();
+          if (!res.ok || text.indexOf("OK") === -1) {
+            showMessage("Error from backend: " + text, "error");
+            return;
+          }
+
           showMessage(
-            "Offer sent: ₱" + amount.toLocaleString("en-PH") + ". The game should pick it up shortly.",
+            "Offer sent: ₱" +
+              amount.toLocaleString("en-PH") +
+              ". The game should pick it up shortly.",
             "success"
           );
         } catch (e) {
-          showMessage("Failed to write to localStorage.", "error");
+          showMessage("Network error sending offer.", "error");
+        }
+      }
+
+      sendOfferBtn.addEventListener("click", () => {
+        sendOffer();
+      });
+
+      offerInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendOffer();
         }
       });
 
