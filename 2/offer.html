@@ -2,267 +2,386 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Banker Offer · Deal or No Deal</title>
+  <title>Banker Offer - Deal or No Deal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: #050608;
-      --card: #11131c;
-      --border: #262a33;
-      --accent: #ffcc00;
-      --text: #f5f5f5;
-      --muted: #888;
-      --danger: #ff4b4b;
-      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg-gradient: radial-gradient(circle at top, #222 0%, #050505 55%, #000 100%);
+      --primary-gold: #ffcc00;
+      --accent-red: #ff5252;
+      --accent-green: #4caf50;
+      --text-main: #f5f5f5;
+      --text-muted: #a5a5a5;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: var(--font);
-      background: radial-gradient(circle at top, #1a1d24 0, #050608 50%, #000 100%);
-      color: var(--text);
       min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      padding: 16px;
     }
-    .card {
-      width: min(420px, 100%);
-      background: linear-gradient(145deg, #0b0e16, #171a26);
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
-      padding: 18px 18px 14px;
-      position: relative;
-      overflow: hidden;
+
+    .offer-page {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
     }
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -120px;
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), transparent 60%);
-      opacity: 0.75;
-      pointer-events: none;
+
+    .offer-header {
+      text-align: center;
+      padding: 8px 0;
     }
-    .card-inner { position: relative; z-index: 1; }
-    h1 {
-      font-size: 1.1rem;
+
+    .offer-header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      color: var(--primary-gold);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      text-shadow: 0 0 16px rgba(0, 0, 0, 0.6);
     }
-    .subtitle {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      font-size: 0.75rem;
-      margin-bottom: 6px;
-    }
-    .pill span { color: var(--accent); font-weight: 600; }
-    .field-group { margin-bottom: 10px; }
-    label {
-      display: block;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-      color: var(--muted);
-    }
-    input[type="number"] {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(0, 0, 0, 0.65);
-      color: var(--text);
+
+    .offer-header p {
+      margin-top: 4px;
       font-size: 0.9rem;
-      outline: none;
+      color: var(--text-muted);
     }
-    input[type="number"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(255, 204, 0, 0.3);
+
+    .offer-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 12px;
+      margin-top: 8px;
     }
-    .actions {
+
+    @media (max-width: 900px) {
+      .offer-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .offer-main {
+      background: rgba(10, 10, 10, 0.95);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 12px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: min(32px, 6vh) 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+      text-align: center;
+      gap: 18px;
+    }
+
+    .offer-label {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .offer-amount {
+      font-size: clamp(2rem, 7vw, 3.4rem);
+      font-weight: 800;
+      color: var(--primary-gold);
+      text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+    }
+
+    .offer-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 420px;
+    }
+
+    .offer-actions {
+      display: flex;
       flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
     }
+
     button {
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      outline: none;
-    }
-    .btn {
-      padding: 8px 14px;
       border-radius: 999px;
-      background: linear-gradient(135deg, #ffcc00, #ff7a00);
-      color: #111;
-      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-size: 0.78rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      white-space: nowrap;
+      transition: background 0.18s ease, transform 0.1s ease, box-shadow 0.18s ease;
     }
-    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 0.78rem;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
       box-shadow: none;
     }
-    .btn-secondary:hover { background: rgba(255, 255, 255, 0.16); }
-    .message {
-      margin-top: 10px;
+
+    .btn-green {
+      background: linear-gradient(to bottom, #66bb6a, #2e7d32);
+      color: white;
+      box-shadow: 0 6px 18px rgba(76, 175, 80, 0.7);
+    }
+
+    .btn-red {
+      background: linear-gradient(to bottom, #ef5350, #c62828);
+      color: white;
+      box-shadow: 0 6px 18px rgba(239, 83, 80, 0.7);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: none;
+    }
+
+    .offer-side {
+      background: rgba(6, 6, 6, 0.98);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 12px 14px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .side-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .side-values {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 8px;
+      font-size: 0.85rem;
+      max-height: 45vh;
+      overflow-y: auto;
+    }
+
+    .side-value-item {
+      padding: 4px 8px;
+      border-radius: 999px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .side-value-item.opened {
+      opacity: 0.3;
+      text-decoration: line-through;
+    }
+
+    .side-value-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .side-value-amount {
+      font-weight: 600;
+    }
+
+    .side-debug {
+      margin-top: 4px;
       font-size: 0.8rem;
-      min-height: 16px;
+      color: var(--text-muted);
     }
-    .message.success { color: #3fd47a; }
-    .message.error { color: var(--danger); }
-    .hint {
-      font-size: 0.76rem;
-      color: var(--muted);
+
+    .debug-btn {
       margin-top: 6px;
-      line-height: 1.5;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      border: 1px dashed rgba(255, 255, 255, 0.4);
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-muted);
     }
-    a {
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(255, 204, 0, 0.5);
+
+    .debug-output {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      max-height: 20vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 8px;
+      padding: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    a:hover { border-bottom-style: solid; }
+
+    .offer-footer {
+      margin-top: 8px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="card-inner">
-      <h1>Banker offer</h1>
-      <div class="subtitle">Enter an amount and send it to the main game.</div>
+  <div class="offer-page">
+    <header class="offer-header">
+      <h1>Banker Offer</h1>
+      <p>Full-screen decision mode. Decide your fate.</p>
+    </header>
 
-      <div class="pill">Backend: <span>Google Sheets</span></div>
+    <main class="offer-layout">
+      <!-- MAIN OFFER AREA -->
+      <section class="offer-main">
+        <div class="offer-label">The banker is offering</div>
+        <div class="offer-amount" id="offerAmountDisplay">Loading...</div>
+        <div class="offer-sub" id="offerSubText">
+          This number should match the latest banker offer from the main game, calculated via the backend.
+        </div>
 
-      <div class="field-group">
-        <label for="offerAmount">Offer amount (₱)</label>
-        <input type="number" id="offerAmount" min="1" step="1" placeholder="e.g. 50000" />
-      </div>
+        <div class="offer-actions">
+          <button class="btn-green" id="btnDeal">Deal</button>
+          <button class="btn-red" id="btnNoDeal">No Deal</button>
+          <button class="btn-ghost" id="btnBackToGame">Back to game</button>
+        </div>
+      </section>
 
-      <div class="actions">
-        <button class="btn-secondary" id="debugBtn">Debug</button>
-        <button class="btn-secondary" id="closeBtn">Close</button>
-        <button class="btn" id="sendOfferBtn">Send offer</button>
-      </div>
+      <!-- SIDE PANEL: VALUES + DEBUG -->
+      <aside class="offer-side">
+        <div class="side-title">Board snapshot</div>
+        <div class="side-values" id="sideValuesContainer">
+          <!-- amounts with opened state -->
+        </div>
 
-      <div class="message" id="message"></div>
+        <div class="side-debug">
+          Backend debug &mdash; uses the same endpoint as the main game.
+          <button class="debug-btn" id="debugBtn">Run debug request</button>
+          <div class="debug-output" id="debugOutput"></div>
+        </div>
+      </aside>
+    </main>
 
-      <div class="hint">
-        Keep this page open while the game runs at  
-        <a href="index.html" target="_blank">/2/index.html</a>.  
-        The game checks for new offers every second.
-      </div>
-    </div>
+    <footer class="offer-footer">
+      Uses backend:
+      <span id="backendUrlText">
+        https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec
+      </span>
+    </footer>
   </div>
 
   <script>
-    (function () {
-      const GOOGLE_SHEETS_WEBAPP_URL =
-        "https://script.google.com/macros/s/AKfycbyL1eN0YfmdkjR4cRe428S0go28IaVfVmOgR8dBUE2Tqu-kZhuiderLdgFIeSkFsl3vNQ/exec";
+    const BACKEND_URL =
+      "https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec";
 
-      const sendOfferBtn = document.getElementById("sendOfferBtn");
-      const offerInput = document.getElementById("offerAmount");
-      const messageEl = document.getElementById("message");
-      const closeBtn = document.getElementById("closeBtn");
-      const debugBtn = document.getElementById("debugBtn");
+    const offerAmountDisplay = document.getElementById("offerAmountDisplay");
+    const sideValuesContainer = document.getElementById("sideValuesContainer");
+    const debugOutput = document.getElementById("debugOutput");
 
-      function showMessage(text, type) {
-        messageEl.innerHTML = text;
-        messageEl.className = "message " + (type || "");
-      }
+    const btnDeal = document.getElementById("btnDeal");
+    const btnNoDeal = document.getElementById("btnNoDeal");
+    const btnBackToGame = document.getElementById("btnBackToGame");
+    const debugBtn = document.getElementById("debugBtn");
 
-      async function sendOffer() {
-        const raw = offerInput.value.trim();
-        const amount = Number(raw);
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(value);
+    }
 
-        if (!raw || isNaN(amount) || amount <= 0) {
-          showMessage("Please enter a valid positive amount.", "error");
-          return;
+    function renderSideValues(values, opened) {
+      sideValuesContainer.innerHTML = "";
+      const sorted = [...values].sort((a, b) => a - b);
+      sorted.forEach((amt) => {
+        const div = document.createElement("div");
+        div.className = "side-value-item";
+        if (opened && opened.includes(amt)) {
+          div.classList.add("opened");
         }
-
-        try {
-          showMessage("Sending offer…", "");
-
-          const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ offer: amount })
-          });
-
-          const text = await res.text();
-
-          if (!res.ok || !text.includes("OK")) {
-            showMessage("Backend error: " + text, "error");
-            return;
-          }
-
-          showMessage(
-            "✅ Offer sent: ₱" +
-              amount.toLocaleString("en-PH") +
-              "<br>The game will pick it up shortly.",
-            "success"
-          );
-        } catch (e) {
-          showMessage("❌ Network error sending offer.<br>" + e, "error");
-        }
-      }
-
-      async function debugConnection() {
-        showMessage("Testing connection…", "");
-
-        try {
-          const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, { method: "GET" });
-          const text = await res.text();
-
-          showMessage(
-            "✅ Connection OK<br>Response:<br><pre>" +
-              text +
-              "</pre>",
-            "success"
-          );
-        } catch (err) {
-          showMessage(
-            "❌ Connection failed<br><pre>" + String(err) + "</pre>",
-            "error"
-          );
-        }
-      }
-
-      sendOfferBtn.addEventListener("click", sendOffer);
-      debugBtn.addEventListener("click", debugConnection);
-
-      offerInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          sendOffer();
-        }
+        const label = document.createElement("span");
+        label.className = "side-value-label";
+        label.textContent = "Value";
+        const val = document.createElement("span");
+        val.className = "side-value-amount";
+        val.textContent = formatCurrency(amt);
+        div.appendChild(label);
+        div.appendChild(val);
+        sideValuesContainer.appendChild(div);
       });
+    }
 
-      closeBtn.addEventListener("click", () => window.close());
-    })();
+    async function fetchLatestOfferSnapshot() {
+      try {
+        const res = await fetch(BACKEND_URL + "?mode=latestOfferSnapshot", {
+          method: "GET",
+          cache: "no-cache"
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const offer = typeof data.offer === "number" ? data.offer : 0;
+        offerAmountDisplay.textContent = formatCurrency(offer);
+
+        // Optional: snapshot of board
+        const values = Array.isArray(data.values) ? data.values : [];
+        const opened = Array.isArray(data.openedAmounts) ? data.openedAmounts : [];
+        if (values.length) {
+          renderSideValues(values, opened);
+        } else {
+          sideValuesContainer.innerHTML =
+            "<div style='grid-column: 1 / -1; font-size: 0.8rem; color: #aaa;'>No board snapshot available.</div>";
+        }
+      } catch (err) {
+        console.warn("Offer snapshot error:", err);
+        offerAmountDisplay.textContent = "Unavailable";
+      }
+    }
+
+    async function runDebugRequest() {
+      debugOutput.textContent = "Running debug request...";
+      try {
+        const res = await fetch(BACKEND_URL + "?mode=debug", {
+          method: "GET",
+          cache: "no-cache"
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        debugOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        debugOutput.textContent = "Debug error: " + err.message;
+      }
+    }
+
+    btnDeal.addEventListener("click", () => {
+      alert("DEAL selected. (Hook this into your game-end flow.)");
+    });
+
+    btnNoDeal.addEventListener("click", () => {
+      alert("NO DEAL selected. (Return to main game and continue opening cases.)");
+    });
+
+    btnBackToGame.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    debugBtn.addEventListener("click", runDebugRequest);
+
+    // INIT
+    fetchLatestOfferSnapshot();
   </script>
 </body>
 </html>
