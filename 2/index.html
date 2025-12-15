@@ -20,10 +20,8 @@
       --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.85);
       --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.6);
       --round-pill: 999px;
-      --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * {
@@ -1002,6 +1000,18 @@
           </div>
           <div class="debug-console" id="debugConsole"></div>
         </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Setup</h2>
+            <span>Google Sheets backend</span>
+          </div>
+          <div style="font-size:0.78rem; color:var(--muted); display:flex; flex-direction:column; gap:4px;">
+            <div><strong>Sheet name:</strong> DealOrNoDeal_Offers → Offers</div>
+            <div><strong>WebApp URL:</strong> set in code: <code>GOOGLE_SHEETS_WEBAPP_URL</code></div>
+            <div>Banker sends offers from the offer page, game polls every second.</div>
+          </div>
+        </section>
       </aside>
     </main>
 
@@ -1010,7 +1020,7 @@
         Round pattern: 4, 3, 2, 2, 1, 1, 1 &nbsp;·&nbsp;
         <a href="custom-amounts.html" class="small-link">Set custom amounts</a>
       </div>
-      <div>Audio and display run entirely in-browser.</div>
+      <div>Running at /2 · Google Sheets for live offers.</div>
     </footer>
   </div>
 
@@ -1018,17 +1028,17 @@
     <div class="modal">
       <div class="modal-title">Waiting for banker…</div>
       <div class="modal-subtitle">
-        The round is complete. Banker is preparing an offer in the banker page.
+        The round is complete. Banker is preparing an offer on the banker page.
       </div>
       <div class="waiting-indicator">
         <div class="dot-pulse">
           <span></span><span></span><span></span>
         </div>
-        <span>Listening for offer via local storage…</span>
+        <span>Polling Google Sheets for a new offer…</span>
       </div>
       <div class="modal-actions">
         <button class="btn-secondary btn-sm" id="cancelWaitingBtn">
-          Keep playing silently
+          Hide this
         </button>
       </div>
     </div>
@@ -1073,6 +1083,9 @@
 
   <script>
     (function () {
+      // TODO: paste your Apps Script Web App URL here
+      const GOOGLE_SHEETS_WEBAPP_URL = 'PASTE_YOUR_WEBAPP_URL_HERE';
+
       const DEFAULT_PRIZES = [
         1, 5, 10, 20, 50,
         100, 200, 500, 1000, 2000,
@@ -1170,14 +1183,36 @@
         }, duration);
       }
 
+      function stopAllAudio() {
+        [audioIntro, audioLoop, audioCase, audioOfferA, audioOfferB, audioSmall, audioBig].forEach(
+          (a) => {
+            try {
+              a.pause();
+              a.currentTime = 0;
+            } catch (e) {}
+          }
+        );
+      }
+
       function safePlay(audioEl) {
-        if (!soundOn) return;
-        if (!audioEl) return;
+        if (!soundOn || !audioEl) return;
+        stopAllAudio();
         try {
           audioEl.currentTime = 0;
           audioEl.play();
         } catch (e) {
-          logDebug("Audio play blocked", "User interaction required by browser");
+          logDebug("Audio play blocked", "User interaction required");
+        }
+      }
+
+      function playLoop() {
+        if (!soundOn) return;
+        stopAllAudio();
+        try {
+          audioLoop.currentTime = 0;
+          audioLoop.play();
+        } catch (e) {
+          logDebug("Loop play blocked", "");
         }
       }
 
@@ -1219,14 +1254,13 @@
         const left = prizes.slice(0, mid);
         const right = prizes.slice(mid);
 
-        function createColumn(values, className) {
+        function createColumn(values) {
           const col = document.createElement("div");
           col.className = "prize-column";
           values.forEach((value) => {
             const item = document.createElement("div");
             item.className = "prize-item";
-            const isSmall =
-              value <= prizes[Math.floor(prizes.length / 2) - 1];
+            const isSmall = value <= prizes[Math.floor(prizes.length / 2) - 1];
             item.classList.add(isSmall ? "small" : "big");
             item.dataset.value = String(value);
             item.innerHTML =
@@ -1241,8 +1275,8 @@
           return col;
         }
 
-        prizeColumnsEl.appendChild(createColumn(left, "left"));
-        prizeColumnsEl.appendChild(createColumn(right, "right"));
+        prizeColumnsEl.appendChild(createColumn(left));
+        prizeColumnsEl.appendChild(createColumn(right));
       }
 
       function crossOutPrize(value) {
@@ -1334,7 +1368,7 @@
       function resetGameState(hardReset = false) {
         stopLoop();
         bankerOffer = null;
-        clearOffer();
+
         if (offerPollInterval) {
           clearInterval(offerPollInterval);
           offerPollInterval = null;
@@ -1351,9 +1385,9 @@
         gameStarted = false;
         gameFinished = false;
         waitingVisible = false;
-        hideModal(waitingModal);
-        hideModal(offerModal);
-        hideModal(finalModal);
+        waitingModal.classList.remove("visible");
+        offerModal.classList.remove("visible");
+        finalModal.classList.remove("visible");
 
         mainCaseInnerEl.classList.remove("revealed");
         mainCaseValueEl.textContent = "–";
@@ -1398,11 +1432,7 @@
         setGamePill("Round 1 · Choose cases");
 
         updateRoundUI();
-        safePlay(audioIntro);
-
-        audioIntro.onended = function () {
-          safePlay(audioLoop);
-        };
+        playLoop();
 
         const cases = document.querySelectorAll(".case");
         cases.forEach((caseEl) => {
@@ -1445,17 +1475,10 @@
           caseEl.classList.add("opened-small");
           safePlay(audioSmall);
         }
-        safePlay(audioCase);
         crossOutPrize(value);
         logDebug("Case opened index " + index, "Value " + formatCurrency(value));
 
         updateRoundUI();
-
-        const totalNonMainCases = 15 - 1;
-        const openedNonMain = openedCases.has(mainCaseIndex)
-          ? openedCases.size - 1
-          : openedCases.size;
-        totalOpenedEl.textContent = String(openedNonMain);
 
         const target = ROUND_PATTERN[currentRound] || 0;
         if (openedThisRound >= target) {
@@ -1494,7 +1517,7 @@
       function showWaitingForBanker() {
         waitingVisible = true;
         waitingModal.classList.add("visible");
-        logDebug("Waiting for banker offer…", "");
+        logDebug("Waiting for banker offer…", "Polling Sheets");
       }
 
       function hideModal(modal) {
@@ -1502,39 +1525,48 @@
       }
 
       function startOfferPolling() {
+        if (!GOOGLE_SHEETS_WEBAPP_URL || GOOGLE_SHEETS_WEBAPP_URL === 'PASTE_YOUR_WEBAPP_URL_HERE') {
+          logDebug("Sheets URL not set", "Skipping polling");
+          showToast("Sheets URL not configured in index.html");
+          return;
+        }
+
         if (offerPollInterval) {
           clearInterval(offerPollInterval);
         }
-        offerPollInterval = setInterval(checkForOffer, 1000);
+
+        offerPollInterval = setInterval(checkForOfferFromSheets, 1000);
       }
 
-      function clearOffer() {
-        localStorage.removeItem("dod_offer");
-      }
-
-      function checkForOffer() {
+      async function checkForOfferFromSheets() {
         try {
-          const raw = localStorage.getItem("dod_offer");
-          if (!raw) {
-            return;
-          }
-          const parsed = JSON.parse(raw);
-          if (!parsed || typeof parsed.amount !== "number") {
-            return;
-          }
-          bankerOffer = parsed;
+          const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+            cache: 'no-store'
+          });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (!data.offer) return;
+
+          const amount = Number(data.offer);
+          if (isNaN(amount) || amount <= 0) return;
+
+          bankerOffer = {
+            amount,
+            time: Number(data.time) || Date.now()
+          };
+
           logDebug(
-            "Offer detected: " + formatCurrency(parsed.amount),
-            "Time " + parsed.time
+            "Offer detected from Sheets: " + formatCurrency(amount),
+            "time=" + bankerOffer.time
           );
+
           clearInterval(offerPollInterval);
           offerPollInterval = null;
           hideModal(waitingModal);
           waitingVisible = false;
-          showOfferModal(parsed);
-          clearOffer();
+          showOfferModal(bankerOffer);
         } catch (e) {
-          logDebug("Error parsing offer", String(e));
+          logDebug("Error fetching offer from Sheets", String(e));
         }
       }
 
@@ -1561,7 +1593,7 @@
         hideModal(offerModal);
         if (currentRound < ROUND_PATTERN.length - 1) {
           currentRound++;
-          logDebug("No Deal chosen", "Moving to round " + (currentRound + 1));
+          logDebug("No Deal chosen", "Next round " + (currentRound + 1));
           setGamePill("Round " + (currentRound + 1) + " · Choose cases");
           setStatus(
             "Round <strong>" +
@@ -1571,10 +1603,7 @@
               "</strong> cases."
           );
           updateRoundUI();
-          startOfferPolling();
-          if (!offerPollInterval) {
-            clearOffer();
-          }
+          showToast("No Deal. Next round.", 1800);
         } else {
           logDebug("No Deal on final round", "Proceed to reveal main case");
           beginFinalReveal(false);
@@ -1614,7 +1643,7 @@
           subtitle = "You went all the way with your case.";
           finalDisplay = formatCurrency(actual);
           detail =
-            "This is the value you walk away with. The banker's last offer was " +
+            "This is what you walk away with. The banker's last offer was " +
             (bankerOffer ? formatCurrency(bankerOffer.amount) : "–") +
             ".";
         }
@@ -1628,7 +1657,7 @@
         setStatus("Game over. Press Play Again to restart.");
         logDebug(
           "Final reveal",
-          "Main case value " +
+          "Main case " +
             formatCurrency(actual) +
             (tookDeal ? ", deal " + formatCurrency(dealtAmount) : "")
         );
@@ -1675,16 +1704,10 @@
         soundOn = soundToggle.checked;
         logDebug("Sound " + (soundOn ? "enabled" : "disabled"), "");
         if (!soundOn) {
-          [audioIntro, audioLoop, audioCase, audioOfferA, audioOfferB, audioSmall, audioBig].forEach(
-            (a) => {
-              try {
-                a.pause();
-              } catch (e) {}
-            }
-          );
+          stopAllAudio();
         } else {
           if (gameStarted && !gameFinished) {
-            safePlay(audioLoop);
+            playLoop();
           }
         }
       });
@@ -1706,6 +1729,7 @@
       cancelWaitingBtn.addEventListener("click", () => {
         hideModal(waitingModal);
         waitingVisible = false;
+        showToast("Still listening for offers in background", 2200);
         logDebug("Waiting modal dismissed by user", "");
       });
 
@@ -1737,10 +1761,6 @@
       });
 
       resetGameState(false);
-
-      setTimeout(() => {
-        safePlay(audioIntro);
-      }, 200);
     })();
   </script>
 </body>
