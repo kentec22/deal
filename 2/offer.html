@@ -1,127 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Banker Offer - Deal or No Deal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Banker Offer · Deal or No Deal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050608;
+      --card: #11131c;
+      --border: #262a33;
+      --accent: #ffcc00;
+      --text: #f5f5f5;
+      --muted: #888;
+      --danger: #ff4b4b;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: system-ui, sans-serif;
-            background: radial-gradient(circle at top, #1b2845 0, #050816 55%, #020308 100%);
-            color: #ffffff;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .card {
-            background: rgba(0,0,0,0.85);
-            border-radius: 18px;
-            padding: 20px 24px;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.8);
-            max-width: 340px;
-            width: 90%;
-            text-align: center;
-        }
+    body {
+      font-family: var(--font);
+      background: radial-gradient(circle at top, #1a1d24 0, #050608 50%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
 
-        h1 {
-            margin: 0 0 16px;
-            font-size: 1.4rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
+    .card {
+      width: min(420px, 100%);
+      background: linear-gradient(145deg, #0b0e16, #171a26);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
+      padding: 18px 18px 14px;
+      position: relative;
+      overflow: hidden;
+    }
 
-        h1 span {
-            color: #f7b500;
-        }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -120px;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), transparent 60%);
+      opacity: 0.75;
+      pointer-events: none;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-        }
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.25);
-            background: rgba(0,0,0,0.7);
-            color: #ffffff;
-            font-size: 1rem;
-            margin-bottom: 12px;
-        }
+    h1 {
+      font-size: 1.1rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
 
-        button {
-            cursor: pointer;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #f7b500, #ffdf6f);
-            color: #000;
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: 700;
-            transition: transform 0.16s, box-shadow 0.16s;
-        }
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-        }
+    .field-group {
+      margin-bottom: 10px;
+    }
 
-        .message {
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: #a5b4fc;
-        }
-    </style>
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(0, 0, 0, 0.65);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(255, 204, 0, 0.3);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffcc00, #ff7a00);
+      color: #111;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .message {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      min-height: 16px;
+    }
+
+    .message.success {
+      color: #3fd47a;
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    .hint {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+    }
+
+    .pill span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255, 204, 0, 0.5);
+    }
+
+    a:hover {
+      border-bottom-style: solid;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="card">
-        <h1><span>Banker</span> Offer</h1>
+  <div class="card">
+    <div class="card-inner">
+      <h1>Banker offer</h1>
+      <div class="subtitle">
+        Enter an amount and send it to the main game via <code>localStorage</code>.
+      </div>
 
-        <label for="offer-input">Enter offer amount (₱):</label>
-        <input type="number" id="offer-input" min="1" step="1" placeholder="e.g. 50000" />
+      <div class="pill">
+        Storage key: <span>dod_offer</span>
+      </div>
 
-        <button id="send-offer-btn">Send Offer</button>
+      <div class="field-group">
+        <label for="offerAmount">Offer amount (₱)</label>
+        <input
+          type="number"
+          id="offerAmount"
+          min="1"
+          step="1"
+          placeholder="e.g. 50000"
+        />
+      </div>
 
-        <div class="message" id="message"></div>
+      <div class="actions">
+        <button class="btn-secondary" id="closeBtn">Close</button>
+        <button class="btn" id="sendOfferBtn">Send offer</button>
+      </div>
+
+      <div class="message" id="message"></div>
+
+      <div class="hint">
+        The main game polls every second for a JSON object:
+        <br />
+        <code>{ "amount": 50000, "time": 123456789 }</code>
+        <br />
+        Keep this tab open and send new offers after each round.
+      </div>
     </div>
+  </div>
 
-    <script>
-        const offerInput = document.getElementById("offer-input");
-        const sendBtn = document.getElementById("send-offer-btn");
-        const messageEl = document.getElementById("message");
+  <script>
+    (function () {
+      const sendOfferBtn = document.getElementById("sendOfferBtn");
+      const offerInput = document.getElementById("offerAmount");
+      const messageEl = document.getElementById("message");
+      const closeBtn = document.getElementById("closeBtn");
 
-        function showMessage(text) {
-            messageEl.textContent = text;
+      function showMessage(text, type) {
+        messageEl.textContent = text;
+        messageEl.className = "message " + (type || "");
+      }
+
+      sendOfferBtn.addEventListener("click", () => {
+        const raw = offerInput.value.trim();
+        const amount = Number(raw);
+        if (!raw || isNaN(amount) || amount <= 0) {
+          showMessage("Please enter a valid positive amount.", "error");
+          return;
         }
+        const payload = {
+          amount: amount,
+          time: Date.now()
+        };
+        try {
+          localStorage.setItem("dod_offer", JSON.stringify(payload));
+          showMessage(
+            "Offer sent: ₱" + amount.toLocaleString("en-PH") + ". The game should pick it up shortly.",
+            "success"
+          );
+        } catch (e) {
+          showMessage("Failed to write to localStorage.", "error");
+        }
+      });
 
-        sendBtn.addEventListener("click", () => {
-            const amount = Number(offerInput.value);
-
-            if (!amount || amount <= 0) {
-                alert("Please enter a valid numeric offer amount.");
-                return;
-            }
-
-            const offerData = {
-                amount,
-                time: Date.now()
-            };
-
-            // Save to localStorage for main game to read
-            localStorage.setItem("dod_offer", JSON.stringify(offerData));
-
-            const formatted = "₱" + amount.toLocaleString();
-            alert("Banker’s Offer Sent: " + formatted);
-            showMessage("Banker’s Offer Sent: " + formatted);
-        });
-    </script>
+      closeBtn.addEventListener("click", () => {
+        window.close();
+      });
+    })();
+  </script>
 </body>
 </html>
