@@ -1,125 +1,1747 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Deal or No Deal</title><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<style>
-body{margin:0;background:#050816;color:#fff;font-family:sans-serif;overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0;background:url("dodTransparent.png") center/contain no-repeat;opacity:.05;pointer-events:none;z-index:-1}
-header{text-align:center;padding:16px;background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.1)}
-header img{max-width:200px}
-header h1{margin:0;font-size:1.8rem;letter-spacing:.1em;text-transform:uppercase}
-header h1 span{color:#f7b500}
-#start-screen{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
-#start-btn{padding:14px 28px;font-size:1.2rem;border-radius:999px;border:none;background:linear-gradient(135deg,#f7b500,#ffdf6f);color:#000;font-weight:700;cursor:pointer}
-main{display:grid;grid-template-columns:260px 1fr 260px;gap:12px;padding:12px}
-.prize-column{display:flex;flex-direction:column;gap:8px}
-.prize-item{padding:8px 12px;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);font-size:1.1rem}
-.prize-item.revealed{opacity:.3;text-decoration:line-through}
-#case-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:12px}
-.case{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.2);cursor:pointer}
-.case:hover{transform:scale(1.05);border-color:#f7b500}
-.case img{width:100%;height:100%;object-fit:cover}
-.case-number{position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.7);padding:3px 6px;border-radius:6px;font-size:.8rem}
-.case-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#f7b500;opacity:0}
-.case.opened{pointer-events:none;opacity:.7}
-#main-case-wrapper{text-align:center;margin-top:10px}
-#main-case{width:180px;margin:auto;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:3px solid #f7b500}
-#main-case img{width:100%;height:100%}
-#round-info{text-align:center;margin-top:10px;font-size:1.2rem;color:#f7b500}
-#offer-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200}
-#offer-box{background:#050814;padding:16px;border-radius:14px;width:280px;text-align:center;border:1px solid rgba(255,255,255,.2)}
-.offer-btn{padding:8px 16px;border-radius:999px;border:none;font-weight:700;cursor:pointer;margin:4px}
-.deal{background:#f7b500;color:#000}
-.no-deal{background:#ff4b4b;color:#fff}
-#settings-panel{position:fixed;right:10px;top:80px;width:240px;background:rgba(0,0,0,.6);padding:10px;border-radius:12px;display:none;z-index:150}
-#debug-console{position:fixed;left:10px;bottom:60px;width:280px;max-height:40vh;overflow-y:auto;background:rgba(0,0,0,.6);padding:8px;border-radius:10px;display:none;z-index:150;font-size:.8rem}
-footer{text-align:center;padding:8px;background:rgba(0,0,0,.85);font-size:.8rem;margin-top:10px}
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deal or No Deal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050608;
+      --accent: #ffcc00;
+      --accent-soft: rgba(255, 204, 0, 0.15);
+      --text: #f1f1f1;
+      --muted: #888;
+      --danger: #ff4b4b;
+      --success: #3fd47a;
+      --card: #12151b;
+      --border: #262a33;
+      --case-size: min(17vw, 120px);
+      --transition-speed: 0.25s;
+      --shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.85);
+      --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.6);
+      --round-pill: 999px;
+      --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: radial-gradient(circle at top, #1a1d24 0, #050608 50%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-root {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px 16px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-wrap img {
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title-block h1 {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title-block span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-label {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 204, 0, 0.1);
+      border: 1px solid rgba(255, 204, 0, 0.4);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffcc00, #ff7a00);
+      color: #111;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-soft);
+      transition: transform var(--transition-speed) ease,
+        box-shadow var(--transition-speed) ease,
+        filter var(--transition-speed) ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-strong);
+      filter: brightness(1.05);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn-danger {
+      background: rgba(255, 75, 75, 0.12);
+      color: #ff8a8a;
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 75, 75, 0.4);
+      font-size: 0.78rem;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 75, 75, 0.2);
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.7rem;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(260px, 1.6fr);
+      gap: 16px;
+      padding: 4px 12px 12px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .board {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      background: radial-gradient(circle at top, #161925 0, #080a11 45%, #050608 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .board::before {
+      content: "";
+      position: absolute;
+      inset: -100px;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent 60%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .board-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .round-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.82rem;
+    }
+
+    .round-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      gap: 6px;
+    }
+
+    .round-pill span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .status-text strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .grid-wrapper {
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(4, var(--case-size));
+      grid-template-rows: repeat(4, var(--case-size));
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @media (max-width: 540px) {
+      :root {
+        --case-size: min(24vw, 96px);
+      }
+    }
+
+    .case-slot {
+      width: var(--case-size);
+      height: var(--case-size);
+      border-radius: 14px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #232633 0, #0b0d14 60%, #050608 100%);
+      border: 1px solid #313542;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.75), var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .case-slot.empty {
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 55%),
+        linear-gradient(145deg, #050608, #10121b);
+      border-style: dashed;
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .case {
+      width: 88%;
+      height: 78%;
+      border-radius: 10px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform var(--transition-speed) ease,
+        box-shadow var(--transition-speed) ease,
+        filter var(--transition-speed) ease;
+    }
+
+    .case.disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    body.animations-on .case:not(.opened):hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.9);
+      filter: brightness(1.05);
+    }
+
+    .case img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity var(--transition-speed) ease;
+    }
+
+    .case img.case-open {
+      opacity: 0;
+    }
+
+    .case.opened img.case-open {
+      opacity: 1;
+    }
+
+    .case.opened img.case-closed {
+      opacity: 0;
+    }
+
+    .case-number {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #000, #20242e);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+    }
+
+    .case-value-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(0, 0, 0, 1);
+      opacity: 0;
+      transition: opacity var(--transition-speed) ease;
+      padding: 4px;
+      text-align: center;
+    }
+
+    .case.opened .case-value-overlay {
+      opacity: 1;
+    }
+
+    body.animations-on .case.opened .case-value-overlay {
+      transition: opacity 0.5s ease 0.15s;
+    }
+
+    .case.opened-small .case-value-overlay {
+      color: var(--success);
+    }
+
+    .case.opened-big .case-value-overlay {
+      color: var(--danger);
+    }
+
+    .main-case-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding-top: 6px;
+      flex-wrap: wrap;
+      z-index: 1;
+    }
+
+    .main-case-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+    }
+
+    .main-case-wrapper {
+      position: relative;
+      width: calc(var(--case-size) * 1.2);
+      max-width: 220px;
+    }
+
+    .main-case-border {
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: conic-gradient(
+        from 0deg,
+        rgba(255, 204, 0, 0.15),
+        rgba(255, 122, 0, 0.4),
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 204, 0, 0.15)
+      );
+      filter: blur(4px);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .main-case-container {
+      position: relative;
+      z-index: 1;
+      border-radius: 16px;
+      padding: 10px;
+      background: radial-gradient(circle at top, #1a1d26, #050608 70%);
+      border: 1px solid rgba(255, 204, 0, 0.6);
+      box-shadow: var(--shadow-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-case-inner {
+      width: 80%;
+      max-width: 220px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 4.2 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-case-inner img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s ease;
+    }
+
+    .main-case-inner img.case-open {
+      opacity: 0;
+    }
+
+    .main-case-inner.revealed img.case-open {
+      opacity: 1;
+    }
+
+    .main-case-inner.revealed img.case-closed {
+      opacity: 0;
+    }
+
+    .main-case-value {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 18px rgba(0, 0, 0, 1);
+      opacity: 0;
+      transition: opacity 0.35s ease 0.15s;
+    }
+
+    .main-case-inner.revealed .main-case-value {
+      opacity: 1;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #0b0e16, #141824);
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .card-header h2 {
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #f9f9f9;
+    }
+
+    .card-header span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .prize-columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .prize-column {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .prize-item {
+      font-size: 0.78rem;
+      border-radius: 999px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f0f0f0;
+      transition: opacity 0.25s ease, filter 0.25s ease,
+        background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .prize-item span {
+      font-weight: 600;
+    }
+
+    .prize-item.small {
+      color: var(--success);
+      border-color: rgba(63, 212, 122, 0.4);
+      background: rgba(63, 212, 122, 0.08);
+    }
+
+    .prize-item.big {
+      color: #ff9696;
+      border-color: rgba(255, 75, 75, 0.5);
+      background: rgba(255, 75, 75, 0.06);
+    }
+
+    .prize-item.crossed {
+      opacity: 0.2;
+      filter: grayscale(1);
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba(255, 255, 255, 0.5);
+      background: rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .round-details {
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      color: var(--muted);
+    }
+
+    .round-details strong {
+      color: var(--accent);
+    }
+
+    .settings-panel {
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 38px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      transition: 0.25s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+      transition: 0.25s;
+    }
+
+    .switch input:checked + .slider {
+      background: linear-gradient(135deg, #ffcc00, #ff7a00);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+
+    .debug-console {
+      font-family: "Consolas", "SF Mono", Menlo, monospace;
+      font-size: 0.72rem;
+      max-height: 180px;
+      overflow-y: auto;
+      background: #050608;
+      border-radius: 10px;
+      padding: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.8);
+    }
+
+    .debug-line {
+      margin-bottom: 2px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .debug-line span {
+      color: var(--muted);
+    }
+
+    .debug-meta {
+      color: #777;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0, 0, 0, 0.9), #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: linear-gradient(145deg, #080910, #151827);
+      border-radius: 18px;
+      padding: 18px 18px 14px;
+      min-width: min(360px, 92vw);
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transform: translateY(10px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    body.animations-on .modal-backdrop.visible .modal {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    body:not(.animations-on) .modal-backdrop.visible .modal {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #f8f8f8;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .offer-amount {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 10px 0 12px;
+      text-shadow: 0 0 26px rgba(0, 0, 0, 1);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .waiting-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .dot-pulse {
+      display: inline-flex;
+      gap: 3px;
+    }
+
+    .dot-pulse span {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent);
+      opacity: 0.4;
+      animation: dotPulse 1s infinite ease-in-out;
+    }
+
+    .dot-pulse span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .dot-pulse span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes dotPulse {
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translateY(-3px);
+        opacity: 1;
+      }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(0, 0, 0, 0.92);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 40;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    footer {
+      padding: 4px 16px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .small-link {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255, 204, 0, 0.4);
+    }
+
+    .small-link:hover {
+      border-bottom-style: solid;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
+<body class="animations-on">
+  <div class="game-root">
+    <header>
+      <div class="logo-wrap">
+        <img src="dodTransparent.png" alt="Deal or No Deal Logo" />
+        <div class="title-block">
+          <h1>Deal or No Deal</h1>
+          <span>Browser edition · 15 cases</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="pill-label" id="gameStatePill">Waiting · Press Start</div>
+        <button class="btn btn-sm" id="startGameBtn">Start Game</button>
+        <button class="btn-secondary btn-sm" id="settingsBtn">Settings</button>
+      </div>
+    </header>
 
-<body>
-<div id="start-screen"><h2>Deal or No Deal</h2><button id="start-btn">Start Game</button></div>
+    <main>
+      <section class="board">
+        <div class="board-top-row">
+          <div class="round-info">
+            <div class="round-pill">
+              ROUND <span id="roundNumber">-</span> / 7
+            </div>
+            <div class="status-text" id="statusText">
+              Press <strong>Start Game</strong> to begin.
+            </div>
+          </div>
+        </div>
 
-<header><img src="company.png"/><h1><span>Deal</span> or <span>No Deal</span></h1></header>
+        <div class="grid-wrapper">
+          <div class="case-grid" id="caseGrid">
+          </div>
 
-<main>
-<div class="prize-column" id="prize-left"></div>
-<div>
-<div id="case-grid"></div>
-<div id="main-case-wrapper"><div id="main-case"><img src="suitcase.png"/></div><div>Your Case</div></div>
-<div id="round-info"></div>
-</div>
-<div class="prize-column" id="prize-right"></div>
-</main>
+          <div class="main-case-section">
+            <div class="main-case-label">Your case</div>
+            <div class="main-case-wrapper">
+              <div class="main-case-border"></div>
+              <div class="main-case-container">
+                <div class="main-case-inner" id="mainCaseInner">
+                  <img
+                    src="suitcase.png"
+                    alt="Main case closed"
+                    class="case-closed"
+                  />
+                  <img
+                    src="suitcase-open.jpg"
+                    alt="Main case open"
+                    class="case-open"
+                  />
+                  <div class="main-case-value" id="mainCaseValue">–</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<div id="offer-modal"><div id="offer-box"><h2>Banker's Offer</h2><div id="offer-amount"></div><button class="offer-btn deal" id="deal-btn">Deal</button><button class="offer-btn no-deal" id="no-deal-btn">No Deal</button></div></div>
+      <aside class="side-panel">
+        <section class="card">
+          <div class="card-header">
+            <h2>Prize values</h2>
+            <span>Crossed = opened</span>
+          </div>
+          <div class="prize-columns" id="prizeColumns"></div>
+        </section>
 
-<div id="settings-panel">
-<label><input type="checkbox" id="sound-toggle" checked/> Sound</label>
-<label><input type="checkbox" id="anim-toggle" checked/> Anim</label>
-<label><input type="checkbox" id="debug-toggle"/> Debug</label>
-<button onclick="location='custom-amounts.html'">Custom Amounts</button>
-<button onclick="location='offer.html'">Enter Offer</button>
-<button onclick="location.reload()">Reset</button>
-</div>
+        <section class="card">
+          <div class="card-header">
+            <h2>Round info</h2>
+            <span>7 total rounds</span>
+          </div>
+          <div class="round-details">
+            <div>
+              <strong>Cases this round:</strong>
+              <span id="casesThisRound">0</span>
+            </div>
+            <div>
+              <strong>Target to open:</strong>
+              <span id="casesToOpen">-</span>
+            </div>
+            <div>
+              <strong>Total opened:</strong>
+              <span id="totalOpened">0</span> / 14
+            </div>
+          </div>
+        </section>
 
-<div id="debug-console"></div>
+        <section class="card">
+          <div class="card-header">
+            <h2>Controls</h2>
+            <span>Settings & tools</span>
+          </div>
 
-<audio id="a-intro" src="1-intro.mp3"></audio>
-<audio id="a-loop" src="4-loop.mp3" loop></audio>
-<audio id="a-case" src="2-case.mp3"></audio>
-<audio id="a-off1" src="3-offer-1.mp3"></audio>
-<audio id="a-off2" src="3-offer.mp3"></audio>
-<audio id="a-small" src="5-smallcase.mp3"></audio>
-<audio id="a-big" src="6-bigcase.mp3"></audio>
+          <div class="settings-panel">
+            <div class="settings-row">
+              <div class="toggle-group">
+                <label class="switch">
+                  <input type="checkbox" id="soundToggle" checked />
+                  <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Sound</span>
+              </div>
 
-<script>
-const R=[4,3,2,2,1,1,1];let P=[1,5,10,20,50,100,200,500,1000,2000,5000,10000,25000,50000,100000];
-let S=[],mI=null,mV=null,r=0,to=R[0],o=0,snd=1,anim=1;
-const L=document.getElementById("prize-left"),Rr=document.getElementById("prize-right"),G=document.getElementById("case-grid"),MC=document.getElementById("main-case"),RI=document.getElementById("round-info"),OM=document.getElementById("offer-modal"),OA=document.getElementById("offer-amount"),DBG=document.getElementById("debug-console");
-function log(x){if(!document.getElementById("debug-toggle").checked)return;DBG.innerHTML+=x+"<br>"}
-function play(a){if(!snd)return;a.currentTime=0;a.play()}
-function sh(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-document.getElementById("start-btn").onclick=()=>{document.getElementById("start-screen").style.display="none";play(document.getElementById("a-loop"));init()};
-play(document.getElementById("a-intro"));
-function init(){
-let c=localStorage.getItem("customAmounts");if(c)P=JSON.parse(c);
-S=sh(P);mI=Math.floor(Math.random()*15);mV=S[mI];
-buildPrizes();buildCases();upd()
-}
-function buildPrizes(){
-L.innerHTML="";Rr.innerHTML="";
-let h=Math.ceil(P.length/2),a=P.slice(0,h),b=P.slice(h);
-a.forEach(v=>{let d=document.createElement("div");d.className="prize-item";d.id="p-"+v;d.textContent="₱"+v.toLocaleString();L.appendChild(d)});
-b.forEach(v=>{let d=document.createElement("div");d.className="prize-item";d.id="p-"+v;d.textContent="₱"+v.toLocaleString();Rr.appendChild(d)});
-}
-function buildCases(){
-G.innerHTML="";
-for(let i=0;i<16;i++){
-let d=document.createElement("div");d.className="case";
-if(i<15){d.dataset.i=i;d.dataset.v=S[i];d.onclick=()=>openCase(i)}else d.style.visibility="hidden";
-let img=document.createElement("img");img.src="suitcase.png";
-let n=document.createElement("div");n.className="case-number";n.textContent=i<15?i+1:"";
-let v=document.createElement("div");v.className="case-value";v.textContent=i<15?"₱"+S[i].toLocaleString():"";
-d.append(img,n,v);G.appendChild(d)
-}}
-function openCase(i){
-if(o>=to)return;
-let d=G.children[i],v=Number(d.dataset.v);
-d.classList.add("opened");d.querySelector("img").src="suitcase-open.jpg";d.querySelector(".case-value").style.opacity=1;
-play(document.getElementById("a-case"));
-if(v>=Math.max(...P)/2)play(document.getElementById("a-big"));else play(document.getElementById("a-small"));
-document.getElementById("p-"+v).classList.add("revealed");
-o++;upd();
-if(o===to)setTimeout(checkOffer,800)
-}
-function upd(){RI.textContent="Round "+(r+1)+" — Open "+(to-o)+" case(s)"}
-function checkOffer(){OM.style.display="flex";let off=localStorage.getItem("dod_offer");if(!off){OA.textContent="Waiting...";return}
-let oData=JSON.parse(off);OA.textContent="₱"+oData.amount.toLocaleString();play(Math.random()<.5?document.getElementById("a-off1"):document.getElementById("a-off2"))}
-document.getElementById("deal-btn").onclick=()=>{OM.style.display="none";alert("You accepted the deal! Your case had ₱"+mV.toLocaleString());location.reload()}
-document.getElementById("no-deal-btn").onclick=()=>{OM.style.display="none";r++;if(r>=7){alert("Final reveal: ₱"+mV.toLocaleString());location.reload()}to=R[r];o=0;upd()}
-document.getElementById("sound-toggle").onchange=e=>snd=e.target.checked?1:0;
-document.getElementById("anim-toggle").onchange=e=>anim=e.target.checked?1:0;
-document.getElementById("debug-toggle").onchange=e=>DBG.style.display=e.target.checked?"block":"none";
-setInterval(()=>{let off=localStorage.getItem("dod_offer");if(off&&OM.style.display!=="flex")checkOffer()},1000);
-</script>
+              <div class="toggle-group">
+                <label class="switch">
+                  <input type="checkbox" id="animationToggle" checked />
+                  <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Animations</span>
+              </div>
+            </div>
 
-<footer>Created by: Kenneth with AI</footer>
-</body></html>
+            <div class="settings-row">
+              <div class="toggle-group">
+                <label class="switch">
+                  <input type="checkbox" id="debugToggle" />
+                  <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Debug console</span>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <button class="btn-secondary btn-sm" id="openCustomAmounts">
+                Custom prize list
+              </button>
+              <button class="btn-secondary btn-sm" id="openOfferPage">
+                Banker offer page
+              </button>
+            </div>
+
+            <div class="settings-row">
+              <button class="btn-danger btn-sm" id="resetGameBtn">
+                Reset game
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card hidden" id="debugCard">
+          <div class="card-header">
+            <h2>Debug console</h2>
+            <span>Internal state</span>
+          </div>
+          <div class="debug-console" id="debugConsole"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer>
+      <div>
+        Round pattern: 4, 3, 2, 2, 1, 1, 1 &nbsp;·&nbsp;
+        <a href="custom-amounts.html" class="small-link">Set custom amounts</a>
+      </div>
+      <div>Audio and display run entirely in-browser.</div>
+    </footer>
+  </div>
+
+  <div class="modal-backdrop" id="waitingModal">
+    <div class="modal">
+      <div class="modal-title">Waiting for banker…</div>
+      <div class="modal-subtitle">
+        The round is complete. Banker is preparing an offer in the banker page.
+      </div>
+      <div class="waiting-indicator">
+        <div class="dot-pulse">
+          <span></span><span></span><span></span>
+        </div>
+        <span>Listening for offer via local storage…</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary btn-sm" id="cancelWaitingBtn">
+          Keep playing silently
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="offerModal">
+    <div class="modal">
+      <div class="modal-title">Banker offer</div>
+      <div class="modal-subtitle">The banker has made you an offer:</div>
+      <div class="offer-amount" id="offerAmount">–</div>
+      <div class="modal-subtitle" id="offerTimeText"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary btn-sm" id="noDealBtn">No Deal</button>
+        <button class="btn btn-sm" id="dealBtn">Deal</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="finalModal">
+    <div class="modal">
+      <div class="modal-title" id="finalTitle">Final result</div>
+      <div class="modal-subtitle" id="finalSubtitle">
+        Your case has been revealed.
+      </div>
+      <div class="offer-amount" id="finalAmount">–</div>
+      <div class="modal-subtitle" id="finalDetailText"></div>
+      <div class="modal-actions">
+        <button class="btn btn-sm" id="restartBtn">Play again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <audio id="audioIntro" src="1-intro.mp3" preload="auto"></audio>
+  <audio id="audioLoop" src="4-loop.mp3" preload="auto" loop></audio>
+  <audio id="audioCase" src="2-case.mp3" preload="auto"></audio>
+  <audio id="audioOfferA" src="3-offer-1.mp3" preload="auto"></audio>
+  <audio id="audioOfferB" src="3-offer.mp3" preload="auto"></audio>
+  <audio id="audioSmall" src="5-smallcase.mp3" preload="auto"></audio>
+  <audio id="audioBig" src="6-bigcase.mp3" preload="auto"></audio>
+
+  <script>
+    (function () {
+      const DEFAULT_PRIZES = [
+        1, 5, 10, 20, 50,
+        100, 200, 500, 1000, 2000,
+        5000, 10000, 25000, 50000, 100000
+      ];
+
+      const ROUND_PATTERN = [4, 3, 2, 2, 1, 1, 1];
+
+      const gridEl = document.getElementById("caseGrid");
+      const prizeColumnsEl = document.getElementById("prizeColumns");
+      const statusTextEl = document.getElementById("statusText");
+      const roundNumberEl = document.getElementById("roundNumber");
+      const casesThisRoundEl = document.getElementById("casesThisRound");
+      const casesToOpenEl = document.getElementById("casesToOpen");
+      const totalOpenedEl = document.getElementById("totalOpened");
+      const gameStatePillEl = document.getElementById("gameStatePill");
+
+      const mainCaseInnerEl = document.getElementById("mainCaseInner");
+      const mainCaseValueEl = document.getElementById("mainCaseValue");
+
+      const startGameBtn = document.getElementById("startGameBtn");
+      const resetGameBtn = document.getElementById("resetGameBtn");
+      const openCustomAmountsBtn = document.getElementById("openCustomAmounts");
+      const openOfferPageBtn = document.getElementById("openOfferPage");
+      const settingsBtn = document.getElementById("settingsBtn");
+
+      const soundToggle = document.getElementById("soundToggle");
+      const animationToggle = document.getElementById("animationToggle");
+      const debugToggle = document.getElementById("debugToggle");
+      const debugCard = document.getElementById("debugCard");
+      const debugConsoleEl = document.getElementById("debugConsole");
+
+      const waitingModal = document.getElementById("waitingModal");
+      const cancelWaitingBtn = document.getElementById("cancelWaitingBtn");
+      const offerModal = document.getElementById("offerModal");
+      const offerAmountEl = document.getElementById("offerAmount");
+      const offerTimeTextEl = document.getElementById("offerTimeText");
+      const finalModal = document.getElementById("finalModal");
+      const finalTitleEl = document.getElementById("finalTitle");
+      const finalSubtitleEl = document.getElementById("finalSubtitle");
+      const finalAmountEl = document.getElementById("finalAmount");
+      const finalDetailTextEl = document.getElementById("finalDetailText");
+      const restartBtn = document.getElementById("restartBtn");
+      const noDealBtn = document.getElementById("noDealBtn");
+      const dealBtn = document.getElementById("dealBtn");
+
+      const toastEl = document.getElementById("toast");
+
+      const audioIntro = document.getElementById("audioIntro");
+      const audioLoop = document.getElementById("audioLoop");
+      const audioCase = document.getElementById("audioCase");
+      const audioOfferA = document.getElementById("audioOfferA");
+      const audioOfferB = document.getElementById("audioOfferB");
+      const audioSmall = document.getElementById("audioSmall");
+      const audioBig = document.getElementById("audioBig");
+
+      let soundOn = true;
+      let animationsOn = true;
+      let debugOn = false;
+
+      let prizes = [];
+      let shuffledCases = [];
+      let mainCaseIndex = null;
+      let openedCases = new Set();
+
+      let currentRound = 0;
+      let openedThisRound = 0;
+
+      let offerPollInterval = null;
+      let waitingVisible = false;
+      let gameStarted = false;
+      let gameFinished = false;
+      let bankerOffer = null;
+
+      function logDebug(message, meta) {
+        if (!debugOn) return;
+        const line = document.createElement("div");
+        line.className = "debug-line";
+        const time = new Date().toLocaleTimeString();
+        line.innerHTML =
+          '<span>[' +
+          time +
+          "]</span> " +
+          message +
+          (meta ? ' <span class="debug-meta">(' + meta + ")</span>" : "");
+        debugConsoleEl.appendChild(line);
+        debugConsoleEl.scrollTop = debugConsoleEl.scrollHeight;
+      }
+
+      function showToast(text, duration = 2000) {
+        toastEl.textContent = text;
+        toastEl.classList.add("visible");
+        setTimeout(() => {
+          toastEl.classList.remove("visible");
+        }, duration);
+      }
+
+      function safePlay(audioEl) {
+        if (!soundOn) return;
+        if (!audioEl) return;
+        try {
+          audioEl.currentTime = 0;
+          audioEl.play();
+        } catch (e) {
+          logDebug("Audio play blocked", "User interaction required by browser");
+        }
+      }
+
+      function stopLoop() {
+        try {
+          audioLoop.pause();
+          audioLoop.currentTime = 0;
+        } catch (e) {}
+      }
+
+      function formatCurrency(n) {
+        return "₱" + n.toLocaleString("en-PH");
+      }
+
+      function loadCustomPrizesOrDefault() {
+        try {
+          const stored = localStorage.getItem("dod_custom_prizes");
+          if (!stored) {
+            return DEFAULT_PRIZES.slice();
+          }
+          const arr = JSON.parse(stored);
+          if (!Array.isArray(arr) || arr.length !== 15) {
+            return DEFAULT_PRIZES.slice();
+          }
+          const nums = arr.map((v) => Number(v)).filter((v) => !isNaN(v));
+          if (nums.length !== 15) {
+            return DEFAULT_PRIZES.slice();
+          }
+          nums.sort((a, b) => a - b);
+          return nums;
+        } catch (e) {
+          return DEFAULT_PRIZES.slice();
+        }
+      }
+
+      function buildPrizeColumns() {
+        prizeColumnsEl.innerHTML = "";
+        const mid = Math.ceil(prizes.length / 2);
+        const left = prizes.slice(0, mid);
+        const right = prizes.slice(mid);
+
+        function createColumn(values, className) {
+          const col = document.createElement("div");
+          col.className = "prize-column";
+          values.forEach((value) => {
+            const item = document.createElement("div");
+            item.className = "prize-item";
+            const isSmall =
+              value <= prizes[Math.floor(prizes.length / 2) - 1];
+            item.classList.add(isSmall ? "small" : "big");
+            item.dataset.value = String(value);
+            item.innerHTML =
+              '<span>' +
+              formatCurrency(value) +
+              "</span>" +
+              '<span>' +
+              (isSmall ? "LOW" : "HIGH") +
+              "</span>";
+            col.appendChild(item);
+          });
+          return col;
+        }
+
+        prizeColumnsEl.appendChild(createColumn(left, "left"));
+        prizeColumnsEl.appendChild(createColumn(right, "right"));
+      }
+
+      function crossOutPrize(value) {
+        const items = prizeColumnsEl.querySelectorAll(".prize-item");
+        items.forEach((el) => {
+          if (Number(el.dataset.value) === value) {
+            el.classList.add("crossed");
+          }
+        });
+      }
+
+      function shuffle(array) {
+        const arr = array.slice();
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function buildCaseGrid() {
+        gridEl.innerHTML = "";
+        for (let i = 1; i <= 16; i++) {
+          const slot = document.createElement("div");
+          slot.className = "case-slot";
+
+          if (i === 16) {
+            slot.classList.add("empty");
+            gridEl.appendChild(slot);
+            continue;
+          }
+
+          const caseIndex = i - 1;
+          const caseEl = document.createElement("div");
+          caseEl.className = "case";
+          caseEl.dataset.index = String(caseIndex);
+
+          const imgClosed = document.createElement("img");
+          imgClosed.src = "suitcase.png";
+          imgClosed.alt = "Case " + i;
+          imgClosed.className = "case-closed";
+
+          const imgOpen = document.createElement("img");
+          imgOpen.src = "suitcase-open.jpg";
+          imgOpen.alt = "Case " + i + " open";
+          imgOpen.className = "case-open";
+
+          const numBadge = document.createElement("div");
+          numBadge.className = "case-number";
+          numBadge.textContent = String(i);
+
+          const valueOverlay = document.createElement("div");
+          valueOverlay.className = "case-value-overlay";
+          valueOverlay.textContent = "–";
+          valueOverlay.dataset.valueShown = "0";
+
+          caseEl.appendChild(imgClosed);
+          caseEl.appendChild(imgOpen);
+          caseEl.appendChild(numBadge);
+          caseEl.appendChild(valueOverlay);
+          slot.appendChild(caseEl);
+          gridEl.appendChild(slot);
+        }
+      }
+
+      function updateRoundUI() {
+        if (!gameStarted) {
+          roundNumberEl.textContent = "-";
+          casesThisRoundEl.textContent = "0";
+          casesToOpenEl.textContent = "-";
+          totalOpenedEl.textContent = "0";
+          return;
+        }
+        roundNumberEl.textContent = String(currentRound + 1);
+        const needed = ROUND_PATTERN[currentRound] || 0;
+        casesThisRoundEl.textContent = String(openedThisRound);
+        casesToOpenEl.textContent = String(needed);
+        totalOpenedEl.textContent = String(openedCases.size);
+      }
+
+      function setStatus(text) {
+        statusTextEl.innerHTML = text;
+      }
+
+      function setGamePill(text) {
+        gameStatePillEl.textContent = text;
+      }
+
+      function resetGameState(hardReset = false) {
+        stopLoop();
+        bankerOffer = null;
+        clearOffer();
+        if (offerPollInterval) {
+          clearInterval(offerPollInterval);
+          offerPollInterval = null;
+        }
+
+        prizes = loadCustomPrizesOrDefault();
+        buildPrizeColumns();
+        buildCaseGrid();
+        shuffledCases = shuffle(prizes);
+        mainCaseIndex = 0;
+        openedCases = new Set();
+        currentRound = 0;
+        openedThisRound = 0;
+        gameStarted = false;
+        gameFinished = false;
+        waitingVisible = false;
+        hideModal(waitingModal);
+        hideModal(offerModal);
+        hideModal(finalModal);
+
+        mainCaseInnerEl.classList.remove("revealed");
+        mainCaseValueEl.textContent = "–";
+
+        document
+          .querySelectorAll(".case")
+          .forEach((c) => c.classList.remove("opened", "opened-small", "opened-big", "disabled"));
+
+        const prizeItems = prizeColumnsEl.querySelectorAll(".prize-item");
+        prizeItems.forEach((el) => el.classList.remove("crossed"));
+
+        updateRoundUI();
+        setStatus("Press <strong>Start Game</strong> to begin.");
+        setGamePill("Waiting · Press Start");
+
+        if (hardReset) {
+          logDebug("Hard reset performed", "");
+          showToast("Game reset.");
+        }
+      }
+
+      function initGame() {
+        resetGameState(false);
+        gameStarted = true;
+        gameFinished = false;
+        currentRound = 0;
+        openedThisRound = 0;
+
+        const indices = Array.from({ length: 15 }, (_, idx) => idx);
+        const chosenIndex =
+          indices[Math.floor(Math.random() * indices.length)];
+        mainCaseIndex = chosenIndex;
+
+        const mainValue = shuffledCases[mainCaseIndex];
+        logDebug("Main case selected: index " + mainCaseIndex, "Value hidden");
+
+        setStatus(
+          "Round <strong>1</strong>: Open <strong>" +
+            ROUND_PATTERN[0] +
+            "</strong> cases."
+        );
+        setGamePill("Round 1 · Choose cases");
+
+        updateRoundUI();
+        safePlay(audioIntro);
+
+        audioIntro.onended = function () {
+          safePlay(audioLoop);
+        };
+
+        const cases = document.querySelectorAll(".case");
+        cases.forEach((caseEl) => {
+          caseEl.classList.remove("disabled");
+          caseEl.addEventListener("click", onCaseClick);
+        });
+      }
+
+      function isBigPrize(value) {
+        const midIndex = Math.floor(prizes.length / 2);
+        const threshold = prizes[midIndex];
+        return value >= threshold;
+      }
+
+      function onCaseClick(event) {
+        if (!gameStarted || gameFinished) return;
+        const caseEl = event.currentTarget;
+        const index = Number(caseEl.dataset.index);
+        if (openedCases.has(index)) {
+          return;
+        }
+        if (index === mainCaseIndex && openedCases.size < 14) {
+          showToast("Your chosen case cannot be opened yet.");
+          return;
+        }
+
+        const value = shuffledCases[index];
+        const overlay = caseEl.querySelector(".case-value-overlay");
+        overlay.textContent = formatCurrency(value);
+        overlay.dataset.valueShown = String(value);
+
+        openedCases.add(index);
+        openedThisRound++;
+
+        caseEl.classList.add("opened");
+        if (isBigPrize(value)) {
+          caseEl.classList.add("opened-big");
+          safePlay(audioBig);
+        } else {
+          caseEl.classList.add("opened-small");
+          safePlay(audioSmall);
+        }
+        safePlay(audioCase);
+        crossOutPrize(value);
+        logDebug("Case opened index " + index, "Value " + formatCurrency(value));
+
+        updateRoundUI();
+
+        const totalNonMainCases = 15 - 1;
+        const openedNonMain = openedCases.has(mainCaseIndex)
+          ? openedCases.size - 1
+          : openedCases.size;
+        totalOpenedEl.textContent = String(openedNonMain);
+
+        const target = ROUND_PATTERN[currentRound] || 0;
+        if (openedThisRound >= target) {
+          onRoundComplete();
+        } else {
+          const remaining = target - openedThisRound;
+          setStatus(
+            "Round <strong>" +
+              (currentRound + 1) +
+              "</strong>: Open <strong>" +
+              remaining +
+              "</strong> more case" +
+              (remaining === 1 ? "" : "s") +
+              "."
+          );
+        }
+      }
+
+      function onRoundComplete() {
+        logDebug(
+          "Round " + (currentRound + 1) + " complete",
+          "Opened " + openedThisRound + " cases"
+        );
+        setStatus(
+          "Round <strong>" +
+            (currentRound + 1) +
+            "</strong> complete. Waiting for banker offer…"
+        );
+        setGamePill("Round " + (currentRound + 1) + " · Waiting offer");
+        openedThisRound = 0;
+        updateRoundUI();
+        showWaitingForBanker();
+        startOfferPolling();
+      }
+
+      function showWaitingForBanker() {
+        waitingVisible = true;
+        waitingModal.classList.add("visible");
+        logDebug("Waiting for banker offer…", "");
+      }
+
+      function hideModal(modal) {
+        modal.classList.remove("visible");
+      }
+
+      function startOfferPolling() {
+        if (offerPollInterval) {
+          clearInterval(offerPollInterval);
+        }
+        offerPollInterval = setInterval(checkForOffer, 1000);
+      }
+
+      function clearOffer() {
+        localStorage.removeItem("dod_offer");
+      }
+
+      function checkForOffer() {
+        try {
+          const raw = localStorage.getItem("dod_offer");
+          if (!raw) {
+            return;
+          }
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed.amount !== "number") {
+            return;
+          }
+          bankerOffer = parsed;
+          logDebug(
+            "Offer detected: " + formatCurrency(parsed.amount),
+            "Time " + parsed.time
+          );
+          clearInterval(offerPollInterval);
+          offerPollInterval = null;
+          hideModal(waitingModal);
+          waitingVisible = false;
+          showOfferModal(parsed);
+          clearOffer();
+        } catch (e) {
+          logDebug("Error parsing offer", String(e));
+        }
+      }
+
+      function showOfferModal(offer) {
+        const formatted = formatCurrency(offer.amount);
+        offerAmountEl.textContent = formatted;
+        const t = new Date(offer.time || Date.now());
+        offerTimeTextEl.textContent =
+          "Offer received at " + t.toLocaleTimeString();
+        offerModal.classList.add("visible");
+        setGamePill("Offer received");
+        setStatus(
+          "The banker has offered you <strong>" +
+            formatted +
+            "</strong>. Deal or No Deal?"
+        );
+        safePlay(audioOfferA);
+        setTimeout(() => {
+          safePlay(audioOfferB);
+        }, 350);
+      }
+
+      function handleNoDeal() {
+        hideModal(offerModal);
+        if (currentRound < ROUND_PATTERN.length - 1) {
+          currentRound++;
+          logDebug("No Deal chosen", "Moving to round " + (currentRound + 1));
+          setGamePill("Round " + (currentRound + 1) + " · Choose cases");
+          setStatus(
+            "Round <strong>" +
+              (currentRound + 1) +
+              "</strong>: Open <strong>" +
+              ROUND_PATTERN[currentRound] +
+              "</strong> cases."
+          );
+          updateRoundUI();
+          startOfferPolling();
+          if (!offerPollInterval) {
+            clearOffer();
+          }
+        } else {
+          logDebug("No Deal on final round", "Proceed to reveal main case");
+          beginFinalReveal(false);
+        }
+      }
+
+      function revealMainCase() {
+        const value = shuffledCases[mainCaseIndex];
+        mainCaseInnerEl.classList.add("revealed");
+        mainCaseValueEl.textContent = formatCurrency(value);
+        return value;
+      }
+
+      function beginFinalReveal(tookDeal, dealtAmount) {
+        gameFinished = true;
+        stopLoop();
+        const actual = revealMainCase();
+        let title, subtitle, detail, finalDisplay;
+
+        if (tookDeal) {
+          title = "Deal!";
+          subtitle = "You accepted the banker's offer.";
+          finalDisplay = formatCurrency(dealtAmount);
+          if (dealtAmount >= actual) {
+            detail =
+              "Great call. Your case actually contained " +
+              formatCurrency(actual) +
+              ", so you beat the banker.";
+          } else {
+            detail =
+              "The banker got you this time. Your case contained " +
+              formatCurrency(actual) +
+              ".";
+          }
+        } else {
+          title = "No Deal · Final reveal";
+          subtitle = "You went all the way with your case.";
+          finalDisplay = formatCurrency(actual);
+          detail =
+            "This is the value you walk away with. The banker's last offer was " +
+            (bankerOffer ? formatCurrency(bankerOffer.amount) : "–") +
+            ".";
+        }
+
+        finalTitleEl.textContent = title;
+        finalSubtitleEl.textContent = subtitle;
+        finalAmountEl.textContent = finalDisplay;
+        finalDetailTextEl.textContent = detail;
+        finalModal.classList.add("visible");
+        setGamePill("Game over");
+        setStatus("Game over. Press Play Again to restart.");
+        logDebug(
+          "Final reveal",
+          "Main case value " +
+            formatCurrency(actual) +
+            (tookDeal ? ", deal " + formatCurrency(dealtAmount) : "")
+        );
+      }
+
+      function openSettingsPanel() {
+        showToast("Use the side panel to adjust settings.", 2200);
+      }
+
+      startGameBtn.addEventListener("click", () => {
+        if (gameStarted && !gameFinished) {
+          if (confirm("Restart the game? Current progress will be lost.")) {
+            resetGameState(false);
+            initGame();
+          }
+        } else {
+          initGame();
+        }
+      });
+
+      resetGameBtn.addEventListener("click", () => {
+        if (confirm("Reset the game and clear the current round?")) {
+          resetGameState(true);
+        }
+      });
+
+      restartBtn.addEventListener("click", () => {
+        finalModal.classList.remove("visible");
+        resetGameState(false);
+        initGame();
+      });
+
+      openCustomAmountsBtn.addEventListener("click", () => {
+        window.location.href = "custom-amounts.html";
+      });
+
+      openOfferPageBtn.addEventListener("click", () => {
+        window.open("offer.html", "_blank");
+      });
+
+      settingsBtn.addEventListener("click", openSettingsPanel);
+
+      soundToggle.addEventListener("change", () => {
+        soundOn = soundToggle.checked;
+        logDebug("Sound " + (soundOn ? "enabled" : "disabled"), "");
+        if (!soundOn) {
+          [audioIntro, audioLoop, audioCase, audioOfferA, audioOfferB, audioSmall, audioBig].forEach(
+            (a) => {
+              try {
+                a.pause();
+              } catch (e) {}
+            }
+          );
+        } else {
+          if (gameStarted && !gameFinished) {
+            safePlay(audioLoop);
+          }
+        }
+      });
+
+      animationToggle.addEventListener("change", () => {
+        animationsOn = animationToggle.checked;
+        document.body.classList.toggle("animations-on", animationsOn);
+        logDebug("Animations " + (animationsOn ? "enabled" : "disabled"), "");
+      });
+
+      debugToggle.addEventListener("change", () => {
+        debugOn = debugToggle.checked;
+        debugCard.classList.toggle("hidden", !debugOn);
+        if (debugOn) {
+          logDebug("Debug console enabled", "");
+        }
+      });
+
+      cancelWaitingBtn.addEventListener("click", () => {
+        hideModal(waitingModal);
+        waitingVisible = false;
+        logDebug("Waiting modal dismissed by user", "");
+      });
+
+      noDealBtn.addEventListener("click", () => {
+        handleNoDeal();
+      });
+
+      dealBtn.addEventListener("click", () => {
+        hideModal(offerModal);
+        if (!bankerOffer) return;
+        beginFinalReveal(true, bankerOffer.amount);
+      });
+
+      waitingModal.addEventListener("click", (e) => {
+        if (e.target === waitingModal) {
+          hideModal(waitingModal);
+          waitingVisible = false;
+        }
+      });
+      offerModal.addEventListener("click", (e) => {
+        if (e.target === offerModal) {
+          hideModal(offerModal);
+        }
+      });
+      finalModal.addEventListener("click", (e) => {
+        if (e.target === finalModal) {
+          hideModal(finalModal);
+        }
+      });
+
+      resetGameState(false);
+
+      setTimeout(() => {
+        safePlay(audioIntro);
+      }, 200);
+    })();
+  </script>
+</body>
+</html>
