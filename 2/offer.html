@@ -129,7 +129,7 @@
     }
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.16); }
     .message {
-      margin-top: 8px;
+      margin-top: 10px;
       font-size: 0.8rem;
       min-height: 16px;
     }
@@ -163,6 +163,7 @@
       </div>
 
       <div class="actions">
+        <button class="btn-secondary" id="debugBtn">Debug</button>
         <button class="btn-secondary" id="closeBtn">Close</button>
         <button class="btn" id="sendOfferBtn">Send offer</button>
       </div>
@@ -180,15 +181,16 @@
   <script>
     (function () {
       const GOOGLE_SHEETS_WEBAPP_URL =
-        "https://script.google.com/macros/s/AKfycby_rINNEXiPenUtCSDjoWAE4fEr_e1Ky5lsa2Bp7WiLVdst_RmW-TEgPaUmtDJwUcJktQ/exec";
+        "https://script.google.com/macros/s/AKfycbyL1eN0YfmdkjR4cRe428S0go28IaVfVmOgR8dBUE2Tqu-kZhuiderLdgFIeSkFsl3vNQ/exec";
 
       const sendOfferBtn = document.getElementById("sendOfferBtn");
       const offerInput = document.getElementById("offerAmount");
       const messageEl = document.getElementById("message");
       const closeBtn = document.getElementById("closeBtn");
+      const debugBtn = document.getElementById("debugBtn");
 
       function showMessage(text, type) {
-        messageEl.textContent = text;
+        messageEl.innerHTML = text;
         messageEl.className = "message " + (type || "");
       }
 
@@ -203,6 +205,7 @@
 
         try {
           showMessage("Sending offer…", "");
+
           const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -210,23 +213,46 @@
           });
 
           const text = await res.text();
-          if (!res.ok || text.indexOf("OK") === -1) {
-            showMessage("Error from backend: " + text, "error");
+
+          if (!res.ok || !text.includes("OK")) {
+            showMessage("Backend error: " + text, "error");
             return;
           }
 
           showMessage(
-            "Offer sent: ₱" +
+            "✅ Offer sent: ₱" +
               amount.toLocaleString("en-PH") +
-              ". The game will pick it up shortly.",
+              "<br>The game will pick it up shortly.",
             "success"
           );
         } catch (e) {
-          showMessage("Network error sending offer.", "error");
+          showMessage("❌ Network error sending offer.<br>" + e, "error");
+        }
+      }
+
+      async function debugConnection() {
+        showMessage("Testing connection…", "");
+
+        try {
+          const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, { method: "GET" });
+          const text = await res.text();
+
+          showMessage(
+            "✅ Connection OK<br>Response:<br><pre>" +
+              text +
+              "</pre>",
+            "success"
+          );
+        } catch (err) {
+          showMessage(
+            "❌ Connection failed<br><pre>" + String(err) + "</pre>",
+            "error"
+          );
         }
       }
 
       sendOfferBtn.addEventListener("click", sendOffer);
+      debugBtn.addEventListener("click", debugConnection);
 
       offerInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
