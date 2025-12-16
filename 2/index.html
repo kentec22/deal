@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -216,6 +217,24 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
     }
 
+    .btn-danger {
+      background: linear-gradient(to bottom, #ef5350, #b71c1c);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(239, 83, 80, 0.8);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: none;
+    }
+
+    .btn-small {
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+
     .splash-hint {
       margin-top: 10px;
       font-size: 12px;
@@ -286,11 +305,6 @@
       font-size: 14px;
     }
 
-    .btn-small {
-      padding: 6px 14px;
-      font-size: 12px;
-    }
-
     .game-body {
       flex: 1;
       display: grid;
@@ -328,7 +342,7 @@
       margin-bottom: 4px;
     }
 
-    /* Case grid: 15 cases, 5x3 ideally inside stage */
+    /* Case grid: 15 cases, 5x3 inside stage */
 
     .case-grid {
       flex: 1;
@@ -557,25 +571,6 @@
       flex-wrap: wrap;
     }
 
-    .btn-danger {
-      background: linear-gradient(to bottom, #ef5350, #b71c1c);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(239, 83, 80, 0.8);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: none;
-    }
-
-    .btn[disabled] {
-      opacity: 0.5;
-      cursor: default;
-      box-shadow: none;
-    }
-
     .game-log {
       margin-top: 6px;
       font-size: 11px;
@@ -758,12 +753,15 @@
       font-size: 22px;
       color: var(--primary-gold);
       margin-bottom: 8px;
+      text-align: center;
     }
 
     .banker-subtext {
       font-size: 13px;
       color: var(--text-muted);
       margin-bottom: 18px;
+      text-align: center;
+      max-width: 380px;
     }
 
     .banker-offer-form {
@@ -886,7 +884,7 @@
           Please wait while the banker thinks about your board.
         </div>
 
-        <div class="banker-offer-form" id="bankerOfferForm">
+        <form class="banker-offer-form" id="bankerOfferForm">
           <input
             type="password"
             id="bankerOfferInput"
@@ -895,10 +893,10 @@
             inputmode="numeric"
           />
           <div class="banker-actions">
-            <button class="btn btn-primary" id="bankerRevealBtn">Reveal Offer</button>
-            <button class="btn btn-ghost" id="bankerCancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="bankerRevealBtn">Reveal Offer</button>
+            <button type="button" class="btn btn-ghost" id="bankerCancelBtn">Cancel</button>
           </div>
-        </div>
+        </form>
       </div>
 
       <!-- Main Game Root -->
@@ -927,7 +925,7 @@
             <div class="case-grid" id="caseGrid"></div>
           </section>
 
-            <!-- RIGHT: MAIN CASE, VALUES, BANKER -->
+          <!-- RIGHT: MAIN CASE, VALUES, BANKER -->
           <section class="game-right">
             <!-- Main case -->
             <div class="main-case-panel">
@@ -975,6 +973,26 @@
   </div>
 
   <script>
+    // ---------- BACKGROUND MUSIC (AUTOPLAY) ----------
+    const bgMusic = new Audio("/2/1-intro.mp3");
+    bgMusic.loop = true;
+    bgMusic.volume = 0.6;
+
+    window.addEventListener("load", () => {
+      bgMusic.play().catch(() => {
+        console.log("Autoplay was blocked; music will start on first user interaction.");
+        const resumeOnInteraction = () => {
+          bgMusic.play().catch(() => {});
+          window.removeEventListener("click", resumeOnInteraction);
+          window.removeEventListener("keydown", resumeOnInteraction);
+          window.removeEventListener("touchstart", resumeOnInteraction);
+        };
+        window.addEventListener("click", resumeOnInteraction);
+        window.addEventListener("keydown", resumeOnInteraction);
+        window.addEventListener("touchstart", resumeOnInteraction);
+      });
+    });
+
     // ---------- STAGE SCALING ----------
     const stageWrapper = document.getElementById("stageWrapper");
     const STAGE_WIDTH = 1920;
@@ -1045,6 +1063,8 @@
     const bankerOfferInput = document.getElementById("bankerOfferInput");
     const bankerRevealBtn = document.getElementById("bankerRevealBtn");
     const bankerCancelBtn = document.getElementById("bankerCancelBtn");
+    const bankerCallingText = document.getElementById("bankerCallingText");
+    const bankerSubText = document.getElementById("bankerSubText");
 
     const caseGrid = document.getElementById("caseGrid");
     const valuesPanel = document.getElementById("valuesPanel");
@@ -1439,7 +1459,10 @@
         buildValuesPanel();
         playerNameTag.textContent = "Player: " + playerName;
 
-        setSettingsStatus("Saved. New amounts will apply next new game. (This game already uses shuffled mapping.)", "ok");
+        setSettingsStatus(
+          "Saved. New amounts will apply on the next new game. (This game already uses a shuffled mapping.)",
+          "ok"
+        );
       } catch (err) {
         setSettingsStatus("Save failed: " + err.message, "error");
       }
@@ -1534,14 +1557,17 @@
     callBankerBtn.addEventListener("click", handleCallBankerClick);
     resetGameBtn.addEventListener("click", handleResetClick);
 
-    bankerRevealBtn.addEventListener("click", handleBankerReveal);
+    bankerOfferForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handleBankerReveal();
+    });
     bankerCancelBtn.addEventListener("click", handleBankerCancel);
 
     // ---------- INITIALIZATION ----------
     buildSettingsFields();
     initPlayerName();
     // Game state initialization happens after splash "Start Game" click
-
   </script>
 </body>
 </html>
+```
