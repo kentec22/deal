@@ -10,7 +10,7 @@
       --stage-width: 1920;
       --stage-height: 1080;
       --case-size: 150px;
-      --case-border-radius: 12px;
+      --case-radius: 12px;
       --primary-gold: #ffcc00;
       --primary-gold-soft: rgba(255, 204, 0, 0.4);
       --accent-blue: #1e88e5;
@@ -22,65 +22,22 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #000;
       color: var(--text-main);
-      font-family: system-ui, sans-serif;
       overflow: hidden;
+    }
+
+    body {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
     }
 
-    /* ---------- FULLSCREEN NAME PROMPT ---------- */
-
-    #namePromptOverlay {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      text-align: center;
-      padding: 20px;
-    }
-
-    #namePromptOverlay h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    #playerNameInput {
-      padding: 12px 16px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #111;
-      color: #fff;
-      width: 260px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    #startGameBtn {
-      padding: 12px 24px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      background: #1e88e5;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    #startGameBtn:hover {
-      background: #1565c0;
-    }
-
-    /* ---------- GAME VIEWPORT ---------- */
+    /* ---------- VIEWPORT & STAGE ---------- */
 
     .viewport {
       width: 100vw;
@@ -89,6 +46,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      background: #000;
     }
 
     .stage-wrapper {
@@ -98,10 +56,8 @@
       transform-origin: center;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      box-shadow: 0 0 50px rgba(0,0,0,0.9);
     }
-
-    /* ---------- HEADER ---------- */
 
     .game-root {
       position: absolute;
@@ -109,7 +65,10 @@
       display: flex;
       flex-direction: column;
       padding: 20px 30px;
+      gap: 12px;
     }
+
+    /* ---------- HEADER ---------- */
 
     .game-header {
       display: flex;
@@ -117,70 +76,131 @@
       align-items: center;
     }
 
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     .title-main {
       font-size: 32px;
-      color: var(--primary-gold);
       letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary-gold);
+      text-shadow: 0 0 14px rgba(0,0,0,0.9);
+    }
+
+    .title-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
     }
 
     .player-name-tag {
       padding: 6px 12px;
-      background: rgba(0,0,0,0.6);
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.7);
     }
 
     .status-chip {
       padding: 6px 12px;
-      background: rgba(0,0,0,0.6);
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.7);
       color: var(--primary-gold);
-      font-weight: bold;
+      font-weight: 600;
     }
+
+    /* ---------- BUTTONS ---------- */
 
     .btn {
-      padding: 6px 14px;
       border-radius: 6px;
       border: none;
+      padding: 6px 14px;
+      font-size: 13px;
       cursor: pointer;
-      background: #444;
       color: #fff;
+      background: #424242;
+      transition: background 0.15s ease, transform 0.1s ease;
     }
 
-    /* ---------- CASE GRID ---------- */
+    .btn-primary { background: #1e88e5; }
+    .btn-danger  { background: #c62828; }
+    .btn-ghost   {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none;
+    }
+
+    /* ---------- BODY LAYOUT ---------- */
 
     .game-body {
       flex: 1;
+      margin-top: 10px;
       display: grid;
       grid-template-columns: 1.5fr 1fr;
       gap: 16px;
-      margin-top: 10px;
     }
+
+    .panel {
+      background: rgba(0,0,0,0.7);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.9);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    /* ---------- CASE GRID ---------- */
 
     .case-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 12px;
+      justify-items: center;
+      align-items: center;
     }
 
     .case {
       width: var(--case-size);
-      aspect-ratio: 4/3;
-      background: #333;
-      border-radius: var(--case-border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
+      max-width: 180px;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--case-radius);
+      background: #444;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.9);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
     }
 
     .case img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     .case-number {
@@ -188,66 +208,107 @@
       bottom: 6px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
       padding: 3px 10px;
       border-radius: 999px;
+      background: rgba(0,0,0,0.8);
       color: var(--primary-gold);
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .case:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 0 18px rgba(255,255,255,0.35);
+      filter: brightness(1.08);
+    }
+
+    .case.disabled {
+      pointer-events: none;
+      opacity: 0.9;
     }
 
     .case.revealed img {
-      filter: grayscale(1) brightness(0.5);
+      filter: grayscale(0.9) brightness(0.6);
+      box-shadow: none;
     }
 
-    /* ---------- MAIN CASE PANEL ---------- */
+    /* ---------- RIGHT SIDE ---------- */
+
+    .right-col {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 10px;
+    }
 
     .main-case-panel {
-      background: rgba(0,0,0,0.6);
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
       display: flex;
       gap: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top, rgba(255,204,0,0.18), rgba(0,0,0,0.95));
+      border: 1px solid rgba(255,204,0,0.4);
     }
 
     .main-case-slot {
       width: 180px;
       height: 130px;
-      border: 2px dashed rgba(255,255,255,0.2);
       border-radius: 12px;
+      border: 2px dashed rgba(255,255,255,0.25);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      background: rgba(0,0,0,0.7);
     }
 
     .main-case-placeholder {
-      color: var(--text-muted);
       font-size: 13px;
+      color: var(--text-muted);
       text-align: center;
     }
 
-    /* ---------- VALUES PANEL ---------- */
+    .main-case-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .main-case-label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .main-case-number-display {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary-gold);
+    }
+
+    /* VALUES PANEL */
 
     .values-panel {
-      background: rgba(0,0,0,0.7);
-      padding: 10px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.1);
-      max-height: 220px;
+      background: rgba(0,0,0,0.9);
+      padding: 8px 10px;
+      max-height: 230px;
       overflow-y: auto;
       display: grid;
-      grid-template-columns: repeat(2,1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 6px;
+      font-size: 13px;
     }
 
     .value-item {
-      padding: 6px 10px;
+      padding: 4px 8px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.2);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to right, rgba(255,255,255,0.06), rgba(0,0,0,0.95));
     }
 
     .value-item.opened {
@@ -255,293 +316,854 @@
       text-decoration: line-through;
     }
 
-    /* ---------- BANKER PANEL ---------- */
+    /* BANKER PANEL */
 
     .banker-panel {
-      background: rgba(0,0,0,0.7);
-      padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.9);
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+    }
+
+    .banker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-muted);
     }
 
     .banker-offer-value {
       font-size: 20px;
+      font-weight: 700;
       color: var(--primary-gold);
-      font-weight: bold;
+    }
+
+    .banker-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
     }
 
     .game-log {
-      max-height: 150px;
+      margin-top: 6px;
+      max-height: 140px;
       overflow-y: auto;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .log-entry { margin-bottom: 2px; }
+
+    /* SETTINGS OVERLAY */
+
+    .settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .settings-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .settings-panel {
+      width: 420px;
+      max-width: 100%;
+      background: rgba(10,10,10,0.97);
+      border-left: 1px solid rgba(255,255,255,0.16);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      box-shadow: -14px 0 30px rgba(0,0,0,0.9);
+    }
+
+    .settings-overlay.visible .settings-panel {
+      transform: translateX(0);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .settings-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .settings-section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .settings-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       font-size: 12px;
       color: var(--text-muted);
+    }
+
+    .settings-field input {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.7);
+      color: var(--text-main);
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .settings-status {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-height: 1em;
+    }
+
+    .settings-status.ok { color: #81c784; }
+    .settings-status.error { color: #ef9a9a; }
+
+    /* BANKER OVERLAY (MANUAL OFFER) */
+
+    .banker-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(0,0,0,0.96), rgba(0,0,0,0.99));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .banker-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .banker-phone-icon {
+      font-size: 38px;
+      margin-bottom: 10px;
+      animation: pulse 1.1s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+    }
+
+    .banker-overlay-title {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: var(--primary-gold);
+    }
+
+    .banker-overlay-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      text-align: center;
+      max-width: 360px;
+    }
+
+    .banker-offer-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .banker-offer-form.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .banker-input {
+      min-width: 220px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.35);
+      background: rgba(0,0,0,0.8);
+      color: var(--text-main);
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .banker-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* FOOTER */
+
+    .game-footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* SCROLLBARS */
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.6); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
     }
   </style>
 </head>
 <body>
+  <div class="viewport">
+    <div class="stage-wrapper" id="stageWrapper">
+      <!-- SETTINGS OVERLAY -->
+      <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel">
+          <div class="settings-header">
+            <div class="settings-title">Settings</div>
+            <button class="btn btn-ghost" id="settingsCloseBtn">Close</button>
+          </div>
 
-<!-- ✅ FULLSCREEN NAME PROMPT -->
-<div id="namePromptOverlay">
-  <h1>Enter your name</h1>
-  <input id="playerNameInput" type="text" placeholder="Leave blank if none" />
-  <button id="startGameBtn">Start</button>
-</div>
+          <div class="settings-section-title">Player</div>
+          <div class="settings-field">
+            <label for="settingsPlayerName">Player name</label>
+            <input type="text" id="settingsPlayerName" />
+          </div>
 
-<div class="viewport">
-  <div class="stage-wrapper" id="stageWrapper">
+          <div class="settings-section-title">Suitcase amounts (₱)</div>
+          <div class="settings-row" id="settingsAmountsRow"></div>
 
-    <div class="game-root" id="gameRoot" style="display:none;">
-      <header class="game-header">
-        <div class="title-main">DEAL OR NO DEAL</div>
-        <div class="header-right">
-          <span class="player-name-tag" id="playerNameTag">Player:</span>
-          <span class="status-chip" id="statusChip">Choose Your Case</span>
-          <button class="btn" id="openSettingsBtn">Settings</button>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+            <button class="btn btn-ghost" id="settingsResetBtn">Reset defaults</button>
+            <button class="btn btn-primary" id="settingsSaveBtn">Save</button>
+          </div>
+          <div class="settings-status" id="settingsStatus"></div>
         </div>
-      </header>
+      </div>
 
-      <main class="game-body">
-        <section>
-          <div class="case-grid" id="caseGrid"></div>
-        </section>
+      <!-- BANKER OVERLAY (MANUAL OFFER) -->
+      <div class="banker-overlay" id="bankerOverlay">
+        <div class="banker-phone-icon">📞</div>
+        <div class="banker-overlay-title" id="bankerOverlayTitle">Banker is calling...</div>
+        <div class="banker-overlay-sub" id="bankerOverlaySub">
+          Please wait while the banker considers the current board.
+        </div>
 
-        <section>
-          <div class="main-case-panel">
-            <div class="main-case-slot" id="mainCaseSlot">
-              <div class="main-case-placeholder">No case selected</div>
-            </div>
-            <div>
-              <div>Your Case</div>
-              <div id="mainCaseNumberDisplay" style="font-size:20px;color:var(--primary-gold);">#—</div>
-            </div>
+        <form class="banker-offer-form" id="bankerOfferForm" autocomplete="off">
+          <input
+            type="text"
+            id="bankerOfferInput"
+            class="banker-input"
+            placeholder="Enter banker’s offer"
+            inputmode="numeric"
+          />
+          <div class="banker-actions">
+            <button type="submit" class="btn btn-primary">Reveal Offer</button>
+            <button type="button" class="btn btn-ghost" id="bankerCancelBtn">Cancel</button>
           </div>
+        </form>
+      </div>
 
-          <div class="values-panel" id="valuesPanel"></div>
-
-          <div class="banker-panel">
-            <div>Banker Offer:</div>
-            <div class="banker-offer-value" id="bankerOfferValue">Waiting...</div>
-            <button class="btn" id="openNextBtn">Open next case</button>
-            <button class="btn" id="callBankerBtn">Call banker</button>
-            <button class="btn" id="resetGameBtn">Reset</button>
-            <div class="game-log" id="gameLog"></div>
+      <!-- MAIN GAME ROOT -->
+      <div class="game-root" id="gameRoot">
+        <header class="game-header">
+          <div class="title-block">
+            <div class="title-main">DEAL OR NO DEAL</div>
+            <div class="title-sub">15-Case Philippine Edition</div>
           </div>
-        </section>
-      </main>
+          <div class="header-right">
+            <div class="player-name-tag" id="playerNameTag">Player:</div>
+            <div class="status-chip" id="statusChip">Choose your case</div>
+            <button class="btn btn-ghost" id="openSettingsBtn">Settings</button>
+          </div>
+        </header>
 
+        <main class="game-body">
+          <!-- LEFT: CASE GRID -->
+          <section class="panel">
+            <div class="panel-title">Cases</div>
+            <div class="case-grid" id="caseGrid"></div>
+          </section>
+
+          <!-- RIGHT: MAIN CASE, VALUES, BANKER -->
+          <section class="right-col">
+            <!-- MAIN CASE -->
+            <div class="main-case-panel">
+              <div class="main-case-slot" id="mainCaseSlot">
+                <div class="main-case-placeholder">No case selected</div>
+              </div>
+              <div class="main-case-info">
+                <div class="main-case-label">Your case</div>
+                <div class="main-case-number-display" id="mainCaseNumberDisplay">#—</div>
+                <div style="font-size:12px;color:var(--text-muted);">
+                  Select a case from the board to keep as your own. Its value will be revealed at the end—unless you take a deal.
+                </div>
+              </div>
+            </div>
+
+            <!-- VALUES -->
+            <div class="panel">
+              <div class="panel-title">Board values (₱)</div>
+              <div class="values-panel" id="valuesPanel"></div>
+            </div>
+
+            <!-- BANKER -->
+            <div class="banker-panel">
+              <div class="banker-header">
+                <span>Banker</span>
+                <span class="banker-offer-value" id="bankerOfferValue">Waiting...</span>
+              </div>
+              <div class="banker-buttons">
+                <button class="btn btn-primary" id="openNextBtn">Open next case</button>
+                <button class="btn" id="callBankerBtn">Call banker</button>
+                <button class="btn btn-danger" id="resetGameBtn">Reset</button>
+              </div>
+              <div class="game-log" id="gameLog"></div>
+            </div>
+          </section>
+        </main>
+
+        <footer class="game-footer">
+          Manual banker mode • 15-case layout • Philippine Peso (₱). Customize values and player name in Settings.
+        </footer>
+      </div>
     </div>
   </div>
-</div>
 
   <script>
-/* ---------- SAFE AUTOPLAY MUSIC ---------- */
-const bgMusic = new Audio("2/1-intro.mp3");
-bgMusic.loop = true;
-bgMusic.volume = 0.6;
+    /* ---------- SOUND HOOKS (YOU CAN IMPLEMENT THESE LATER) ---------- */
 
-window.addEventListener("load", () => {
-  bgMusic.play().catch(() => {
-    const resume = () => {
-      bgMusic.play().catch(()=>{});
-      window.removeEventListener("click", resume);
-      window.removeEventListener("keydown", resume);
-      window.removeEventListener("touchstart", resume);
-    };
-    window.addEventListener("click", resume);
-    window.addEventListener("keydown", resume);
-    window.addEventListener("touchstart", resume);
-  });
-});
+    function playCaseOpenSound() {
+      // Example:
+      // new Audio("sounds/case-open.mp3").play();
+    }
 
-/* ---------- STAGE SCALING ---------- */
-const stageWrapper = document.getElementById("stageWrapper");
-function updateScale() {
-  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-  stageWrapper.style.transform = "scale(" + scale + ")";
-}
-window.addEventListener("resize", updateScale);
-updateScale();
+    function playBankerCallSound() {
+      // Example:
+      // new Audio("sounds/banker-call.mp3").play();
+    }
 
-/* ---------- GAME STATE ---------- */
-const DEFAULT_AMOUNTS = [
-  0,10,100,250,500,750,1000,1500,2000,2500,3000,4000,5000,7000,10000
-];
+    function playOfferRevealSound() {
+      // Example:
+      // new Audio("sounds/offer-reveal.mp3").play();
+    }
 
-let amounts = DEFAULT_AMOUNTS.slice();
-let shuffled = [];
-let caseMap = {};
-let opened = new Set();
-let mainCase = null;
-let round = 0;
-let openedThisRound = 0;
-const ROUND_SCHEDULE = [5,4,3,2,1];
+    function playClickSound() {
+      // Example:
+      // new Audio("sounds/click.mp3").play();
+    }
 
-const caseGrid = document.getElementById("caseGrid");
-const valuesPanel = document.getElementById("valuesPanel");
-const mainCaseSlot = document.getElementById("mainCaseSlot");
-const mainCaseNumberDisplay = document.getElementById("mainCaseNumberDisplay");
-const bankerOfferValue = document.getElementById("bankerOfferValue");
-const gameLog = document.getElementById("gameLog");
-const statusChip = document.getElementById("statusChip");
+    function playBackgroundMusic() {
+      // Example:
+      // const music = new Audio("music/intro.mp3");
+      // music.loop = true;
+      // music.volume = 0.5;
+      // music.play().catch(()=>{});
+    }
 
-/* ---------- NAME PROMPT ---------- */
-const namePromptOverlay = document.getElementById("namePromptOverlay");
-const playerNameInput = document.getElementById("playerNameInput");
-const startGameBtn = document.getElementById("startGameBtn");
-const gameRoot = document.getElementById("gameRoot");
-const playerNameTag = document.getElementById("playerNameTag");
+    /* Optionally call this now or from a button once you wire music */
+    // playBackgroundMusic();
 
-startGameBtn.addEventListener("click", () => {
-  const name = playerNameInput.value.trim();
-  playerNameTag.textContent = "Player: " + name;
-  namePromptOverlay.style.display = "none";
-  gameRoot.style.display = "flex";
-  initGame();
-});
+    /* ---------- STAGE SCALING ---------- */
+    const stageWrapper = document.getElementById("stageWrapper");
+    function updateStageScale() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const scale = Math.min(vw / 1920, vh / 1080);
+      stageWrapper.style.transform = "scale(" + scale + ")";
+    }
+    window.addEventListener("resize", updateStageScale);
+    updateStageScale();
 
-/* ---------- UTIL ---------- */
-function log(msg) {
-  const div = document.createElement("div");
-  div.textContent = msg;
-  gameLog.appendChild(div);
-  gameLog.scrollTop = gameLog.scrollHeight;
-}
+    /* ---------- CONSTANTS ---------- */
+    const DEFAULT_AMOUNTS = [
+      0, 10, 100, 250, 500,
+      750, 1000, 1500, 2000,
+      2500, 3000, 4000, 5000,
+      7000, 10000
+    ];
 
-function formatPHP(n) {
-  return "₱" + n.toLocaleString("en-PH");
-}
+    const ROUND_SCHEDULE = [5, 4, 3, 2, 1];
 
-/* ---------- BUILD VALUES PANEL ---------- */
-function buildValues() {
-  valuesPanel.innerHTML = "";
-  const sorted = [...amounts].sort((a,b)=>a-b);
-  sorted.forEach(v=>{
-    const item = document.createElement("div");
-    item.className = "value-item";
-    item.dataset.amount = v;
-    item.textContent = formatPHP(v);
-    valuesPanel.appendChild(item);
-  });
-}
+    const STORAGE_KEY_AMOUNTS = "dond_ph_15_amounts";
+    const STORAGE_KEY_PLAYER = "dond_ph_15_player";
 
-function markValue(v) {
-  valuesPanel.querySelectorAll(".value-item").forEach(el=>{
-    if(Number(el.dataset.amount)===v) el.classList.add("opened");
-  });
-}
+    /* ---------- STATE ---------- */
+    let amounts = [];
+    let shuffledAmounts = [];
+    let caseAmountMap = {}; // caseIndex -> amount
+    let openedCases = new Set();
+    let mainCaseIndex = null;
+    let currentRoundIndex = 0;
+    let openedThisRound = 0;
+    let gamePhase = "selection"; // "selection" | "game" | "ended"
+    let playerName = "";
 
-/* ---------- CASE GRID ---------- */
-function createCase(i) {
-  const div = document.createElement("div");
-  div.className = "case";
-  div.dataset.index = i;
+    /* ---------- DOM ---------- */
+    const caseGrid = document.getElementById("caseGrid");
+    const valuesPanel = document.getElementById("valuesPanel");
+    const mainCaseSlot = document.getElementById("mainCaseSlot");
+    const mainCaseNumberDisplay = document.getElementById("mainCaseNumberDisplay");
+    const bankerOfferValue = document.getElementById("bankerOfferValue");
+    const gameLog = document.getElementById("gameLog");
+    const statusChip = document.getElementById("statusChip");
+    const playerNameTag = document.getElementById("playerNameTag");
 
-  const img = document.createElement("img");
-  img.src = "suitcase.png";
+    const openNextBtn = document.getElementById("openNextBtn");
+    const callBankerBtn = document.getElementById("callBankerBtn");
+    const resetGameBtn = document.getElementById("resetGameBtn");
+    const openSettingsBtn = document.getElementById("openSettingsBtn");
 
-  const num = document.createElement("div");
-  num.className = "case-number";
-  num.textContent = i;
+    const settingsOverlay = document.getElementById("settingsOverlay");
+    const settingsCloseBtn = document.getElementById("settingsCloseBtn");
+    const settingsPlayerNameInput = document.getElementById("settingsPlayerName");
+    const settingsAmountsRow = document.getElementById("settingsAmountsRow");
+    const settingsSaveBtn = document.getElementById("settingsSaveBtn");
+    const settingsResetBtn = document.getElementById("settingsResetBtn");
+    const settingsStatus = document.getElementById("settingsStatus");
 
-  div.appendChild(img);
-  div.appendChild(num);
+    const bankerOverlay = document.getElementById("bankerOverlay");
+    const bankerOfferForm = document.getElementById("bankerOfferForm");
+    const bankerOfferInput = document.getElementById("bankerOfferInput");
+    const bankerCancelBtn = document.getElementById("bankerCancelBtn");
+    const bankerOverlayTitle = document.getElementById("bankerOverlayTitle");
+    const bankerOverlaySub = document.getElementById("bankerOverlaySub");
 
-  div.addEventListener("click", ()=>onCaseClick(i,div));
-  return div;
-}
+    /* ---------- UTIL ---------- */
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        maximumFractionDigits: 0
+      }).format(value);
+    }
 
-function buildGrid() {
-  caseGrid.innerHTML = "";
-  for(let i=1;i<=15;i++){
-    if(i===mainCase) continue;
-    caseGrid.appendChild(createCase(i));
-  }
-}
+    function logEvent(text) {
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      entry.textContent = text;
+      gameLog.appendChild(entry);
+      gameLog.scrollTop = gameLog.scrollHeight;
+    }
 
-/* ---------- MAIN CASE ---------- */
-function setMainCase(i) {
-  mainCase = i;
-  mainCaseSlot.innerHTML = "";
-  const c = createCase(i);
-  c.classList.add("disabled");
-  mainCaseSlot.appendChild(c);
-  mainCaseNumberDisplay.textContent = "#" + i;
-}
+    function getStoredAmounts() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_AMOUNTS);
+        if (!raw) return null;
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length === 15) return arr.map(Number);
+      } catch (e) {
+        console.warn("Failed to read stored amounts:", e);
+      }
+      return null;
+    }
 
-/* ---------- GAME LOGIC ---------- */
-function revealCase(i, el) {
-  if(opened.has(i) || i===mainCase) return;
-  opened.add(i);
+    function storeAmounts(arr) {
+      try {
+        localStorage.setItem(STORAGE_KEY_AMOUNTS, JSON.stringify(arr));
+      } catch (e) {
+        console.warn("Failed to store amounts:", e);
+      }
+    }
 
-  const amount = caseMap[i];
-  markValue(amount);
+    function getStoredPlayerName() {
+      try {
+        const v = localStorage.getItem(STORAGE_KEY_PLAYER);
+        if (v && typeof v === "string") return v;
+      } catch (e) {
+        console.warn("Failed to read player name:", e);
+      }
+      return "";
+    }
 
-  el.classList.add("revealed");
-  el.querySelector("img").src = "suitcase-open.png";
+    function storePlayerName(name) {
+      try {
+        localStorage.setItem(STORAGE_KEY_PLAYER, name);
+      } catch (e) {
+        console.warn("Failed to store player name:", e);
+      }
+    }
 
-  log("Opened case #" + i + ": " + formatPHP(amount));
+    /* ---------- VALUES PANEL ---------- */
+    function buildValuesPanel() {
+      valuesPanel.innerHTML = "";
+      const sorted = [...amounts].sort((a, b) => a - b);
+      sorted.forEach((amt) => {
+        const item = document.createElement("div");
+        item.className = "value-item";
+        item.dataset.amount = amt;
+        item.textContent = formatCurrency(amt);
+        valuesPanel.appendChild(item);
+      });
+    }
 
-  openedThisRound++;
-  const need = ROUND_SCHEDULE[round];
-  if(openedThisRound >= need) {
-    statusChip.textContent = "Call the banker";
-  }
-}
+    function markValueOpened(amount) {
+      valuesPanel.querySelectorAll(".value-item").forEach((item) => {
+        if (!item.classList.contains("opened") && Number(item.dataset.amount) === amount) {
+          item.classList.add("opened");
+        }
+      });
+    }
 
-function onCaseClick(i, el) {
-  if(mainCase===null) {
-    setMainCase(i);
-    buildGrid();
-    statusChip.textContent = "Open " + ROUND_SCHEDULE[0] + " cases";
-    return;
-  }
+    /* ---------- CASE GRID ---------- */
+    function createCaseElement(index) {
+      const div = document.createElement("div");
+      div.className = "case";
+      div.dataset.index = index;
 
-  const need = ROUND_SCHEDULE[round];
-  if(openedThisRound >= need) {
-    statusChip.textContent = "Call the banker";
-    return;
-  }
+      const img = document.createElement("img");
+      img.src = "suitcase.png";
+      img.alt = "Case " + index;
 
-  revealCase(i, el);
-}
+      const label = document.createElement("div");
+      label.className = "case-number";
+      label.textContent = index;
 
-/* ---------- BANKER ---------- */
-document.getElementById("callBankerBtn").addEventListener("click", ()=>{
-  const remaining = amounts.filter(a=>!opened.has(a));
-  const avg = remaining.reduce((a,b)=>a+b,0)/remaining.length;
-  bankerOfferValue.textContent = formatPHP(Math.round(avg));
-  log("Banker offers: " + formatPHP(Math.round(avg)));
+      div.appendChild(img);
+      div.appendChild(label);
 
-  openedThisRound = 0;
-  if(round < ROUND_SCHEDULE.length-1) round++;
-  statusChip.textContent = "Open " + ROUND_SCHEDULE[round] + " cases";
-});
+      div.addEventListener("click", () => {
+        playClickSound();
+        onCaseClick(index, div);
+      });
 
-document.getElementById("openNextBtn").addEventListener("click", ()=>{
-  const need = ROUND_SCHEDULE[round];
-  const left = need - openedThisRound;
-  statusChip.textContent = "Open " + left + " more";
-});
+      return div;
+    }
 
-/* ---------- RESET ---------- */
-document.getElementById("resetGameBtn").addEventListener("click", initGame);
+    function rebuildCaseGrid() {
+      caseGrid.innerHTML = "";
+      for (let i = 1; i <= 15; i++) {
+        if (i === mainCaseIndex) continue;
+        caseGrid.appendChild(createCaseElement(i));
+      }
+    }
 
-/* ---------- INIT GAME ---------- */
-function initGame() {
-  opened.clear();
-  mainCase = null;
-  round = 0;
-  openedThisRound = 0;
+    /* ---------- MAIN CASE ---------- */
+    function setMainCase(index) {
+      mainCaseIndex = index;
+      mainCaseSlot.innerHTML = "";
+      const mainCaseEl = createCaseElement(index);
+      mainCaseEl.classList.add("disabled");
+      mainCaseSlot.appendChild(mainCaseEl);
+      mainCaseNumberDisplay.textContent = "#" + index;
+    }
 
-  shuffled = [...amounts].sort(()=>Math.random()-0.5);
-  caseMap = {};
-  for(let i=0;i<15;i++) caseMap[i+1] = shuffled[i];
+    /* ---------- GAME FLOW ---------- */
+    function revealCase(index, caseEl) {
+      if (openedCases.has(index) || index === mainCaseIndex) return;
 
-  mainCaseSlot.innerHTML = '<div class="main-case-placeholder">No case selected</div>';
-  mainCaseNumberDisplay.textContent = "#—";
+      openedCases.add(index);
+      openedThisRound++;
 
-  </body>
-    </html>
+      const amount = caseAmountMap[index];
+      markValueOpened(amount);
+
+      caseEl.classList.add("revealed");
+      const img = caseEl.querySelector("img");
+      if (img) img.src = "suitcase-open.png";
+
+      playCaseOpenSound();
+      logEvent("Case #" + index + " opened: " + formatCurrency(amount));
+
+      const toOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
+      if (openedThisRound >= toOpenThisRound) {
+        statusChip.textContent = "Round complete. Call the banker.";
+        openNextBtn.disabled = true;
+        callBankerBtn.disabled = false;
+      }
+    }
+
+    function onCaseClick(index, caseEl) {
+      if (gamePhase === "selection") {
+        setMainCase(index);
+        rebuildCaseGrid();
+        gamePhase = "game";
+        currentRoundIndex = 0;
+        openedThisRound = 0;
+        statusChip.textContent = "Open " + ROUND_SCHEDULE[0] + " cases.";
+        openNextBtn.disabled = false;
+        callBankerBtn.disabled = true;
+        logEvent("You selected case #" + index + " as your personal case.");
+        return;
+      }
+
+      if (gamePhase !== "game") return;
+
+      const toOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
+      if (openedThisRound >= toOpenThisRound) {
+        statusChip.textContent = "You’ve opened enough cases this round. Call the banker.";
+        openNextBtn.disabled = true;
+        callBankerBtn.disabled = false;
+        return;
+      }
+
+      revealCase(index, caseEl);
+    }
+
+    function handleOpenNextClick() {
+      if (gamePhase !== "game") return;
+      const toOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
+      const remaining = Math.max(toOpenThisRound - openedThisRound, 0);
+      statusChip.textContent = "Tap a case to open (" + remaining + " left this round).";
+    }
+
+    /* ---------- MANUAL BANKER FLOW ---------- */
+    let bankerTimeout = null;
+
+    function showBankerOverlay() {
+      playBankerCallSound();
+      bankerOverlay.classList.add("visible");
+      bankerOfferForm.classList.remove("visible");
+      bankerOfferInput.value = "";
+      bankerOverlayTitle.textContent = "Banker is calling...";
+      bankerOverlaySub.textContent = "Please wait while the banker considers the current board.";
+
+      if (bankerTimeout) clearTimeout(bankerTimeout);
+      bankerTimeout = setTimeout(() => {
+        bankerOfferForm.classList.add("visible");
+        bankerOverlayTitle.textContent = "Enter the banker’s offer";
+        bankerOverlaySub.textContent =
+          "Type the offer amount (hidden) and click Reveal Offer to show it to the player.";
+        bankerOfferInput.focus();
+      }, 1500);
+    }
+
+    function hideBankerOverlay() {
+      bankerOverlay.classList.remove("visible");
+      bankerOfferForm.classList.remove("visible");
+      if (bankerTimeout) {
+        clearTimeout(bankerTimeout);
+        bankerTimeout = null;
+      }
+    }
+
+    function handleCallBankerClick() {
+      if (gamePhase !== "game") return;
+      const toOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
+      if (openedThisRound < toOpenThisRound) {
+        statusChip.textContent = "You still need to open " + (toOpenThisRound - openedThisRound) + " case(s) first.";
+        return;
+      }
+      showBankerOverlay();
+    }
+
+    function handleBankerReveal(e) {
+      e.preventDefault();
+      const raw = bankerOfferInput.value.trim();
+      const num = Number(raw.replace(/[^\d]/g, ""));
+      if (!raw || !Number.isFinite(num) || num < 0) {
+        alert("Please enter a valid numeric offer.");
+        return;
+      }
+      const offer = num;
+
+      playOfferRevealSound();
+      bankerOfferValue.textContent = formatCurrency(offer);
+      logEvent("Banker offer: " + formatCurrency(offer));
+      hideBankerOverlay();
+
+      if (currentRoundIndex < ROUND_SCHEDULE.length - 1) {
+        currentRoundIndex++;
+        openedThisRound = 0;
+        statusChip.textContent =
+          "Offer revealed. If NO DEAL, open " + ROUND_SCHEDULE[currentRoundIndex] + " more cases.";
+        openNextBtn.disabled = false;
+        callBankerBtn.disabled = true;
+      } else {
+        statusChip.textContent = "Late game. Keep opening or accept a future offer.";
+        openNextBtn.disabled = false;
+        callBankerBtn.disabled = false;
+      }
+    }
+
+    function handleBankerCancel() {
+      hideBankerOverlay();
+      statusChip.textContent = "Banker call cancelled. Continue opening cases.";
+    }
+
+    /* ---------- SETTINGS ---------- */
+    function buildSettingsFields() {
+      settingsAmountsRow.innerHTML = "";
+      for (let i = 1; i <= 15; i++) {
+        const field = document.createElement("div");
+        field.className = "settings-field";
+        const label = document.createElement("label");
+        label.textContent = "Case " + i;
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.step = "1";
+        input.id = "settingsAmount" + i;
+        field.appendChild(label);
+        field.appendChild(input);
+        settingsAmountsRow.appendChild(field);
+      }
+    }
+
+    function openSettings() {
+      settingsOverlay.classList.add("visible");
+      settingsStatus.textContent = "";
+      settingsStatus.className = "settings-status";
+
+      settingsPlayerNameInput.value = playerName;
+
+      settingsAmountsRow.querySelectorAll("input").forEach((input, idx) => {
+        input.value = amounts[idx];
+      });
+    }
+
+    function closeSettings() {
+      settingsOverlay.classList.remove("visible");
+    }
+
+    function getAmountsFromSettings() {
+      const vals = [];
+      for (let i = 1; i <= 15; i++) {
+        const input = document.getElementById("settingsAmount" + i);
+        const value = Number(input.value);
+        if (Number.isNaN(value) || value < 0) {
+          throw new Error("Invalid amount in case " + i);
+        }
+        vals.push(value);
+      }
+      return vals;
+    }
+
+    function handleSettingsSave() {
+      try {
+        const updatedName = settingsPlayerNameInput.value.trim();
+        const updatedAmounts = getAmountsFromSettings();
+
+        playerName = updatedName; // can be blank
+        storePlayerName(playerName);
+        storeAmounts(updatedAmounts);
+
+        amounts = updatedAmounts.slice();
+        playerNameTag.textContent = "Player: " + (playerName || "");
+        settingsStatus.textContent = "Saved. New amounts will be used on next game reset.";
+        settingsStatus.className = "settings-status ok";
+      } catch (err) {
+        settingsStatus.textContent = "Save failed: " + err.message;
+        settingsStatus.className = "settings-status error";
+      }
+    }
+
+    function handleSettingsReset() {
+      settingsPlayerNameInput.value = playerName || "";
+      settingsAmountsRow.querySelectorAll("input").forEach((input, idx) => {
+        input.value = DEFAULT_AMOUNTS[idx];
+      });
+      settingsStatus.textContent = "Defaults restored in form. Click Save to apply.";
+      settingsStatus.className = "settings-status ok";
+    }
+
+    /* ---------- RESET / INIT ---------- */
+    function initPlayerName() {
+      playerName = getStoredPlayerName();
+      playerNameTag.textContent = "Player: " + (playerName || "");
+    }
+
+    function initGameState() {
+      const storedAmounts = getStoredAmounts();
+      amounts = storedAmounts || DEFAULT_AMOUNTS.slice();
+      shuffledAmounts = [...amounts].sort(() => Math.random() - 0.5);
+
+      caseAmountMap = {};
+      for (let i = 0; i < 15; i++) {
+        caseAmountMap[i + 1] = shuffledAmounts[i];
+      }
+
+      openedCases = new Set();
+      mainCaseIndex = null;
+      currentRoundIndex = 0;
+      openedThisRound = 0;
+      gamePhase = "selection";
+      bankerOfferValue.textContent = "Waiting...";
+      gameLog.innerHTML = "";
+      mainCaseSlot.innerHTML = '<div class="main-case-placeholder">No case selected</div>';
+      mainCaseNumberDisplay.textContent = "#—";
+      statusChip.textContent = "Choose your case";
+      openNextBtn.disabled = true;
+      callBankerBtn.disabled = true;
+
+      caseGrid.innerHTML = "";
+      for (let i = 1; i <= 15; i++) {
+        caseGrid.appendChild(createCaseElement(i));
+      }
+
+      buildValuesPanel();
+      logEvent("New game started. Choose your case.");
+    }
+
+    function handleResetClick() {
+      playClickSound();
+      initGameState();
+    }
+
+    /* ---------- BUTTON SOUND WIRING ---------- */
+    [openNextBtn, callBankerBtn, resetGameBtn,
+     openSettingsBtn, settingsCloseBtn,
+     settingsSaveBtn, settingsResetBtn,
+     bankerCancelBtn].forEach((btn) => {
+      if (!btn) return;
+      btn.addEventListener("click", () => {
+        playClickSound();
+      }, { capture: true });
+    });
+
+    /* ---------- EVENT LISTENERS ---------- */
+    openNextBtn.addEventListener("click", handleOpenNextClick);
+    callBankerBtn.addEventListener("click", handleCallBankerClick);
+    resetGameBtn.addEventListener("click", handleResetClick);
+
+    openSettingsBtn.addEventListener("click", openSettings);
+    settingsCloseBtn.addEventListener("click", closeSettings);
+    settingsSaveBtn.addEventListener("click", handleSettingsSave);
+    settingsResetBtn.addEventListener("click", handleSettingsReset);
+
+    bankerOfferForm.addEventListener("submit", handleBankerReveal);
+    bankerCancelBtn.addEventListener("click", handleBankerCancel);
+
+    /* ---------- INITIALIZE ---------- */
+    buildSettingsFields();
+    initPlayerName();
+    initGameState();
+  </script>
+</body>
+</html>
