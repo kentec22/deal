@@ -335,3 +335,213 @@
     </div>
   </div>
 </div>
+
+  <script>
+/* ---------- SAFE AUTOPLAY MUSIC ---------- */
+const bgMusic = new Audio("2/1-intro.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.6;
+
+window.addEventListener("load", () => {
+  bgMusic.play().catch(() => {
+    const resume = () => {
+      bgMusic.play().catch(()=>{});
+      window.removeEventListener("click", resume);
+      window.removeEventListener("keydown", resume);
+      window.removeEventListener("touchstart", resume);
+    };
+    window.addEventListener("click", resume);
+    window.addEventListener("keydown", resume);
+    window.addEventListener("touchstart", resume);
+  });
+});
+
+/* ---------- STAGE SCALING ---------- */
+const stageWrapper = document.getElementById("stageWrapper");
+function updateScale() {
+  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  stageWrapper.style.transform = "scale(" + scale + ")";
+}
+window.addEventListener("resize", updateScale);
+updateScale();
+
+/* ---------- GAME STATE ---------- */
+const DEFAULT_AMOUNTS = [
+  0,10,100,250,500,750,1000,1500,2000,2500,3000,4000,5000,7000,10000
+];
+
+let amounts = DEFAULT_AMOUNTS.slice();
+let shuffled = [];
+let caseMap = {};
+let opened = new Set();
+let mainCase = null;
+let round = 0;
+let openedThisRound = 0;
+const ROUND_SCHEDULE = [5,4,3,2,1];
+
+const caseGrid = document.getElementById("caseGrid");
+const valuesPanel = document.getElementById("valuesPanel");
+const mainCaseSlot = document.getElementById("mainCaseSlot");
+const mainCaseNumberDisplay = document.getElementById("mainCaseNumberDisplay");
+const bankerOfferValue = document.getElementById("bankerOfferValue");
+const gameLog = document.getElementById("gameLog");
+const statusChip = document.getElementById("statusChip");
+
+/* ---------- NAME PROMPT ---------- */
+const namePromptOverlay = document.getElementById("namePromptOverlay");
+const playerNameInput = document.getElementById("playerNameInput");
+const startGameBtn = document.getElementById("startGameBtn");
+const gameRoot = document.getElementById("gameRoot");
+const playerNameTag = document.getElementById("playerNameTag");
+
+startGameBtn.addEventListener("click", () => {
+  const name = playerNameInput.value.trim();
+  playerNameTag.textContent = "Player: " + name;
+  namePromptOverlay.style.display = "none";
+  gameRoot.style.display = "flex";
+  initGame();
+});
+
+/* ---------- UTIL ---------- */
+function log(msg) {
+  const div = document.createElement("div");
+  div.textContent = msg;
+  gameLog.appendChild(div);
+  gameLog.scrollTop = gameLog.scrollHeight;
+}
+
+function formatPHP(n) {
+  return "₱" + n.toLocaleString("en-PH");
+}
+
+/* ---------- BUILD VALUES PANEL ---------- */
+function buildValues() {
+  valuesPanel.innerHTML = "";
+  const sorted = [...amounts].sort((a,b)=>a-b);
+  sorted.forEach(v=>{
+    const item = document.createElement("div");
+    item.className = "value-item";
+    item.dataset.amount = v;
+    item.textContent = formatPHP(v);
+    valuesPanel.appendChild(item);
+  });
+}
+
+function markValue(v) {
+  valuesPanel.querySelectorAll(".value-item").forEach(el=>{
+    if(Number(el.dataset.amount)===v) el.classList.add("opened");
+  });
+}
+
+/* ---------- CASE GRID ---------- */
+function createCase(i) {
+  const div = document.createElement("div");
+  div.className = "case";
+  div.dataset.index = i;
+
+  const img = document.createElement("img");
+  img.src = "suitcase.png";
+
+  const num = document.createElement("div");
+  num.className = "case-number";
+  num.textContent = i;
+
+  div.appendChild(img);
+  div.appendChild(num);
+
+  div.addEventListener("click", ()=>onCaseClick(i,div));
+  return div;
+}
+
+function buildGrid() {
+  caseGrid.innerHTML = "";
+  for(let i=1;i<=15;i++){
+    if(i===mainCase) continue;
+    caseGrid.appendChild(createCase(i));
+  }
+}
+
+/* ---------- MAIN CASE ---------- */
+function setMainCase(i) {
+  mainCase = i;
+  mainCaseSlot.innerHTML = "";
+  const c = createCase(i);
+  c.classList.add("disabled");
+  mainCaseSlot.appendChild(c);
+  mainCaseNumberDisplay.textContent = "#" + i;
+}
+
+/* ---------- GAME LOGIC ---------- */
+function revealCase(i, el) {
+  if(opened.has(i) || i===mainCase) return;
+  opened.add(i);
+
+  const amount = caseMap[i];
+  markValue(amount);
+
+  el.classList.add("revealed");
+  el.querySelector("img").src = "suitcase-open.png";
+
+  log("Opened case #" + i + ": " + formatPHP(amount));
+
+  openedThisRound++;
+  const need = ROUND_SCHEDULE[round];
+  if(openedThisRound >= need) {
+    statusChip.textContent = "Call the banker";
+  }
+}
+
+function onCaseClick(i, el) {
+  if(mainCase===null) {
+    setMainCase(i);
+    buildGrid();
+    statusChip.textContent = "Open " + ROUND_SCHEDULE[0] + " cases";
+    return;
+  }
+
+  const need = ROUND_SCHEDULE[round];
+  if(openedThisRound >= need) {
+    statusChip.textContent = "Call the banker";
+    return;
+  }
+
+  revealCase(i, el);
+}
+
+/* ---------- BANKER ---------- */
+document.getElementById("callBankerBtn").addEventListener("click", ()=>{
+  const remaining = amounts.filter(a=>!opened.has(a));
+  const avg = remaining.reduce((a,b)=>a+b,0)/remaining.length;
+  bankerOfferValue.textContent = formatPHP(Math.round(avg));
+  log("Banker offers: " + formatPHP(Math.round(avg)));
+
+  openedThisRound = 0;
+  if(round < ROUND_SCHEDULE.length-1) round++;
+  statusChip.textContent = "Open " + ROUND_SCHEDULE[round] + " cases";
+});
+
+document.getElementById("openNextBtn").addEventListener("click", ()=>{
+  const need = ROUND_SCHEDULE[round];
+  const left = need - openedThisRound;
+  statusChip.textContent = "Open " + left + " more";
+});
+
+/* ---------- RESET ---------- */
+document.getElementById("resetGameBtn").addEventListener("click", initGame);
+
+/* ---------- INIT GAME ---------- */
+function initGame() {
+  opened.clear();
+  mainCase = null;
+  round = 0;
+  openedThisRound = 0;
+
+  shuffled = [...amounts].sort(()=>Math.random()-0.5);
+  caseMap = {};
+  for(let i=0;i<15;i++) caseMap[i+1] = shuffled[i];
+
+  mainCaseSlot.innerHTML = '<div class="main-case-placeholder">No case selected</div>';
+  mainCaseNumberDisplay.textContent = "#—";
+
+  </body>
+    </html>
