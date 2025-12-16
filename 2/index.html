@@ -1,3 +1,6 @@
+**Regenerating HTML**
+
+Okay, I need to regenerate the full `index.html` with some fixes. First, I’ll adjust the audio path to "2/1-intro.mp3" and make it relative. I’ll also ensure a safe autoplay wrapper. The bankerOfferInput should not be type=password, so I’ll make it normal text with numeric inputmode. I’ll add `autocomplete="off"` to address the warning, though it's not really necessary. I’ll check for no obvious JS errors as they seem fine, but the audio path is a key concern. I'll just output the code, no extra commentary.
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -717,7 +720,7 @@
       color: #e57373;
     }
 
-    /* ---------- BANKER OFFER OVERLAY (MANUAL, PASSWORD INPUT) ---------- */
+    /* ---------- BANKER OFFER OVERLAY (MANUAL, HIDDEN INPUT) ---------- */
 
     .banker-overlay {
       position: absolute;
@@ -884,13 +887,14 @@
           Please wait while the banker thinks about your board.
         </div>
 
-        <form class="banker-offer-form" id="bankerOfferForm">
+        <form class="banker-offer-form" id="bankerOfferForm" autocomplete="off">
           <input
-            type="password"
+            type="text"
             id="bankerOfferInput"
             class="banker-input"
             placeholder="Enter banker’s offer"
             inputmode="numeric"
+            autocomplete="off"
           />
           <div class="banker-actions">
             <button type="submit" class="btn btn-primary" id="bankerRevealBtn">Reveal Offer</button>
@@ -973,14 +977,14 @@
   </div>
 
   <script>
-    // ---------- BACKGROUND MUSIC (AUTOPLAY) ----------
-    const bgMusic = new Audio("/2/1-intro.mp3");
+    // ---------- BACKGROUND MUSIC (SAFE AUTOPLAY) ----------
+    const bgMusic = new Audio("2/1-intro.mp3");
     bgMusic.loop = true;
     bgMusic.volume = 0.6;
 
     window.addEventListener("load", () => {
       bgMusic.play().catch(() => {
-        console.log("Autoplay was blocked; music will start on first user interaction.");
+        console.log("Autoplay blocked; will retry on first user interaction.");
         const resumeOnInteraction = () => {
           bgMusic.play().catch(() => {});
           window.removeEventListener("click", resumeOnInteraction);
@@ -1320,7 +1324,6 @@
       bankerOverlay.classList.add("visible");
       bankerOfferForm.classList.remove("visible");
       bankerOfferInput.value = "";
-      bankerOfferInput.type = "password";
       bankerCallingText.textContent = "Banker is calling...";
       bankerSubText.textContent = "Please wait while the banker thinks about your board.";
 
@@ -1329,7 +1332,7 @@
         bankerOfferForm.classList.add("visible");
         bankerCallingText.textContent = "Enter the banker’s offer";
         bankerSubText.textContent =
-          "Type the offer amount (hidden) and click Reveal Offer to show it to the player.";
+          "Type the offer amount (hidden to audience) and click Reveal Offer.";
         bankerOfferInput.focus();
       }, 1500);
     }
