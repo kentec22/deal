@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <title>Deal or No Deal - 15 Case PH Edition</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     :root {
       --stage-width: 1920;
       --stage-height: 1080;
-      --case-size: 150px; /* logical size inside 1920x1080 stage */
+      --case-size: 150px;
       --case-border-radius: 12px;
       --primary-gold: #ffcc00;
       --primary-gold-soft: rgba(255, 204, 0, 0.4);
@@ -17,233 +18,90 @@
       --text-main: #f5f5f5;
       --text-muted: #aaaaaa;
       --bg-gradient: radial-gradient(circle at top, #222 0%, #050505 55%, #000 100%);
-      --danger: #ff5252;
-      --success: #4caf50;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #000;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text-main);
+      font-family: system-ui, sans-serif;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    /* ---------- STAGE SCALING WRAPPER ---------- */
-
-    .viewport {
-      position: relative;
-      width: 100vw;
       height: 100vh;
-      overflow: hidden;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .stage-wrapper {
-      position: relative;
-      width: var(--stage-width)px;
-      height: var(--stage-height)px;
-      transform-origin: center center;
-      background: var(--bg-gradient);
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
-      overflow: hidden;
-    }
+    /* ---------- FULLSCREEN NAME PROMPT ---------- */
 
-    /* ---------- CINEMATIC SPLASH SCREEN ---------- */
-
-    .splash-overlay {
-      position: absolute;
+    #namePromptOverlay {
+      position: fixed;
       inset: 0;
-      background: radial-gradient(circle at top, #111 0%, #000 60%, #000 100%);
+      background: #000;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 50;
-      opacity: 1;
-      pointer-events: auto;
-      transition: opacity 0.6s ease;
-    }
-
-    .splash-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .splash-spotlight {
-      position: absolute;
-      width: 160%;
-      height: 160%;
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.18) 0%, transparent 60%);
-      mix-blend-mode: screen;
-      opacity: 0.18;
-      transform: translateY(-20%);
-      animation: sweep 6s infinite linear;
-      pointer-events: none;
-    }
-
-    @keyframes sweep {
-      0% { transform: translate(-30%, -30%) rotate(0deg); }
-      50% { transform: translate(30%, -40%) rotate(20deg); }
-      100% { transform: translate(-30%, -30%) rotate(0deg); }
-    }
-
-    .splash-content {
-      position: relative;
+      z-index: 9999;
       text-align: center;
-      z-index: 2;
       padding: 20px;
     }
 
-    .splash-title {
-      font-size: 64px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--primary-gold);
-      text-shadow: 0 0 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 204, 0, 0.7);
-      margin-bottom: 16px;
-      animation: titleIn 1s ease forwards;
-      opacity: 0;
-      transform: translateY(20px) scale(0.95);
+    #namePromptOverlay h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
     }
 
-    @keyframes titleIn {
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .splash-subtitle {
-      font-size: 20px;
-      color: var(--text-muted);
-      margin-bottom: 30px;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease forwards;
-      animation-delay: 0.5s;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .splash-form {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease forwards;
-      animation-delay: 0.9s;
-    }
-
-    .splash-input {
-      min-width: 260px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      background: rgba(0, 0, 0, 0.7);
-      color: var(--text-main);
-      font-size: 16px;
-      outline: none;
+    #playerNameInput {
+      padding: 12px 16px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #111;
+      color: #fff;
+      width: 260px;
       text-align: center;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      margin-bottom: 20px;
     }
 
-    .splash-input:focus {
-      border-color: var(--primary-gold);
-      box-shadow: 0 0 24px rgba(255, 204, 0, 0.6);
-    }
-
-    .splash-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .btn {
-      border-radius: 999px;
+    #startGameBtn {
+      padding: 12px 24px;
+      font-size: 18px;
       border: none;
+      border-radius: 8px;
+      background: #1e88e5;
+      color: #fff;
       cursor: pointer;
-      padding: 10px 22px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
     }
 
-    .btn:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: none;
+    #startGameBtn:hover {
+      background: #1565c0;
     }
 
-    .btn-primary {
-      background: linear-gradient(to bottom, #1e88e5, #0d47a1);
-      color: #fff;
-      box-shadow: 0 6px 16px rgba(30, 136, 229, 0.8);
+    /* ---------- GAME VIEWPORT ---------- */
+
+    .viewport {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
-    .btn-secondary {
-      background: linear-gradient(to bottom, #424242, #111);
-      color: var(--text-main);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+    .stage-wrapper {
+      width: var(--stage-width)px;
+      height: var(--stage-height)px;
+      background: var(--bg-gradient);
+      transform-origin: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
     }
 
-    .btn-danger {
-      background: linear-gradient(to bottom, #ef5350, #b71c1c);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(239, 83, 80, 0.8);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: none;
-    }
-
-    .btn-small {
-      padding: 6px 14px;
-      font-size: 12px;
-    }
-
-    .splash-hint {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--text-muted);
-      opacity: 0;
-      animation: fadeInUp 0.8s ease forwards;
-      animation-delay: 1.4s;
-    }
-
-    /* ---------- MAIN GAME LAYOUT (INSIDE 1920x1080) ---------- */
+    /* ---------- HEADER ---------- */
 
     .game-root {
       position: absolute;
@@ -251,7 +109,6 @@
       display: flex;
       flex-direction: column;
       padding: 20px 30px;
-      gap: 12px;
     }
 
     .game-header {
@@ -260,1312 +117,430 @@
       align-items: center;
     }
 
-    .title-logo {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
     .title-main {
       font-size: 32px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
       color: var(--primary-gold);
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
-    }
-
-    .title-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 14px;
-      color: var(--text-muted);
+      letter-spacing: 0.2em;
     }
 
     .player-name-tag {
       padding: 6px 12px;
+      background: rgba(0,0,0,0.6);
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
     .status-chip {
       padding: 6px 12px;
+      background: rgba(0,0,0,0.6);
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255,255,255,0.2);
       color: var(--primary-gold);
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: bold;
     }
+
+    .btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #444;
+      color: #fff;
+    }
+
+    /* ---------- CASE GRID ---------- */
 
     .game-body {
       flex: 1;
       display: grid;
       grid-template-columns: 1.5fr 1fr;
       gap: 16px;
-      margin-top: 6px;
+      margin-top: 10px;
     }
-
-    .game-left,
-    .game-right {
-      border-radius: 16px;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
-      padding: 14px;
-    }
-
-    .game-left {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .game-right {
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      gap: 10px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 4px;
-    }
-
-    /* Case grid: 15 cases, 5x3 inside stage */
 
     .case-grid {
-      flex: 1;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      grid-auto-rows: minmax(120px, 1fr);
       gap: 12px;
-      justify-items: center;
-      align-items: center;
     }
 
     .case {
-      position: relative;
       width: var(--case-size);
-      max-width: 180px;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 4/3;
+      background: #333;
       border-radius: var(--case-border-radius);
-      overflow: hidden;
-      background: linear-gradient(to bottom, #555, #111);
-      border: 2px solid rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.85);
+      position: relative;
+      overflow: hidden;
     }
 
     .case img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      pointer-events: none;
     }
 
     .case-number {
       position: absolute;
-      bottom: 8px;
+      bottom: 6px;
       left: 50%;
       transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
       padding: 3px 10px;
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.8);
       color: var(--primary-gold);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
+      font-weight: bold;
     }
 
-    .case.revealed {
-      cursor: default;
-      filter: grayscale(0.9) brightness(0.6);
-      box-shadow: none;
+    .case.revealed img {
+      filter: grayscale(1) brightness(0.5);
     }
 
-    .case.disabled {
-      pointer-events: none;
-      opacity: 0.85;
-    }
-
-    .selection-phase .case:not(.revealed):not(.disabled):hover {
-      transform: translateY(-6px) scale(1.05);
-      box-shadow: 0 0 25px rgba(255, 204, 0, 0.6);
-      filter: brightness(1.15);
-    }
-
-    .non-selection-phase .case:not(.revealed):not(.disabled):hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 0 16px rgba(255, 255, 255, 0.3);
-      filter: brightness(1.08);
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .info-row span {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(0, 0, 0, 0.75);
-    }
-
-    /* Main case (right top) */
+    /* ---------- MAIN CASE PANEL ---------- */
 
     .main-case-panel {
-      background: radial-gradient(circle at top, rgba(255, 204, 0, 0.2), rgba(0, 0, 0, 0.95));
+      background: rgba(0,0,0,0.6);
+      padding: 12px;
       border-radius: 12px;
-      padding: 10px;
-      border: 1px solid rgba(255, 204, 0, 0.4);
+      border: 1px solid rgba(255,255,255,0.1);
       display: flex;
-      align-items: center;
       gap: 12px;
     }
 
     .main-case-slot {
-      flex: 0 0 180px;
+      width: 180px;
       height: 130px;
-      border-radius: var(--case-border-radius);
-      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.8);
       overflow: hidden;
-      position: relative;
-    }
-
-    .main-case-slot .case {
-      width: 100%;
-      height: 100%;
-      max-width: none;
-      box-shadow: none;
-      border: none;
-      cursor: default;
     }
 
     .main-case-placeholder {
-      font-size: 13px;
       color: var(--text-muted);
+      font-size: 13px;
       text-align: center;
-      padding: 0 8px;
     }
 
-    .main-case-info {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .main-case-label {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-muted);
-    }
-
-    .main-case-number-display {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary-gold);
-    }
-
-    .main-case-note {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* Values */
+    /* ---------- VALUES PANEL ---------- */
 
     .values-panel {
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(0, 0, 0, 0.9);
-      padding: 8px 10px 10px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px 8px;
-      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.1);
       max-height: 220px;
       overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 6px;
     }
 
     .value-item {
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.95));
-    }
-
-    .value-item.high {
-      border-color: var(--primary-gold-soft);
-      background: linear-gradient(to right, rgba(255, 204, 0, 0.06), rgba(0, 0, 0, 0.95));
     }
 
     .value-item.opened {
-      opacity: 0.35;
+      opacity: 0.3;
       text-decoration: line-through;
     }
 
-    .value-label {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .value-amount {
-      font-weight: 600;
-    }
-
-    /* Banker panel */
+    /* ---------- BANKER PANEL ---------- */
 
     .banker-panel {
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(8, 8, 8, 0.96);
+      background: rgba(0,0,0,0.7);
       padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-
-    .banker-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      color: var(--text-muted);
+      gap: 8px;
     }
 
     .banker-offer-value {
       font-size: 20px;
-      font-weight: 700;
       color: var(--primary-gold);
-    }
-
-    .banker-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      font-weight: bold;
     }
 
     .game-log {
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--text-muted);
       max-height: 150px;
       overflow-y: auto;
-    }
-
-    .log-entry {
-      margin-bottom: 2px;
-    }
-
-    .log-entry span {
-      color: var(--primary-gold);
-    }
-
-    .game-footer {
-      text-align: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* ---------- SETTINGS PANEL ---------- */
-
-    .settings-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: flex-end;
-      align-items: stretch;
-      z-index: 30;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .settings-overlay.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .settings-panel {
-      width: 420px;
-      max-width: 100%;
-      background: rgba(10, 10, 10, 0.98);
-      border-left: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 16px;
-      box-shadow: -12px 0 30px rgba(0, 0, 0, 0.9);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-    }
-
-    .settings-overlay.visible .settings-panel {
-      transform: translateX(0);
-    }
-
-    .settings-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .settings-title {
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-    }
-
-    .settings-section-title {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-top: 8px;
-      margin-bottom: 4px;
-    }
-
-    .settings-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .settings-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
       font-size: 12px;
       color: var(--text-muted);
     }
-
-    .settings-field label {
-      font-size: 11px;
-    }
-
-    .settings-field input {
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(0, 0, 0, 0.7);
-      color: var(--text-main);
-      font-size: 13px;
-      outline: none;
-      text-align: right;
-    }
-
-    .settings-field input:focus {
-      border-color: var(--primary-gold);
-    }
-
-    .settings-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
-
-    .settings-actions {
-      margin-top: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .settings-status {
-      font-size: 11px;
-      color: var(--text-muted);
-      min-height: 1em;
-      margin-top: 4px;
-    }
-
-    .settings-status.ok {
-      color: #81c784;
-    }
-
-    .settings-status.error {
-      color: #e57373;
-    }
-
-    /* ---------- BANKER OFFER OVERLAY (MANUAL, HIDDEN INPUT) ---------- */
-
-    .banker-overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.98) 60%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 40;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .banker-overlay.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .banker-phone-icon {
-      font-size: 40px;
-      margin-bottom: 12px;
-      animation: pulse 1s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.8; }
-    }
-
-    .banker-calling-text {
-      font-size: 22px;
-      color: var(--primary-gold);
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .banker-subtext {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 18px;
-      text-align: center;
-      max-width: 380px;
-    }
-
-    .banker-offer-form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      opacity: 0;
-      transform: translateY(15px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .banker-offer-form.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .banker-input {
-      min-width: 220px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      background: rgba(0, 0, 0, 0.8);
-      color: var(--text-main);
-      font-size: 16px;
-      outline: none;
-      text-align: center;
-    }
-
-    .banker-input:focus {
-      border-color: var(--primary-gold);
-      box-shadow: 0 0 18px rgba(255, 204, 0, 0.7);
-    }
-
-    .banker-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    /* ---------- SCROLLBARS ---------- */
-
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.6);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 4px;
-    }
-
   </style>
 </head>
+
+<script>
+/* ---------- SAFE AUTOPLAY MUSIC ---------- */
+const bgMusic = new Audio("2/1-intro.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.6;
+
+window.addEventListener("load", () => {
+  bgMusic.play().catch(() => {
+    const resume = () => {
+      bgMusic.play().catch(()=>{});
+      window.removeEventListener("click", resume);
+      window.removeEventListener("keydown", resume);
+      window.removeEventListener("touchstart", resume);
+    };
+    window.addEventListener("click", resume);
+    window.addEventListener("keydown", resume);
+    window.addEventListener("touchstart", resume);
+  });
+});
+
+/* ---------- STAGE SCALING ---------- */
+const stageWrapper = document.getElementById("stageWrapper");
+function updateScale() {
+  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  stageWrapper.style.transform = "scale(" + scale + ")";
+}
+window.addEventListener("resize", updateScale);
+updateScale();
+
+/* ---------- GAME STATE ---------- */
+const DEFAULT_AMOUNTS = [
+  0,10,100,250,500,750,1000,1500,2000,2500,3000,4000,5000,7000,10000
+];
+
+let amounts = DEFAULT_AMOUNTS.slice();
+let shuffled = [];
+let caseMap = {};
+let opened = new Set();
+let mainCase = null;
+let round = 0;
+let openedThisRound = 0;
+const ROUND_SCHEDULE = [5,4,3,2,1];
+
+const caseGrid = document.getElementById("caseGrid");
+const valuesPanel = document.getElementById("valuesPanel");
+const mainCaseSlot = document.getElementById("mainCaseSlot");
+const mainCaseNumberDisplay = document.getElementById("mainCaseNumberDisplay");
+const bankerOfferValue = document.getElementById("bankerOfferValue");
+const gameLog = document.getElementById("gameLog");
+const statusChip = document.getElementById("statusChip");
+
+/* ---------- NAME PROMPT ---------- */
+const namePromptOverlay = document.getElementById("namePromptOverlay");
+const playerNameInput = document.getElementById("playerNameInput");
+const startGameBtn = document.getElementById("startGameBtn");
+const gameRoot = document.getElementById("gameRoot");
+const playerNameTag = document.getElementById("playerNameTag");
+
+startGameBtn.addEventListener("click", () => {
+  const name = playerNameInput.value.trim();
+  playerNameTag.textContent = "Player: " + name;
+  namePromptOverlay.style.display = "none";
+  gameRoot.style.display = "flex";
+  initGame();
+});
+
+/* ---------- UTIL ---------- */
+function log(msg) {
+  const div = document.createElement("div");
+  div.textContent = msg;
+  gameLog.appendChild(div);
+  gameLog.scrollTop = gameLog.scrollHeight;
+}
+
+function formatPHP(n) {
+  return "₱" + n.toLocaleString("en-PH");
+}
+
+/* ---------- BUILD VALUES PANEL ---------- */
+function buildValues() {
+  valuesPanel.innerHTML = "";
+  const sorted = [...amounts].sort((a,b)=>a-b);
+  sorted.forEach(v=>{
+    const item = document.createElement("div");
+    item.className = "value-item";
+    item.dataset.amount = v;
+    item.textContent = formatPHP(v);
+    valuesPanel.appendChild(item);
+  });
+}
+
+function markValue(v) {
+  valuesPanel.querySelectorAll(".value-item").forEach(el=>{
+    if(Number(el.dataset.amount)===v) el.classList.add("opened");
+  });
+}
+
+/* ---------- CASE GRID ---------- */
+function createCase(i) {
+  const div = document.createElement("div");
+  div.className = "case";
+  div.dataset.index = i;
+
+  const img = document.createElement("img");
+  img.src = "suitcase.png";
+
+  const num = document.createElement("div");
+  num.className = "case-number";
+  num.textContent = i;
+
+  div.appendChild(img);
+  div.appendChild(num);
+
+  div.addEventListener("click", ()=>onCaseClick(i,div));
+  return div;
+}
+
+function buildGrid() {
+  caseGrid.innerHTML = "";
+  for(let i=1;i<=15;i++){
+    if(i===mainCase) continue;
+    caseGrid.appendChild(createCase(i));
+  }
+}
+
+/* ---------- MAIN CASE ---------- */
+function setMainCase(i) {
+  mainCase = i;
+  mainCaseSlot.innerHTML = "";
+  const c = createCase(i);
+  c.classList.add("disabled");
+  mainCaseSlot.appendChild(c);
+  mainCaseNumberDisplay.textContent = "#" + i;
+}
+
+/* ---------- GAME LOGIC ---------- */
+function revealCase(i, el) {
+  if(opened.has(i) || i===mainCase) return;
+  opened.add(i);
+
+  const amount = caseMap[i];
+  markValue(amount);
+
+  el.classList.add("revealed");
+  el.querySelector("img").src = "suitcase-open.png";
+
+  log("Opened case #" + i + ": " + formatPHP(amount));
+
+  openedThisRound++;
+  const need = ROUND_SCHEDULE[round];
+  if(openedThisRound >= need) {
+    statusChip.textContent = "Call the banker";
+  }
+}
+
+function onCaseClick(i, el) {
+  if(mainCase===null) {
+    setMainCase(i);
+    buildGrid();
+    statusChip.textContent = "Open " + ROUND_SCHEDULE[0] + " cases";
+    return;
+  }
+
+  const need = ROUND_SCHEDULE[round];
+  if(openedThisRound >= need) {
+    statusChip.textContent = "Call the banker";
+    return;
+  }
+
+  revealCase(i, el);
+}
+
+/* ---------- BANKER ---------- */
+document.getElementById("callBankerBtn").addEventListener("click", ()=>{
+  const remaining = amounts.filter(a=>!opened.has(a));
+  const avg = remaining.reduce((a,b)=>a+b,0)/remaining.length;
+  bankerOfferValue.textContent = formatPHP(Math.round(avg));
+  log("Banker offers: " + formatPHP(Math.round(avg)));
+
+  openedThisRound = 0;
+  if(round < ROUND_SCHEDULE.length-1) round++;
+  statusChip.textContent = "Open " + ROUND_SCHEDULE[round] + " cases";
+});
+
+document.getElementById("openNextBtn").addEventListener("click", ()=>{
+  const need = ROUND_SCHEDULE[round];
+  const left = need - openedThisRound;
+  statusChip.textContent = "Open " + left + " more";
+});
+
+/* ---------- RESET ---------- */
+document.getElementById("resetGameBtn").addEventListener("click", initGame);
+
+/* ---------- INIT GAME ---------- */
+function initGame() {
+  opened.clear();
+  mainCase = null;
+  round = 0;
+  openedThisRound = 0;
+
+  shuffled = [...amounts].sort(()=>Math.random()-0.5);
+  caseMap = {};
+  for(let i=0;i<15;i++) caseMap[i+1] = shuffled[i];
+
+  mainCaseSlot.innerHTML = '<div class="main-case-placeholder">No case selected</div>';
+  mainCaseNumberDisplay.textContent = "#—";
+ 
+  
 <body>
-  <div class="viewport">
-    <div class="stage-wrapper" id="stageWrapper">
-      <!-- Cinematic Splash -->
-      <div class="splash-overlay" id="splashOverlay">
-        <div class="splash-spotlight"></div>
-        <div class="splash-content">
-          <div class="splash-title">DEAL OR NO DEAL</div>
-          <div class="splash-subtitle">15-Case 7th DCNC Edition • Choose wisely.</div>
 
-          <div class="splash-form">
-            <input
-              type="text"
-              id="splashPlayerName"
-              class="splash-input"
-              placeholder="Enter your name"
-              autocomplete="off"
-            />
-            <div class="splash-buttons">
-              <button class="btn btn-primary" id="splashStartBtn">Start Game</button>
-              <button class="btn btn-secondary" id="splashSettingsBtn">Settings</button>
-            </div>
-          </div>
-          <div class="splash-hint">Tip: You can customize suitcase amounts in Settings.</div>
+<!-- ✅ FULLSCREEN NAME PROMPT -->
+<div id="namePromptOverlay">
+  <h1>Enter your name</h1>
+  <input id="playerNameInput" type="text" placeholder="Leave blank if none" />
+  <button id="startGameBtn">Start</button>
+</div>
+
+<div class="viewport">
+  <div class="stage-wrapper" id="stageWrapper">
+
+    <div class="game-root" id="gameRoot" style="display:none;">
+      <header class="game-header">
+        <div class="title-main">DEAL OR NO DEAL</div>
+        <div class="header-right">
+          <span class="player-name-tag" id="playerNameTag">Player:</span>
+          <span class="status-chip" id="statusChip">Choose Your Case</span>
+          <button class="btn" id="openSettingsBtn">Settings</button>
         </div>
-      </div>
+      </header>
 
-      <!-- Settings Panel -->
-      <div class="settings-overlay" id="settingsOverlay">
-        <div class="settings-panel">
-          <div class="settings-header">
-            <div class="settings-title">Settings</div>
-            <button class="btn btn-ghost btn-small" id="settingsCloseBtn">Close</button>
-          </div>
+      <main class="game-body">
+        <section>
+          <div class="case-grid" id="caseGrid"></div>
+        </section>
 
-          <div class="settings-section-title">Player</div>
-          <div class="settings-group">
-            <div class="settings-field">
-              <label for="settingsPlayerName">Player name</label>
-              <input type="text" id="settingsPlayerName" />
+        <section>
+          <div class="main-case-panel">
+            <div class="main-case-slot" id="mainCaseSlot">
+              <div class="main-case-placeholder">No case selected</div>
             </div>
-          </div>
-
-          <div class="settings-section-title">Suitcase amounts (₱)</div>
-          <div class="settings-group">
-            <div class="settings-row" id="settingsAmountsRow">
-              <!-- 15 fields injected by JS -->
-            </div>
-          </div>
-
-          <div class="settings-actions">
-            <button class="btn btn-secondary btn-small" id="settingsResetBtn">Reset defaults</button>
-            <button class="btn btn-primary btn-small" id="settingsSaveBtn">Save</button>
-          </div>
-          <div class="settings-status" id="settingsStatus"></div>
-        </div>
-      </div>
-
-      <!-- Banker Offer Overlay -->
-      <div class="banker-overlay" id="bankerOverlay">
-        <div class="banker-phone-icon">📞</div>
-        <div class="banker-calling-text" id="bankerCallingText">Banker is calling...</div>
-        <div class="banker-subtext" id="bankerSubText">
-          Please wait while the banker thinks about your board.
-        </div>
-
-        <form class="banker-offer-form" id="bankerOfferForm" autocomplete="off">
-          <input
-            type="text"
-            id="bankerOfferInput"
-            class="banker-input"
-            placeholder="Enter banker’s offer"
-            inputmode="numeric"
-            autocomplete="off"
-          />
-          <div class="banker-actions">
-            <button type="submit" class="btn btn-primary" id="bankerRevealBtn">Reveal Offer</button>
-            <button type="button" class="btn btn-ghost" id="bankerCancelBtn">Cancel</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Main Game Root -->
-      <div class="game-root" id="gameRoot">
-        <header class="game-header">
-          <div class="title-logo">
-            <div class="title-main">DEAL OR NO DEAL</div>
-            <div class="title-sub">15-Case Philippine Edition</div>
-          </div>
-          <div class="header-right">
-            <div class="player-name-tag" id="playerNameTag">Player: —</div>
-            <div class="status-chip" id="statusChip">Choose Your Case</div>
-            <button class="btn btn-ghost btn-small" id="openSettingsBtn">Settings</button>
-          </div>
-        </header>
-
-        <main class="game-body" id="gameBody">
-          <!-- LEFT: GRID & INFO -->
-          <section class="game-left">
-            <div class="section-title">Cases</div>
-            <div class="info-row">
-              <span id="roundInfo">Round: 0</span>
-              <span id="toOpenInfo">Cases to open: 0</span>
-              <span id="remainingInfo">Remaining: 15</span>
-            </div>
-            <div class="case-grid" id="caseGrid"></div>
-          </section>
-
-          <!-- RIGHT: MAIN CASE, VALUES, BANKER -->
-          <section class="game-right">
-            <!-- Main case -->
-            <div class="main-case-panel">
-              <div class="main-case-slot" id="mainCaseSlot">
-                <div class="main-case-placeholder">
-                  No case selected yet.<br />Tap a case from the grid to lock it in.
-                </div>
-              </div>
-              <div class="main-case-info">
-                <div class="main-case-label">Your Case</div>
-                <div class="main-case-number-display" id="mainCaseNumberDisplay">#—</div>
-                <div class="main-case-note">
-                  This is your personal case. Its amount will be revealed at the end—unless you take a deal earlier.
-                </div>
-              </div>
-            </div>
-
-            <!-- Values -->
             <div>
-              <div class="section-title">Board values (₱)</div>
-              <div class="values-panel" id="valuesPanel"></div>
+              <div>Your Case</div>
+              <div id="mainCaseNumberDisplay" style="font-size:20px;color:var(--primary-gold);">#—</div>
             </div>
+          </div>
 
-            <!-- Banker panel -->
-            <div class="banker-panel">
-              <div class="banker-header">
-                <div>Banker</div>
-                <div class="banker-offer-value" id="bankerOfferValue">Waiting...</div>
-              </div>
-              <div class="banker-buttons">
-                <button class="btn btn-primary btn-small" id="openNextBtn">Open next case</button>
-                <button class="btn btn-secondary btn-small" id="callBankerBtn">Call banker</button>
-                <button class="btn btn-danger btn-small" id="resetGameBtn">Reset</button>
-              </div>
-              <div class="game-log" id="gameLog"></div>
-            </div>
-          </section>
-        </main>
+          <div class="values-panel" id="valuesPanel"></div>
 
-        <footer class="game-footer">
-          Manual banker mode • 15-case layout • Amounts in Philippine Peso (₱). Customize values & player name in Settings.
-        </footer>
-      </div>
+          <div class="banker-panel">
+            <div>Banker Offer:</div>
+            <div class="banker-offer-value" id="bankerOfferValue">Waiting...</div>
+            <button class="btn" id="openNextBtn">Open next case</button>
+            <button class="btn" id="callBankerBtn">Call banker</button>
+            <button class="btn" id="resetGameBtn">Reset</button>
+            <div class="game-log" id="gameLog"></div>
+          </div>
+        </section>
+      </main>
+
     </div>
   </div>
-
-  <script>
-    // ---------- BACKGROUND MUSIC (SAFE AUTOPLAY) ----------
-    const bgMusic = new Audio("1-intro.mp3");
-    bgMusic.loop = true;
-    bgMusic.volume = 0.6;
-
-    window.addEventListener("load", () => {
-      bgMusic.play().catch(() => {
-        console.log("Autoplay blocked; will retry on first user interaction.");
-        const resumeOnInteraction = () => {
-          bgMusic.play().catch(() => {});
-          window.removeEventListener("click", resumeOnInteraction);
-          window.removeEventListener("keydown", resumeOnInteraction);
-          window.removeEventListener("touchstart", resumeOnInteraction);
-        };
-        window.addEventListener("click", resumeOnInteraction);
-        window.addEventListener("keydown", resumeOnInteraction);
-        window.addEventListener("touchstart", resumeOnInteraction);
-      });
-    });
-
-    // ---------- STAGE SCALING ----------
-    const stageWrapper = document.getElementById("stageWrapper");
-    const STAGE_WIDTH = 1920;
-    const STAGE_HEIGHT = 1080;
-
-    function updateStageScale() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const scale = Math.min(vw / STAGE_WIDTH, vh / STAGE_HEIGHT);
-      stageWrapper.style.transform = "scale(" + scale + ")";
-    }
-
-    window.addEventListener("resize", updateStageScale);
-    updateStageScale();
-
-    // ---------- CONSTANTS & DEFAULTS ----------
-    const DEFAULT_AMOUNTS = [
-      0,
-      10,
-      100,
-      250,
-      500,
-      750,
-      1000,
-      1500,
-      2000,
-      2500,
-      3000,
-      4000,
-      5000,
-      7000,
-      10000
-    ];
-
-    const ROUND_SCHEDULE = [5, 4, 3, 2, 1]; // for 15 cases total
-
-    const STORAGE_KEY_AMOUNTS = "dond_ph_15_amounts";
-    const STORAGE_KEY_PLAYER_NAME = "dond_ph_15_player_name";
-
-    // ---------- STATE ----------
-    let amounts = [];
-    let shuffledAmounts = [];
-    let caseAmountMap = {}; // caseIndex -> amount
-    let openedCases = new Set();
-    let mainCaseIndex = null;
-    let playerName = "";
-
-    let currentRoundIndex = 0;
-    let casesOpenedInRound = 0;
-    let gamePhase = "selection"; // "selection" | "game" | "ended"
-
-    // ---------- DOM ----------
-    const splashOverlay = document.getElementById("splashOverlay");
-    const splashPlayerName = document.getElementById("splashPlayerName");
-    const splashStartBtn = document.getElementById("splashStartBtn");
-    const splashSettingsBtn = document.getElementById("splashSettingsBtn");
-
-    const settingsOverlay = document.getElementById("settingsOverlay");
-    const settingsCloseBtn = document.getElementById("settingsCloseBtn");
-    const settingsPlayerNameInput = document.getElementById("settingsPlayerName");
-    const settingsAmountsRow = document.getElementById("settingsAmountsRow");
-    const settingsSaveBtn = document.getElementById("settingsSaveBtn");
-    const settingsResetBtn = document.getElementById("settingsResetBtn");
-    const settingsStatus = document.getElementById("settingsStatus");
-
-    const bankerOverlay = document.getElementById("bankerOverlay");
-    const bankerOfferForm = document.getElementById("bankerOfferForm");
-    const bankerOfferInput = document.getElementById("bankerOfferInput");
-    const bankerRevealBtn = document.getElementById("bankerRevealBtn");
-    const bankerCancelBtn = document.getElementById("bankerCancelBtn");
-    const bankerCallingText = document.getElementById("bankerCallingText");
-    const bankerSubText = document.getElementById("bankerSubText");
-
-    const caseGrid = document.getElementById("caseGrid");
-    const valuesPanel = document.getElementById("valuesPanel");
-
-    const playerNameTag = document.getElementById("playerNameTag");
-    const statusChip = document.getElementById("statusChip");
-
-    const roundInfo = document.getElementById("roundInfo");
-    const toOpenInfo = document.getElementById("toOpenInfo");
-    const remainingInfo = document.getElementById("remainingInfo");
-
-    const mainCaseSlot = document.getElementById("mainCaseSlot");
-    const mainCaseNumberDisplay = document.getElementById("mainCaseNumberDisplay");
-
-    const bankerOfferValue = document.getElementById("bankerOfferValue");
-    const gameLog = document.getElementById("gameLog");
-
-    const openNextBtn = document.getElementById("openNextBtn");
-    const callBankerBtn = document.getElementById("callBankerBtn");
-    const resetGameBtn = document.getElementById("resetGameBtn");
-    const openSettingsBtn = document.getElementById("openSettingsBtn");
-    const gameBody = document.getElementById("gameBody");
-
-    // ---------- UTILITIES ----------
-    function formatCurrency(value) {
-      return new Intl.NumberFormat("en-PH", {
-        style: "currency",
-        currency: "PHP",
-        maximumFractionDigits: 0
-      }).format(value);
-    }
-
-    function logEvent(text) {
-      const entry = document.createElement("div");
-      entry.className = "log-entry";
-      entry.textContent = text;
-      gameLog.appendChild(entry);
-      gameLog.scrollTop = gameLog.scrollHeight;
-    }
-
-    function getStoredAmounts() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY_AMOUNTS);
-        if (!raw) return null;
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr) && arr.length === 15) return arr.map(Number);
-      } catch (e) {
-        console.warn("Failed to parse stored amounts:", e);
-      }
-      return null;
-    }
-
-    function storeAmounts(arr) {
-      try {
-        localStorage.setItem(STORAGE_KEY_AMOUNTS, JSON.stringify(arr));
-      } catch (e) {
-        console.warn("Failed to store amounts:", e);
-      }
-    }
-
-    function getStoredPlayerName() {
-      try {
-        const v = localStorage.getItem(STORAGE_KEY_PLAYER_NAME);
-        if (v && typeof v === "string") return v;
-      } catch (e) {
-        console.warn("Failed to read player name:", e);
-      }
-      return "";
-    }
-
-    function storePlayerName(name) {
-      try {
-        localStorage.setItem(STORAGE_KEY_PLAYER_NAME, name);
-      } catch (e) {
-        console.warn("Failed to store player name:", e);
-      }
-    }
-
-    // ---------- VALUES PANEL ----------
-    function buildValuesPanel() {
-      valuesPanel.innerHTML = "";
-      const sorted = [...amounts].sort((a, b) => a - b);
-      sorted.forEach((amt, idx) => {
-        const div = document.createElement("div");
-        div.className = "value-item " + (idx >= sorted.length / 2 ? "high" : "low");
-        div.dataset.amount = amt;
-        const label = document.createElement("span");
-        label.className = "value-label";
-        label.textContent = "Value";
-        const val = document.createElement("span");
-        val.className = "value-amount";
-        val.textContent = formatCurrency(amt);
-        div.appendChild(label);
-        div.appendChild(val);
-        valuesPanel.appendChild(div);
-      });
-    }
-
-    function markValueOpened(amount) {
-      const items = valuesPanel.querySelectorAll(".value-item");
-      items.forEach((item) => {
-        if (!item.classList.contains("opened") && Number(item.dataset.amount) === amount) {
-          item.classList.add("opened");
-        }
-      });
-    }
-
-    // ---------- CASE GRID ----------
-    function createCaseElement(caseIndex) {
-      const div = document.createElement("div");
-      div.className = "case";
-      div.dataset.index = caseIndex;
-
-      const img = document.createElement("img");
-      img.src = "suitcase.png";
-      img.alt = "Case " + caseIndex;
-
-      const label = document.createElement("div");
-      label.className = "case-number";
-      label.textContent = caseIndex;
-
-      div.appendChild(img);
-      div.appendChild(label);
-      return div;
-    }
-
-    function rebuildCaseGrid() {
-      caseGrid.innerHTML = "";
-      for (let i = 1; i <= 15; i++) {
-        if (i === mainCaseIndex) continue;
-        const caseEl = createCaseElement(i);
-        caseEl.addEventListener("click", () => onCaseClick(i, caseEl));
-        caseGrid.appendChild(caseEl);
-      }
-    }
-
-    function setMainCase(caseIndex) {
-      mainCaseIndex = caseIndex;
-      mainCaseSlot.innerHTML = "";
-
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
-      wrapper.style.width = "100%";
-      wrapper.style.height = "100%";
-
-      const mainCaseElement = createCaseElement(caseIndex);
-      mainCaseElement.classList.add("disabled");
-      mainCaseElement.style.cursor = "default";
-
-      wrapper.appendChild(mainCaseElement);
-      mainCaseSlot.appendChild(wrapper);
-
-      mainCaseNumberDisplay.textContent = "#" + caseIndex;
-    }
-
-    function revealCase(caseIndex, caseEl) {
-      if (openedCases.has(caseIndex) || caseIndex === mainCaseIndex) return;
-      openedCases.add(caseIndex);
-      casesOpenedInRound += 1;
-
-      const amount = caseAmountMap[caseIndex];
-      markValueOpened(amount);
-
-      caseEl.classList.add("revealed");
-      const img = caseEl.querySelector("img");
-      if (img) img.src = "suitcase-open.png";
-
-      logEvent("Case #" + caseIndex + " opened: " + formatCurrency(amount));
-      updateRoundProgress();
-    }
-
-    function updateTopBar() {
-      roundInfo.textContent = "Round: " + currentRoundIndex;
-      const totalToOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
-      const remainingToOpen =
-        gamePhase === "game"
-          ? Math.max(totalToOpenThisRound - casesOpenedInRound, 0)
-          : 0;
-      toOpenInfo.textContent = "Cases to open: " + remainingToOpen;
-      const remainingCases = 15 - openedCases.size;
-      remainingInfo.textContent = "Remaining: " + remainingCases;
-    }
-
-    function updatePhaseUI() {
-      if (gamePhase === "selection") {
-        gameBody.classList.remove("non-selection-phase");
-        gameBody.classList.add("selection-phase");
-        statusChip.textContent = "Choose Your Case";
-        openNextBtn.disabled = true;
-        callBankerBtn.disabled = true;
-      } else if (gamePhase === "game") {
-        gameBody.classList.remove("selection-phase");
-        gameBody.classList.add("non-selection-phase");
-        statusChip.textContent = "Open cases and watch the board.";
-        openNextBtn.disabled = false;
-        callBankerBtn.disabled = false;
-      } else if (gamePhase === "ended") {
-        statusChip.textContent = "Game over.";
-        openNextBtn.disabled = true;
-        callBankerBtn.disabled = true;
-      }
-      updateTopBar();
-    }
-
-    function updateRoundProgress() {
-      const totalToOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
-      if (casesOpenedInRound >= totalToOpenThisRound) {
-        statusChip.textContent = "Round " + (currentRoundIndex + 1) + " complete. Call the banker.";
-        openNextBtn.disabled = true;
-        callBankerBtn.disabled = false;
-      }
-      updateTopBar();
-    }
-
-    function onCaseClick(caseIndex, caseEl) {
-      if (gamePhase === "selection") {
-        setMainCase(caseIndex);
-        rebuildCaseGrid();
-        gamePhase = "game";
-        currentRoundIndex = 0;
-        casesOpenedInRound = 0;
-        logEvent("You selected case #" + caseIndex + " as your case.");
-        updatePhaseUI();
-      } else if (gamePhase === "game") {
-        const totalToOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
-        const remainingToOpen = totalToOpenThisRound - casesOpenedInRound;
-        if (remainingToOpen <= 0) {
-          statusChip.textContent = "You’ve opened enough cases this round. Call the banker.";
-          openNextBtn.disabled = true;
-          return;
-        }
-        revealCase(caseIndex, caseEl);
-      }
-    }
-
-    function handleOpenNextClick() {
-      if (gamePhase !== "game") return;
-      const totalToOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
-      const remainingToOpen = totalToOpenThisRound - casesOpenedInRound;
-      if (remainingToOpen <= 0) {
-        statusChip.textContent = "You’ve opened enough cases this round. Call the banker.";
-        openNextBtn.disabled = true;
-        return;
-      }
-      statusChip.textContent =
-        "Tap a case to open (" + remainingToOpen + " left this round).";
-    }
-
-    // ---------- MANUAL BANKER FLOW ----------
-    let bankerFormTimeout = null;
-
-    function showBankerOverlay() {
-      bankerOverlay.classList.add("visible");
-      bankerOfferForm.classList.remove("visible");
-      bankerOfferInput.value = "";
-      bankerCallingText.textContent = "Banker is calling...";
-      bankerSubText.textContent = "Please wait while the banker thinks about your board.";
-
-      if (bankerFormTimeout) clearTimeout(bankerFormTimeout);
-      bankerFormTimeout = setTimeout(() => {
-        bankerOfferForm.classList.add("visible");
-        bankerCallingText.textContent = "Enter the banker’s offer";
-        bankerSubText.textContent =
-          "Type the offer amount (hidden to audience) and click Reveal Offer.";
-        bankerOfferInput.focus();
-      }, 1500);
-    }
-
-    function hideBankerOverlay() {
-      bankerOverlay.classList.remove("visible");
-      bankerOfferForm.classList.remove("visible");
-      if (bankerFormTimeout) {
-        clearTimeout(bankerFormTimeout);
-        bankerFormTimeout = null;
-      }
-    }
-
-    function handleCallBankerClick() {
-      if (gamePhase === "selection") return;
-      showBankerOverlay();
-    }
-
-    function handleBankerReveal() {
-      const raw = bankerOfferInput.value.trim();
-      const num = Number(raw.replace(/[^\d]/g, ""));
-      if (!raw || !Number.isFinite(num) || num < 0) {
-        alert("Please enter a valid numeric offer.");
-        return;
-      }
-      const offer = num;
-      bankerOfferValue.textContent = formatCurrency(offer);
-      logEvent("Banker offer (manual): " + formatCurrency(offer));
-      hideBankerOverlay();
-
-      const totalToOpenThisRound = ROUND_SCHEDULE[currentRoundIndex] || 0;
-      if (
-        casesOpenedInRound >= totalToOpenThisRound &&
-        currentRoundIndex < ROUND_SCHEDULE.length - 1
-      ) {
-        currentRoundIndex += 1;
-        casesOpenedInRound = 0;
-        statusChip.textContent =
-          "Offer revealed. If NO DEAL, open " +
-          ROUND_SCHEDULE[currentRoundIndex] +
-          " more next round.";
-        openNextBtn.disabled = false;
-      } else if (currentRoundIndex >= ROUND_SCHEDULE.length - 1) {
-        statusChip.textContent =
-          "Late game. Few cases left; keep opening or accept a future offer.";
-      }
-
-      updateTopBar();
-    }
-
-    function handleBankerCancel() {
-      hideBankerOverlay();
-      statusChip.textContent = "Banker call cancelled. Continue opening cases.";
-    }
-
-    // ---------- SETTINGS ----------
-    function openSettings() {
-      settingsOverlay.classList.add("visible");
-      settingsStatus.textContent = "";
-      settingsStatus.className = "settings-status";
-
-      settingsPlayerNameInput.value = playerName;
-
-      settingsAmountsRow.querySelectorAll("input").forEach((inp, idx) => {
-        inp.value = amounts[idx];
-      });
-    }
-
-    function closeSettings() {
-      settingsOverlay.classList.remove("visible");
-    }
-
-    function buildSettingsFields() {
-      settingsAmountsRow.innerHTML = "";
-      for (let i = 1; i <= 15; i++) {
-        const field = document.createElement("div");
-        field.className = "settings-field";
-
-        const label = document.createElement("label");
-        label.textContent = "Case " + i;
-
-        const input = document.createElement("input");
-        input.type = "number";
-        input.min = "0";
-        input.step = "1";
-        input.id = "settingsAmount" + i;
-
-        field.appendChild(label);
-        field.appendChild(input);
-        settingsAmountsRow.appendChild(field);
-      }
-    }
-
-    function setSettingsStatus(message, type) {
-      settingsStatus.textContent = message;
-      settingsStatus.className = "settings-status " + (type || "");
-    }
-
-    function getAmountsFromSettingsForm() {
-      const vals = [];
-      for (let i = 1; i <= 15; i++) {
-        const input = document.getElementById("settingsAmount" + i);
-        const value = Number(input.value);
-        if (Number.isNaN(value) || value < 0) {
-          throw new Error("Invalid amount in case " + i);
-        }
-        vals.push(value);
-      }
-      return vals;
-    }
-
-    function handleSettingsSave() {
-      try {
-        const updatedName = settingsPlayerNameInput.value.trim();
-        const updatedAmounts = getAmountsFromSettingsForm();
-
-        playerName = updatedName || "Player";
-        storePlayerName(playerName);
-        storeAmounts(updatedAmounts);
-
-        amounts = updatedAmounts.slice();
-        shuffledAmounts = [...amounts].sort(() => Math.random() - 0.5);
-        caseAmountMap = {};
-        for (let i = 0; i < 15; i++) {
-          caseAmountMap[i + 1] = shuffledAmounts[i];
-        }
-        buildValuesPanel();
-        playerNameTag.textContent = "Player: " + playerName;
-
-        setSettingsStatus(
-          "Saved. New amounts will apply on the next new game. (This game already uses a shuffled mapping.)",
-          "ok"
-        );
-      } catch (err) {
-        setSettingsStatus("Save failed: " + err.message, "error");
-      }
-    }
-
-    function handleSettingsReset() {
-      settingsPlayerNameInput.value = playerName || "Player";
-      settingsAmountsRow.querySelectorAll("input").forEach((inp, idx) => {
-        inp.value = DEFAULT_AMOUNTS[idx];
-      });
-      setSettingsStatus("Defaults restored in form. Click Save to apply.", "ok");
-    }
-
-    // ---------- GAME INIT ----------
-    function initGameState() {
-      const stored = getStoredAmounts();
-      amounts = stored || DEFAULT_AMOUNTS.slice();
-      shuffledAmounts = [...amounts].sort(() => Math.random() - 0.5);
-      caseAmountMap = {};
-      for (let i = 0; i < 15; i++) {
-        caseAmountMap[i + 1] = shuffledAmounts[i];
-      }
-
-      openedCases = new Set();
-      mainCaseIndex = null;
-      currentRoundIndex = 0;
-      casesOpenedInRound = 0;
-      gamePhase = "selection";
-      bankerOfferValue.textContent = "Waiting...";
-      gameLog.innerHTML = "";
-      mainCaseSlot.innerHTML =
-        '<div class="main-case-placeholder">No case selected yet.<br />Tap a case from the grid to lock it in.</div>';
-      mainCaseNumberDisplay.textContent = "#—";
-
-      caseGrid.innerHTML = "";
-      for (let i = 1; i <= 15; i++) {
-        const caseEl = createCaseElement(i);
-        caseEl.addEventListener("click", () => onCaseClick(i, caseEl));
-        caseGrid.appendChild(caseEl);
-      }
-
-      buildValuesPanel();
-      logEvent("New game started. Choose your case.");
-      updatePhaseUI();
-    }
-
-    function initPlayerName() {
-      playerName = getStoredPlayerName() || "";
-      if (!playerName) playerName = "Player";
-      playerNameTag.textContent = "Player: " + playerName;
-      splashPlayerName.value = playerName === "Player" ? "" : playerName;
-    }
-
-    // ---------- SPLASH ----------
-    function startGameFromSplash() {
-      const name = splashPlayerName.value.trim();
-      if (name) {
-        playerName = name;
-        storePlayerName(playerName);
-      } else {
-        playerName = getStoredPlayerName() || "Player";
-      }
-      playerNameTag.textContent = "Player: " + playerName;
-      splashOverlay.classList.add("hidden");
-      setTimeout(() => {
-        splashOverlay.style.display = "none";
-      }, 700);
-      initGameState();
-    }
-
-    // ---------- RESET ----------
-    function handleResetClick() {
-      initGameState();
-      statusChip.textContent = "Game reset. Choose your case.";
-    }
-
-    // ---------- EVENT LISTENERS ----------
-    splashStartBtn.addEventListener("click", startGameFromSplash);
-    splashPlayerName.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") startGameFromSplash();
-    });
-    splashSettingsBtn.addEventListener("click", () => {
-      openSettings();
-    });
-
-    openSettingsBtn.addEventListener("click", openSettings);
-    settingsCloseBtn.addEventListener("click", closeSettings);
-    settingsSaveBtn.addEventListener("click", handleSettingsSave);
-    settingsResetBtn.addEventListener("click", handleSettingsReset);
-
-    openNextBtn.addEventListener("click", handleOpenNextClick);
-    callBankerBtn.addEventListener("click", handleCallBankerClick);
-    resetGameBtn.addEventListener("click", handleResetClick);
-
-    bankerOfferForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      handleBankerReveal();
-    });
-    bankerCancelBtn.addEventListener("click", handleBankerCancel);
-
-    // ---------- INITIALIZATION ----------
-    buildSettingsFields();
-    initPlayerName();
-    // Game state initialization happens after splash "Start Game" click
-  </script>
-</body>
-</html>
+</div>
